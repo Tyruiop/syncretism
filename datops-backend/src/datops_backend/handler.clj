@@ -147,10 +147,10 @@
                 " * regularmarketprice"))
          (when (not itm)
            (str " AND (((strike >= regularmarketprice) AND (opttype = \"C\"))"
-                "OR ((strike <= regularmarketprice) AND (opttype = \"P\"))"))
+                " OR ((strike <= regularmarketprice) AND (opttype = \"P\")))"))
          (when (not otm)
            (str " AND (((strike <= regularmarketprice) AND (opttype = \"C\"))"
-                "OR ((strike >= regularmarketprice) AND (opttype = \"P\"))"))
+                " OR ((strike >= regularmarketprice) AND (opttype = \"P\")))"))
 
          ;; Ask bid spread
          (when min-ask-bid

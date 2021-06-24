@@ -1,0 +1,20 @@
+{;; Should we crawl out of market hours
+ :force-crawl false
+
+ ;; Do we log debug info
+ :debug false
+
+ ;; How often to we save & reorder the queue & the proxies (in seconds)
+ :t-reorder 60
+
+ ;; How often do we fully clean the queue (remove expired options & gather new symbols)
+ :t-clean-queue 86400
+
+ ;; Number of endpoints to use
+ :nb-endpoints 2
+
+ ;; Max Batch size when writing to db
+ :batch-size 60000
+
+ ;; Where to save the options data
+ :save-path "options"}

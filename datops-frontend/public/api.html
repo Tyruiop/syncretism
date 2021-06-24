@@ -1,0 +1,64 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="description" content="Search for options.">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <link href="main.css?v=7" rel="stylesheet" type="text/css">
+    <title>Ops.Syncretism - Options Search</title>
+  </head>
+  <body>
+    <div class="menu">
+      <div id="status" class="m left"></div>
+      <p class="m right">
+	<!-- <a href="/api.html" target="_blank">Github</a> -->
+	<!-- <a href="/api.html" target="_blank">API</a> -->
+	<a href="https://discord.gg/qBWD5Sus3d" target="_blank">Discord</a>
+	<a href="mailto:contact@syncretism.io">Contact</a>
+    </p></div>
+    <main>
+      <div class="title"><h1><a href="/">Ops.Syncretism</a></h1><h2>Tracking millions of options</h2></div>
+
+      <div class="api">
+	<h1 id="api">API</h1>
+	<h2 id="example-use">Example use:</h2>
+	<p><code>curl -X GET https://api.syncretism.io/ops  -H "Content-Type: application/json" -d '{"max-price": 0.5, "puts": true}'</code></p>
+	<h2 id="parameters">Parameters</h2>
+	<ul>
+	  <li><p><code>tickers [string]</code>: a list of space or comma separated tickers to restrict or exclude them from the query.</p></li>
+	  <li><p><code>exclude [true|false]</code>: if true, then <code>tickers</code> are excluded. If false, the search is restricted to these tickers.</p></li>
+	  <li><p><code>min-diff [int]</code>: minimum difference in percentage between strike and stock price.</p></li>
+	  <li><p><code>max-diff [int]</code>: maximum difference in percentage between strike and stock price.</p></li>
+	  <li><p><code>min-ask-bid [float]</code>: minimum spread between bid and ask.</p></li>
+	  <li><p><code>max-ask-bid [float]</code>: maximum spread between bid and ask.</p></li>
+	  <li><p><code>min-exp [int]</code>: minimum days until expiration.</p></li>
+	  <li><p><code>max-exp [int]</code>: maximum days until expiration.</p></li>
+	  <li><p><code>min-price [float]</code>: minimum option premium.</p></li>
+	  <li><p><code>max-price [float]</code>: maximum option premium.</p></li>
+	  <li><p><code>calls [true|false]</code>: select call options.</p></li>
+	  <li><p><code>puts [true|false]</code>: select put options.</p></li>
+	  <li><p><code>stock [true|false]</code>: select normal stocks.</p></li>
+	  <li><p><code>etf [true|false]</code>: select etf options.</p></li>
+	  <li><p><code>min-sto [float]</code>: minimum option price / stock price ratio.</p></li>
+	  <li><p><code>max-sto [float]</code>: maximum option price / stock price ratio.</p></li>
+	  <li><p><code>min-pso [float]</code>: minimum premium / strike price ratio.</p></li>
+	  <li><p><code>max-pso [float]</code>: maximum premium / strike price ratio.</p></li>
+	  <li><p><code>min-cap [float]</code>: minimum market capitalization (in billions USD).</p></li>
+	  <li><p><code>max-cap [float]</code>: maximum market capitalization (in billions USD).</p></li>
+	  <li><p><code>order-by [default: e_desc]</code>: how to order results, possible values:</p>
+	    <ul>
+	      <li><code>e_desc</code>, <code>e_asc</code>: expiration, descending / ascending.</li>
+	      <li><code>iv_desc</code>, <code>iv_asc</code>: implied volatility, descending / ascending.</li>
+	      <li><code>lp_desc</code>, <code>lp_asc</code>: lastprice, descending / ascending.</li>
+	      <li><code>md_desc</code>, <code>md_asc</code>: current stock price, descending / ascending.</li>
+	    </ul>
+	  </li>
+	  <li><p><code>limit [int]</code>: number of results (max 50).</p></li>
+	  <li><p><code>active [true|false]</code>: if set to true, restricts to options for which volume, open interest, ask, and bid are all <code>&gt; 0</code>.</p></li>
+	</ul>
+      </div>
+    </main>
+    
+    <div class="footer"></div>
+  </body>
+</html>

@@ -1,0 +1,241 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="description" content="Search for options.">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <link href="main.css?v=7" rel="stylesheet" type="text/css">
+    <title>Ops.Syncretism - Options Search</title>
+  </head>
+  <body>
+    <div class="menu">
+      <div id="status" class="m left"></div>
+      <p class="m right">
+	<!-- <a href="/api.html" target="_blank">Github</a> -->
+	<a href="/api.html" target="_blank">API</a>
+	<a href="https://discord.gg/qBWD5Sus3d" target="_blank">Discord</a>
+	<a href="mailto:contact@syncretism.io">Contact</a>
+    </p></div>
+    <main>
+      <div class="title"><h1><a href="/">Ops.Syncretism</a></h1><h2>Tracking millions of options</h2></div>
+      <div class="search">
+	<div class="filter">
+	  <div class="name header">Filter</div>
+	  <div class="values"></div>
+	  <div class="descr header">Description</div>
+	</div>
+
+	<div class="filter">
+	  <div class="name"><label for="max-diff">Strike to stock difference %</label></div>
+	  <div class="values">
+	    <div class="send-params">
+	      <p class="sep">range</p>
+	      <input name="min-diff" id="min-diff-value" type="text" placeholder="min">
+	      <p class="sep">to</p>
+	      <input name="max-diff" id="max-diff-value" type="text" value="10">
+	    </div>
+	  </div>
+	  <div class="descr">
+	    <div class="info"><p>&#128712;</p>
+	      <div class="box">
+		<p><strong>How far the option can be from the money.</strong><br/>
+		  <strong>E.g.:</strong> if the underlying stock
+		  is trading at $100, setting the max to 5 means that we will be looking at
+		  options with strike prices between 95 and 105.</p>
+	      </div>
+	    </div>
+	    </div>
+	</div>
+
+	<div class="filter">
+	  <div class="name">Bid ask spread</div>
+	  <div class="values">
+	    <div class="send-params">
+	      <p class="sep">range</p>
+	      <input name="min-ask-bid" id="min-ask-bid-value" type="text" placeholder="0">
+	      <p class="sep">to</p>
+	      <input name="max-ask-bid" id="max-ask-bid-value" type="text" placeholder="inf">
+	    </div>
+	  </div>
+	  <div class="descr">
+	    <div class="info"><p>&#128712;</p>
+	      <div class="box">
+		<p><strong>Difference between bids (demand) and asks (offer).</strong></p>
+	      </div>
+	    </div>
+	  </div>
+	</div>
+
+	<div class="filter">
+	  <div class="name">Days to Expiration date</div>
+	  <div class="values">
+	    <div class="send-params">
+	      <p class="sep">range</p>
+	      <input name="min-exp" id="min-exp-value" type="text" placeholder="0">
+	      <p class="sep">to</p>
+	      <input name="max-exp" id="max-exp-value" type="text" placeholder="inf">
+	    </div>
+	  </div>
+	</div>
+	
+	<div class="filter">
+	  <div class="name">Option premium</div>
+	  <div class="values">
+	    <div class="send-params">
+	      <p class="sep">range</p>
+	      <input name="min-price" id="min-price-value" type="text" placeholder="0.1">
+	      <p class="sep">to</p>
+	      <input name="max-price" id="max-price-value" type="text" value="2.00" placeholder="10">
+	    </div>
+	  </div>
+	  <div class="descr">
+	    <div class="info"><p>&#128712;</p>
+	      <div class="box">
+		<p><strong>This is based on the Ask value, if no Ask is found, we use the last recorded price of the option.</strong></p>
+	      </div>
+	    </div>
+	  </div>
+	</div>
+
+	<div class="filter">
+	  <div class="name">Option type</div>
+	  <div class="values">
+	    <div class="send-params">
+	      <input name="calls" id="calls" type="checkbox" checked="checked"><label for="calls">Call</label><p class="sep"></p>
+	      <input name="puts" id="puts" type="checkbox" checked="checked"><label for="puts">Put</label><p class="sep"></p>
+	      
+	    </div>
+	  </div>
+	</div>
+
+	<div class="filter">
+	  <div class="name">Security type</div>
+	  <div class="values">
+	    <div class="send-params">
+	      <input name="stock" id="stock" type="checkbox" checked="checked"><label for="stock">Stock</label>
+	      <p class="sep"></p>
+	      <input name="etf" id="etf" type="checkbox"><label for="etf">ETF</label>
+	    </div>
+	  </div>
+	  <div class="descr">
+	    <div class="info"><p>&#128712;</p>
+	      <div class="box">
+		<p><strong>Exchange Traded Funds</strong> are publicly traded investment funds.</p>
+	      </div>
+	    </div>
+	  </div>
+	</div>
+
+	<div class="filter">
+	  <div class="name">Option price/Stock price ratio</div>
+	  <div class="values">
+	    <div class="send-params">
+	      <p class="sep">range</p>
+	      <input name="min-sto" id="min-sto-value" type="text" placeholder="0">
+	      <p class="sep">to</p>
+	      <input name="max-sto" id="max-sto-value" type="text" placeholder="inf">
+	    </div>
+	  </div>
+	  <div class="descr">
+	    <div class="info"><p>&#128712;</p>
+	      <div class="box">
+		<p><strong>Option price / Stock price allows to find proportionately cheap options comparatively to the price of the underlying stock.</strong><br/>
+		Note that this is based on the Ask price, if there is no offer, the value will be 0.</p>
+		</div>
+	    </div>
+	  </div>
+	</div>
+
+        <div class="filter">
+	  <div class="name">Option premium/Strike ratio</div>
+	  <div class="values">
+	    <div class="send-params">
+	      <p class="sep">range</p>
+	      <input name="min-pso" id="min-pso-value" type="text" placeholder="0">
+	      <p class="sep">to</p>
+	      <input name="max-pso" id="max-pso-value" type="text" placeholder="inf">
+	    </div>
+	  </div>
+	  <div class="descr">
+	    <div class="info"><p>&#128712;</p>
+	      <div class="box">
+		<p><strong>Option premium/Strike ratio</strong> to find options for which
+		  the premium is proportionately small or large compared to its strike
+		price.</p>
+	      </div>
+	    </div>
+	  </div>
+	</div>
+
+	<div class="filter">
+	  <div class="name">Market capitalization (Billions $)</div>
+	  <div class="values">
+	    <div class="send-params">
+	      <p class="sep">range</p>
+	      <input name="min-cap" id="min-cap-value" type="text" placeholder="0">
+	      <p class="sep">to</p>
+	      <input name="max-cap" id="max-cap-value" type="text" placeholder="inf">
+	    </div>
+	  </div>
+	</div>
+
+	<div class="filter">
+	  <div class="name"><label for="tickers">Ticker selection</label></div>
+	  <div class="values">
+	    <div class="send-params">
+	      <input name="tickers" id="tickers-value" type="text" placeholder="TSLA, GME" class="wide"><p class="sep"><p>
+		<input name="exclude" id="exclude" type="checkbox" checked="checked"><label for="exclude">Exclude</label>
+	    </div>
+	  </div>
+	  <div class="descr">
+	    <div class="info">
+	      <p>&#128712;</p>
+	      <div class="box">
+		<p><strong>To restrict the search to a set of tickers (space or comma
+		    separated). If exclude is ticked, then the selected tickers will be
+		    excluded from the results.
+		</strong></p>
+		</div>
+	    </div>
+	  </div>
+	</div>
+
+	<div class="send-params">
+	  <!-- <input name="non-expired" id="non-expired" type="checkbox" checked="checked"><label for="non-expired">Filter expired options</label><p class="sep"></p> -->
+	  <label for="order-by-value">Order by:</label>
+	  <select name="order-by" id="order-by-value" placeholder="Ordering property">
+	    <option value="e_desc" selected="selected">Expiration ↓</option>
+	    <option value="e_asc">Expiration ↑</option>
+	    <option value="iv_desc">Implied Volatility ↓</option>
+	    <option value="iv_asc">Implied Volatility ↑</option>
+	    <option value="lp_desc">Option Price ↓</option>
+	    <option value="lp_asc">Option Price ↑</option>
+	    <option value="md_desc">Stock Price ↓</option>
+	    <option value="md_asc">Stock Price ↑</option>
+	    <option value="mdh_desc">Stock Price (Day, High) ↓</option>
+	    <option value="mdh_asc">Stock Price (Day, High) ↑</option>
+	    <option value="mdl_desc">Stock Price (Day, Low) ↓</option>
+	    <option value="mdl_asc">Stock Price (Day, Low) ↑</option>
+	  </select>
+	  <p class="sep"></p>
+	  <label for="limit-value">Limit:</label><input name="limit" id="limit-value" type="text" placeholder="Max 50"><p class="sep"></p>
+	  <div class="wrap">
+		<input class="hl" name="active" id="active" type="checkbox" checked="active"><label for="active"><span class="hl">Active</span></label><p class="sep"></p>
+		<div class="info field"><p class="infosign">&#128712;</p>
+		  <div class="box">
+		    <p>Active options must have both bid and ask prices defined, as well as a volume and open interest > 0.<strong> Ticking this box will filter out most options during pre and post market.</strong></p>
+		  </div>
+		</div>
+	  </div>
+	  <p class="sep"></p>
+	  <button>Send</button>
+	</div>
+      </div>
+    </main>
+    
+    <div id="app"></div>
+
+    <div class="footer"></div>
+    <script src="/js/main.js"></script>
+  </body>
+</html>

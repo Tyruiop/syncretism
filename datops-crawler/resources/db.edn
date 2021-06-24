@@ -1,0 +1,5 @@
+{:dbtype "mysql"
+ :dbname "options"
+ :user "datops"
+ :password "12345password"
+ :rewriteBatchedStatements true}

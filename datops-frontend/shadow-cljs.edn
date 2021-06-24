@@ -1,0 +1,17 @@
+;; shadow-cljs configuration
+{:source-paths
+ ["src/dev"
+  "src/main"
+  "src/test"]
+
+ :dev-http {8080 "public"}
+
+ :dependencies
+ [[cljs-http "0.1.46"]
+  [reagent "1.0.0"]]
+
+ :builds
+ {:frontend
+  {:target :browser
+   :compiler-options {:optimizations :advanced}
+   :modules {:main {:init-fn live-opts.core/init}}}}}

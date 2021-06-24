@@ -225,7 +225,7 @@
           (= 7 day-of-week)   ;; Sunday
           "CLOSED"
           
-          (< mins 270)        ;; Pre-market open (4h30)
+          (< hours-of-day 4)        ;; Pre-market open (4h)
           "CLOSED"
           
           (>= hour-of-day 20) ;; End market open (20h)
@@ -243,6 +243,7 @@
                (or (>= hour-of-day 10)
                    (and (= hour-of-day 9) (>= minute-of-hour 30))))
           "OPEN")))
+
 
 (defroutes app-routes
   (GET "/" [] "Hi :)")

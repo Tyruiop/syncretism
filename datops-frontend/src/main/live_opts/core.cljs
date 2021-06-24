@@ -324,17 +324,6 @@
          (swap! state #(update % :cur-visible-quotes conj contractsymbol))))}
     " "]])
 
-(defn draw-symbol
-  [symbol]
-  (let [{:keys [dividendDate earningsTimestamp]} (get quotes symbol)
-        cur-time (cur-ny-time)]
-    [:<>
-     [:span.symbol symbol]
-     (when (and dividendDate (> dividendDate cur-time))
-       [:span.dividend "D" [:span.hover (from-ts dividendDate)]])
-     (when (and earningsTimestamp (> earningsTimestamp cur-time))
-       [:span.dividend "E" [:span.hover (from-ts earningsTimestamp)]])]))
-
 (defn landing-loading
   []
   [:div {:class ["loading"]}
@@ -403,9 +392,6 @@
 
                              (= id :contractsymbol)
                              (draw-contract-symbol contractsymbol)
-
-                             (= id :symbol)
-                             (draw-symbol v)
                              
                              :else (str v))]]))
                  columns-w-names))]

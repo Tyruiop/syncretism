@@ -225,7 +225,7 @@
           (= 7 day-of-week)   ;; Sunday
           "CLOSED"
           
-          (< hours-of-day 4)        ;; Pre-market open (4h)
+          (< hour-of-day 4)        ;; Pre-market open (4h)
           "CLOSED"
           
           (>= hour-of-day 20) ;; End market open (20h)

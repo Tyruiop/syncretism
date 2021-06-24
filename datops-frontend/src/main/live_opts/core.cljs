@@ -89,6 +89,8 @@
         ;; Stock to strike diff
         min-diff (.-value (gdom/getElement "min-diff-value"))
         max-diff (.-value (gdom/getElement "max-diff-value"))
+        otm (.-checked (gdom/getElement "otm"))
+        itm (.-checked (gdom/getElement "itm"))
 
         ;; Bid ask spread
         min-ask-bid (.-value (gdom/getElement "min-ask-bid-value"))
@@ -138,6 +140,8 @@
           ;; Stock to strike diff
           "&min-diff=" (js/encodeURIComponent min-diff)
           "&max-diff=" (js/encodeURIComponent max-diff)
+          "&itm=" (js/encodeURIComponent itm)
+          "&otm=" (js/encodeURIComponent otm)
           
           ;; Ask bid spread
           "&min-ask-bid=" (js/encodeURIComponent min-ask-bid)
@@ -184,7 +188,7 @@
                   {:params
                    (pr-str
                     {:tickers tickers :exclude exclude
-                     :min-diff min-diff :max-diff max-diff
+                     :min-diff min-diff :max-diff max-diff :otm otm :itm itm
                      :min-ask-bid min-ask-bid :max-ask-bid max-ask-bid
                      :min-exp min-exp :max-exp max-exp
                      :min-price min-price :max-price max-price
@@ -447,11 +451,21 @@
 
     ;; stock to strike diff
     (let [min-diff (.get url-params "min-diff")
-          max-diff (.get url-params "max-diff")]
+          max-diff (.get url-params "max-diff")
+          itm (.get url-params "itm")
+          otm (.get url-params "otm")]
       (when min-diff
         (set! (.-value (gdom/getElement "min-diff-value")) min-diff))
       (when max-diff
-        (set! (.-value (gdom/getElement "max-diff-value")) max-diff)))
+        (set! (.-value (gdom/getElement "max-diff-value")) max-diff))
+      (when itm
+        (set!
+         (.-checked (gdom/getElement "itm"))
+         (or (= "true" itm) (= "on" itm))))
+      (when otm
+        (set!
+         (.-checked (gdom/getElement "otm"))
+         (or (= "true" otm) (= "on" otm)))))
 
     ;; bid ask spread
     (let [min-ask-bid (.get url-params "min-ask-bid")

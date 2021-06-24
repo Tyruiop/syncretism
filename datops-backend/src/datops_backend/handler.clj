@@ -97,7 +97,7 @@
                         (catch Exception e nil)))))
 
 (defn run-query [{:keys [tickers exclude
-                         min-diff max-diff
+                         min-diff max-diff itm otm
                          min-ask-bid max-ask-bid
                          min-exp max-exp
                          min-price max-price
@@ -145,6 +145,12 @@
                 " * regularmarketprice"
                 " AND strike <= " (float (+ 1 (/ max-diff 100)))
                 " * regularmarketprice"))
+         (when (not itm)
+           (str " AND (((strike >= regularmarketprice) AND (opttype = \"C\"))"
+                " OR ((strike <= regularmarketprice) AND (opttype = \"P\")))"))
+         (when (not otm)
+           (str " AND (((strike <= regularmarketprice) AND (opttype = \"C\"))"
+                " OR ((strike >= regularmarketprice) AND (opttype = \"P\")))"))
 
          ;; Ask bid spread
          (when min-ask-bid

@@ -68,13 +68,14 @@ span.hl { color:#d00; font-weight: bold; }
 }
 .filter:first-child { border:0px; }
 .filter:hover { border-color:#ccc; }
-.filter > .name, .filter > .values, .filter > .descr { width:33%; display:flex; align-items:center; }
+.filter > .name, .filter > .values, .filter > .descr { width:33%; display:flex; align-items:center; position:relative; }
 .filter > .name { text-align: left; text-transform:uppercase; }
 .filter > .values { justify-content: center; }
 .filter > .descr { justify-content: right; }
 .filter > .name.header, .filter > .values.header, .filter > .descr.header {
     font-weight:bold; margin-bottom:0; text-transform:none;
 }
+.lower { display:flex; position:relative; top:6px; }
 
 .info { position:relative; cursor:help; }
 .info > .box {

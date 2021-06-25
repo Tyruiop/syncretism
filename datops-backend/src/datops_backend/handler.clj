@@ -49,8 +49,9 @@
     (->> data
          (map (fn [[ticker d]]
                 (let [events (get d "calendarEvents")]
-                  {"earnings" (get-in events ["earnings" "earningsDate"])
-                   "dividends" (get events "dividendDate")})))
+                  [ticker
+                   {"earnings" (get-in events ["earnings" "earningsDate"])
+                    "dividends" (get events "dividendDate")}])))
          (into {}))))
 
 (def order-aliases

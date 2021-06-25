@@ -33,6 +33,26 @@
            (map (fn [symb] (str "symbol=" (pr-str symb))) symbs))))
     (catch Exception e [])))
 
+(defn get-fundamentals [symbs]
+  (try
+    (db/query
+     db
+     (str "SELECT * FROM fundamentals WHERE "
+          (str/join
+           " OR "
+           (map (fn [symb] (str "symbol=" (pr-str symb))) symbs))))
+    (catch Exception e [])))
+
+(defn get-catalysts
+  [symbs]
+  (let [data (map (juxt :symbol (comp json/read-str :data)) (get-fundamentals symbs))]
+    (->> data
+         (map (fn [[ticker d]]
+                (let [events (get d "calendarEvents")]
+                  {"earnings" (get-in events ["earnings" "earningsDate"])
+                   "dividends" (get events "dividendDate")})))
+         (into {}))))
+
 (def order-aliases
   {"e_desc" "expiration desc"
    "e_asc" "expiration asc"
@@ -259,14 +279,15 @@
          (pr-str {:opts-nb res})))
   (GET "/query" {:keys [params]}
        (let [res (-> params :params read-string sanitize-query run-query)
-             quotes (->> res
-                         (map :symbol)
+             symbols (map :symbol res)
+             quotes (->> symbols
                          get-quotes
                          (map
                           (fn [{symb :symbol data :data}]
                             [symb (json/read-str data :key-fn keyword)]))
-                         (into {}))]
-         (pr-str {:options res :quotes quotes})))
+                         (into {}))
+             catalysts (get-catalysts symbols)]
+         (pr-str {:options res :quotes quotes :catalysts catalysts})))
   (GET "/ops" req
        (let [res (-> req :body slurp (json/read-str :key-fn keyword) run-query)]
          (json/write-str res)))

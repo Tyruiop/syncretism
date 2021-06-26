@@ -40,11 +40,13 @@
   (let [options (get-live-options limit :last-seen last-seen)
         yields (keep calculate-monthly-yield options)
         last-seen (-> options last :contractsymbol)]
-    (with-open [con (jdbc/get-connection db)
-                ps
-                (jdbc/prepare
-                 con
-                 ["UPDATE live SET yield=?, monthlyyield=? WHERE contractsymbol=?"])]
-      (jdbp/execute-batch! ps yields))
-    (when (not-empty yields)
-      (recur limit {:last-seen last-seen}))))
+    (try
+      (with-open [con (jdbc/get-connection db)
+                  ps
+                  (jdbc/prepare
+                   con
+                   ["UPDATE live SET yield=?, monthlyyield=? WHERE contractsymbol=?"])]
+        (jdbp/execute-batch! ps yields))
+      (when (not-empty yields)
+        (recur limit {:last-seen last-seen}))
+      (catch Exception e (spit "test.edn" (pr-str yields))))))

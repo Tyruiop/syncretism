@@ -16,7 +16,8 @@
     (let [yield (/ (or (when (> ask 0) ask) lastprice) strike)
           now (/ (System/currentTimeMillis) 1000)
           nb-months (/ (- expiration now) month-unit)]
-      [(float yield) (when (> nb-months 0) (float (/ yield nb-months))) contractsymbol])))
+      (when (> nb-months 0)
+        [(float yield) (float (/ yield nb-months)) contractsymbol]))))
 
 ;; (calculate-monthly-yield {:strike 100 :ask 3 :expiration (+ (* 3 month-unit) (/ (System/currentTimeMillis) 1000))})
 ;; => [0.03 0.01 nil]

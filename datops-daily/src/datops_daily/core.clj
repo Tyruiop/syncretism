@@ -9,5 +9,5 @@
   (let [set-args (into #{} args)]
     (when (set-args "--yields")
       (info "Updating yields across active options.")
-      (dbu/update-live-options 10000)
+      (dbu/update-live-options 1000)
       (info "Done."))))

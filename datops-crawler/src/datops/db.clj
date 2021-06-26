@@ -54,14 +54,16 @@ priceToBook FLOAT,
 ask FLOAT,
 bid FLOAT,
 lastTradeDate BIGINT,
-quoteType VARCHAR(15)
+quoteType VARCHAR(15),
+yield FLOAT,
+monthlyYield FLOAT
 ) ENGINE=Aria;")
 
 ;; (jdbc/execute! db ["DROP TABLE live"])
 ;; (jdbc/execute! db [live-table-def])
 ;; (jdbc/execute! db [live-quote-table-def])
 ;; (jdbc/execute! db ["ALTER TABLE live ADD COLUMN (quoteType VARCHAR(15))"])
-;; (jdbc/execute! db ["ALTER TABLE live ADD COLUMN (regularMarketPrice FLOAT)"])
+;; (jdbc/execute! db ["ALTER TABLE live ADD COLUMN (monthlyyield FLOAT)"])
 
 (def live-columns
   [[[:opt :contractSymbol] "contractSymbol"]

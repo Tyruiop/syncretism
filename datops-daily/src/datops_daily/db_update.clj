@@ -47,6 +47,6 @@
                    con
                    ["UPDATE live SET yield=?, monthlyyield=? WHERE contractsymbol=?"])]
         (jdbp/execute-batch! ps yields))
-      (when (not-empty yields)
-        (recur limit {:last-seen last-seen}))
-      (catch Exception e (spit "test.edn" (pr-str yields))))))
+      (catch Exception e (spit "test.edn" (pr-str yields))))
+    (when (not-empty yields)
+      (recur limit {:last-seen last-seen}))))

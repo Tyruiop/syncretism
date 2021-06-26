@@ -88,9 +88,9 @@
 	  <div class="values">
 	    <div class="send-params">
 	      <p class="sep">range</p>
-	      <input name="min-price" id="min-price-value" type="text" placeholder="0.1">
+	      <input name="min-price" id="min-price-value" type="text" placeholder="0">
 	      <p class="sep">to</p>
-	      <input name="max-price" id="max-price-value" type="text" value="2.00" placeholder="10">
+	      <input name="max-price" id="max-price-value" type="text" value="2.00" placeholder="inf">
 	    </div>
 	  </div>
 	  <div class="descr">
@@ -167,6 +167,44 @@
 		<p><strong>Option premium/Strike ratio</strong> to find options for which
 		  the premium is proportionately small or large compared to its strike
 		price.</p>
+	      </div>
+	    </div>
+	  </div>
+	</div>
+
+	<div class="filter">
+	  <div class="name">Yield</div>
+	  <div class="values">
+	    <div class="send-params">
+	      <p class="sep">range</p>
+	      <input name="min-yield" id="min-yield-value" type="text" placeholder="0">
+	      <p class="sep">to</p>
+	      <input name="max-yield" id="max-yield-value" type="text" placeholder="inf">
+	    </div>
+	  </div>
+	  <div class="descr">
+	    <div class="info"><p>&#128712;</p>
+	      <div class="box">
+		<p>The <strong>yield</strong> is <code>premium/strike</code>.</p>
+	      </div>
+	    </div>
+	  </div>
+	</div>
+
+	<div class="filter">
+	  <div class="name">Monthly yield</div>
+	  <div class="values">
+	    <div class="send-params">
+	      <p class="sep">range</p>
+	      <input name="min-myield" id="min-myield-value" type="text" placeholder="0">
+	      <p class="sep">to</p>
+	      <input name="max-myield" id="max-myield-value" type="text" placeholder="inf">
+	    </div>
+	  </div>
+	  <div class="descr">
+	    <div class="info"><p>&#128712;</p>
+	      <div class="box">
+		<p>The <strong>monthly yield</strong> is calculated with <code>yield/months to expiration</code>. In this calculation and for simplicity, months are blocks of 30 days.</p>
 	      </div>
 	    </div>
 	  </div>

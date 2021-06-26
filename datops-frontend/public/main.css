@@ -70,7 +70,7 @@ span.hl { color:#d00; font-weight: bold; }
 .filter:hover { border-color:#ccc; }
 .filter > .name, .filter > .values, .filter > .descr { width:33%; display:flex; align-items:center; position:relative; }
 .filter > .name { text-align: left; text-transform:uppercase; }
-.filter > .values { justify-content: center; }
+.filter > .values { justify-content: center; flex-direction:column; }
 .filter > .descr { justify-content: right; }
 .filter > .name.header, .filter > .values.header, .filter > .descr.header {
     font-weight:bold; margin-bottom:0; text-transform:none;

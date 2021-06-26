@@ -114,7 +114,15 @@
 
         ;; Premium/strike ratio
         min-pso (.-value (gdom/getElement "min-pso-value"))
-        max-pso (.-value (gdom/getElement "max-pso-value"))        
+        max-pso (.-value (gdom/getElement "max-pso-value"))
+
+        ;; Yield
+        min-yield (.-value (gdom/getElement "min-yield-value"))
+        max-yield (.-value (gdom/getElement "max-yield-value"))
+
+        ;; Monthly yield
+        min-myield (.-value (gdom/getElement "min-myield-value"))
+        max-myield (.-value (gdom/getElement "max-myield-value"))        
 
         ;; Market capitalization
         min-cap (.-value (gdom/getElement "min-cap-value"))
@@ -167,6 +175,14 @@
           "&min-pso=" (js/encodeURIComponent min-pso)
           "&max-pso=" (js/encodeURIComponent max-pso)
 
+          ;; Yield
+          "&min-yield=" (js/encodeURIComponent min-yield)
+          "&max-yield=" (js/encodeURIComponent max-yield)
+
+          ;; Monthly yield
+          "&min-myield=" (js/encodeURIComponent min-myield)
+          "&max-myield=" (js/encodeURIComponent max-myield)
+
           ;; Market cap
           "&min-cap=" (js/encodeURIComponent min-cap)
           "&max-cap=" (js/encodeURIComponent max-cap)
@@ -192,6 +208,8 @@
                      :stock stock :etf etf
                      :min-sto min-sto :max-sto max-sto
                      :min-pso min-pso :max-pso max-pso
+                     :min-yield min-yield :max-yield max-yield
+                     :min-myield min-myield :max-myield max-myield
                      :min-cap min-cap :max-cap max-cap
                      :order-by order-by :limit limit :active active
                      })}}))
@@ -543,6 +561,22 @@
         (set! (.-value (gdom/getElement "min-pso-value")) min-pso))
       (when max-pso
         (set! (.-value (gdom/getElement "max-pso-value")) max-pso)))
+
+    ;; Yield
+    (let [min-yield (.get url-params "min-yield")
+          max-yield (.get url-params "max-yield")]
+      (when min-yield
+        (set! (.-value (gdom/getElement "min-yield-value")) min-yield))
+      (when max-yield
+        (set! (.-value (gdom/getElement "max-yield-value")) max-yield)))
+
+    ;; Monthly yield
+    (let [min-myield (.get url-params "min-myield")
+          max-myield (.get url-params "max-myield")]
+      (when min-myield
+        (set! (.-value (gdom/getElement "min-myield-value")) min-myield))
+      (when max-myield
+        (set! (.-value (gdom/getElement "max-myield-value")) max-myield)))
 
     ;; Market cap
     (let [min-cap (.get url-params "min-cap")

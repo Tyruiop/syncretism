@@ -1,4 +1,4 @@
-(ns datops-daily.db-update
+(ns datops-compute.db-update
   (:require
    [clojure.java.jdbc :as db]
    [clojure.data.json :as json]

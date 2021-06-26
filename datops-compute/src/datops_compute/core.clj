@@ -1,8 +1,8 @@
-(ns datops-daily.core
+(ns datops-compute.core
   (:gen-class)
   (:require
    [taoensso.timbre :as timbre :refer [info warn error]]
-   [datops-daily.db-update :as dbu]))
+   [datops-compute.db-update :as dbu]))
 
 (defn -main
   [& args]

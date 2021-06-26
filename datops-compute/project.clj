@@ -1,4 +1,4 @@
-(defproject datops-daily "0.1.0-SNAPSHOT"
+(defproject datops-compute "0.1.0-SNAPSHOT"
   :description "Computations to be ran daily over option data"
   :url "http://example.com/FIXME"
   :license {:name "GNU AGPL-V3 or later"
@@ -10,7 +10,7 @@
                  [clojure.java-time "0.3.2"]
                  [com.taoensso/timbre "5.1.2"]
                  [mysql/mysql-connector-java "8.0.23"]]
-  :main ^:skip-aot datops-daily.core
+  :main ^:skip-aot datops-compute.core
   :target-path "target/%s"
   :profiles {:uberjar {:aot :all
                        :jvm-opts ["-Dclojure.compiler.direct-linking=true"]}})

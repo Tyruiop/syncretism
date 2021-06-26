@@ -20,16 +20,12 @@
    {:cur-results nil
     :cur-sort nil
     :cur-quotes nil
+    :cur-catalysts nil
     :cur-visible-quotes #{}
     :status :loading}))
-(defn reset-state []
-  (swap! state #(-> %
-                    (assoc :cur-results nil)
-                    (assoc :cur-quotes nil)
-                    (assoc :cur-visible-quotes #{})
-                    (assoc :cur-sort nil))))
 (defn print-opts-ex [] (-> @state :cur-results first println))
 (defn print-quotes-ex [] (-> @state :cur-quotes first println))
+(defn print-catalysts-ex [] (-> @state :cur-catalysts first println))
 
 (def srv-addr "https://api.syncretism.io")
 
@@ -199,10 +195,11 @@
                      :min-cap min-cap :max-cap max-cap
                      :order-by order-by :limit limit :active active
                      })}}))
-            {:keys [quotes options]} (-> resp :body read-string)]
+            {:keys [quotes options catalysts]} (-> resp :body read-string)]
         (swap! state #(-> %
                           (assoc :cur-quotes quotes)
                           (assoc :cur-results options)
+                          (assoc :cur-catalysts catalysts)
                           (assoc :cur-sort (get order-aliases order-by))
                           (assoc :status :results)))))))
 
@@ -328,6 +325,19 @@
          (swap! state #(update % :cur-visible-quotes conj contractsymbol))))}
     " "]])
 
+(defn draw-symbol
+  [ticker]
+  (let [catalysts (get-in @state [:cur-catalysts ticker])
+        now (cur-ny-time)
+        earnings (-> catalysts (get "earnings") first)
+        dividends (get catalysts "dividends")]
+    [:div.symb
+     [:p ticker]
+     (when (> (get earnings "raw") now)
+       [:div.catalyst.e [:p "E"] [:div.cat-info (str "earnings: " (get earnings "fmt"))]])
+     (when (> (get dividends "raw") now)
+       [:div.catalyst.d [:p "D"] [:div.cat-info (str "dividends: " (get dividends "fmt"))]])]))
+
 (defn landing-loading
   []
   [:div {:class ["loading"]}
@@ -396,6 +406,9 @@
 
                              (= id :contractsymbol)
                              (draw-contract-symbol contractsymbol)
+
+                             (= id :symbol)
+                             (draw-symbol v)
                              
                              :else (str v))]]))
                  columns-w-names))]

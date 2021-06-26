@@ -286,7 +286,7 @@
                          (map
                           (fn [{symb :symbol data :data}]
                             [symb (json/read-str data :key-fn keyword)]))
-                         (into {}))
+                         (into {}))             
              catalysts (get-catalysts symbols)]
          (pr-str {:options res :quotes quotes :catalysts catalysts})))
   (GET "/ops" req

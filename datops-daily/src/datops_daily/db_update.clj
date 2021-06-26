@@ -11,10 +11,11 @@
 (defn calculate-monthly-yield
   "Calculate the yield (premium/strike) and monthly yield of a given option"
   [{:keys [contractsymbol strike ask bid lastprice expiration]}]
-  (let [yield (/ (or (when (> ask 0) ask) lastprice) strike)
-        now (/ (System/currentTimeMillis) 1000)
-        nb-months (/ (- expiration now) month-unit)]
-    [(float yield) (float (/ yield nb-months)) contractsymbol]))
+  (when (and (> strike 0) (or (> ask 0) (> lastprice 0)))
+    (let [yield (/ (or (when (> ask 0) ask) lastprice) strike)
+          now (/ (System/currentTimeMillis) 1000)
+          nb-months (/ (- expiration now) month-unit)]
+      [(float yield) (when (> nb-months 0) (float (/ yield nb-months))) contractsymbol])))
 
 ;; (calculate-monthly-yield {:strike 100 :ask 3 :expiration (+ (* 3 month-unit) (/ (System/currentTimeMillis) 1000))})
 ;; => [0.03 0.01 nil]
@@ -34,7 +35,7 @@
 (defn update-live-options
   [limit & {:keys [last-seen]}]
   (let [options (get-live-options limit :last-seen last-seen)
-        yields (map calculate-monthly-yield options)
+        yields (keep calculate-monthly-yield options)
         last-seen (-> options last :contractsymbol)]
     (with-open [con (jdbc/get-connection db)
                 ps

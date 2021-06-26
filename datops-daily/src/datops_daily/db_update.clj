@@ -2,6 +2,7 @@
   (:require
    [clojure.java.jdbc :as db]
    [clojure.data.json :as json]
+   [taoensso.timbre :as timbre :refer [info warn error]]
    [next.jdbc :as jdbc]
    [next.jdbc.prepare :as jdbp]
    [next.jdbc.types :as jdbt]))
@@ -34,6 +35,7 @@
 
 (defn update-live-options
   [limit & {:keys [last-seen]}]
+  (info (str "Last seen: " last-seen))
   (let [options (get-live-options limit :last-seen last-seen)
         yields (keep calculate-monthly-yield options)
         last-seen (-> options last :contractsymbol)]

@@ -192,6 +192,28 @@ td.opttype.P > div {
     background:rgba(255,30,0,0.1);
 }
 
+.symb {
+    display:flex; align-items: center;
+}
+.symb > .catalyst {
+    border-radius:5px;
+    margin-left:0.5em;
+    background:#333;
+    color:#fff;
+    font-weight: bold;
+    padding:0 5px;
+    text-align: center;
+    position:relative;
+}
+.symb > .catalyst > .cat-info {
+    display:none; position:absolute; top:110%; left:110%; width:200px;
+    background:#333; color:#fff;
+    padding:3px; z-index: 10;
+}
+.symb > .catalyst:hover > .cat-info {
+    display:block;
+}
+
 .contractsymbol > div { display:flex; white-space:pre; }
 .contractsymbol > div > a {
     flex:1;

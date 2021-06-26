@@ -110,6 +110,10 @@
       (assoc :max-sto (try (Double/parseDouble max-sto) (catch Exception e nil)))
       (assoc :min-pso (try (Double/parseDouble min-pso) (catch Exception e nil)))
       (assoc :max-pso (try (Double/parseDouble max-pso) (catch Exception e nil)))
+      (assoc :min-yield (try (Double/parseDouble min-yield) (catch Exception e nil)))
+      (assoc :max-yield (try (Double/parseDouble max-yield) (catch Exception e nil)))
+      (assoc :min-myield (try (Double/parseDouble min-myield) (catch Exception e nil)))
+      (assoc :max-myield (try (Double/parseDouble max-myield) (catch Exception e nil)))
       (assoc :min-cap (try
                         (long (* 1E9 (Double/parseDouble min-cap)))
                         (catch Exception e nil)))
@@ -126,6 +130,8 @@
                          stock etf
                          min-sto max-sto
                          min-pso max-pso
+                         min-yield max-yield
+                         min-myield max-myield
                          min-cap max-cap
                          order-by limit active]
                   :as req}]
@@ -209,6 +215,18 @@
          (when max-pso
            (str " AND ((ask <> 0 AND ask/strike <= " max-pso
                 ") OR (ask = 0 AND lastprice/strike <= " max-pso "))"))
+
+         ;; Yield
+         (when min-yield
+           (str " AND yield >=" min-yield))
+         (when max-yield
+           (str " AND yield <=" min-yield))
+
+         ;; Monthly yield
+         (when min-myield
+           (str " AND monthlyyield >=" min-myield))
+         (when max-myield
+           (str " AND monthlyyield <=" max-myield))
 
          ;; Market cap
          (when min-cap

@@ -105,6 +105,10 @@ npm install
 
 Copy & paste the `/public` folder wherever your local http server is.
 
+## Data processing `/datops-compute`
+
+Very early stage, software to do post processing on the crawled data. For the moment, can be used to calculate the yield & monthly yield of all non expired options.
+
 # Licence
 
 Syncretism is licensed under the GNU Affero General Public License 3 or any later version at your choice.

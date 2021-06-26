@@ -8,6 +8,7 @@
 * Added filter by Premium / Strike
 * Added filter by Active (V > 0, OI > 0, A > 0, B > 0) options.
 * Added moneyness filter (ItM/OtM checkboxes)
+* Added yield & monthly yield filters
 
 ## UI
 * Revamped filters, should be less clutered now

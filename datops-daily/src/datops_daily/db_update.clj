@@ -33,7 +33,6 @@
 
 (defn update-live-options
   [limit & {:keys [last-seen]}]
-  (println "Last seen:" last-seen)
   (let [options (get-live-options limit :last-seen last-seen)
         yields (map calculate-monthly-yield options)
         last-seen (-> options last :contractsymbol)]

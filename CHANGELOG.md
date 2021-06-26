@@ -12,6 +12,11 @@
 ## UI
 * Revamped filters, should be less clutered now
 * Infobox for some filters
+* Displays catalysts (earnings/dividends).
+
+## Backend
+* Crawler gets fundamentals to db
+* Ability to request catalysts from FE.
 
 ## API
 * Endpoint available at https://api.syncretism.io/ops

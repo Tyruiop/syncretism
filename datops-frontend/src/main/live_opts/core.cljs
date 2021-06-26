@@ -64,6 +64,8 @@
    [:ask "Ask" "A"]
    [:volume "Volume" "V"]
    [:openinterest "Open Interest" "OI"]
+   [:yield "Yield" "Y"]
+   [:monthlyyield "Monthly Yield" "MY"]
    ;;[:inthemoney "In the Money" "ItM"]
    ;;[:pchange "Price Change" "PC"]
    [:regularmarketprice "Stock Market Price" "SMP"]
@@ -411,7 +413,9 @@
                       [:div
                        (cond (= id :lastcrawl) (s-to-h-min (- cur-time v))
 
-                             (= id :impliedvolatility) (gstring/format "%.2f" v)
+                             (or (= id :impliedvolatility)
+                                 (= id :yield) (= id :monthlyyield))
+                             (gstring/format "%.2f" v)
                              
                              (or (= id :expiration) (= id :lasttradedate))
                              (-> (from-ts (+ (or v 0) offset-exp)) (str/split #",") first)

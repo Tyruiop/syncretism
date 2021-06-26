@@ -95,6 +95,8 @@
            min-price max-price
            min-sto max-sto
            min-pso max-pso
+           min-yield max-yield
+           min-myield max-myield
            min-cap max-cap] :as req}]
   (-> req
       (assoc :limit (try (Integer/parseInt limit) (catch Exception e 50)))

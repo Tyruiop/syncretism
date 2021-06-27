@@ -29,13 +29,12 @@
                            reverse
                            (take nb-days))]
     (->> selected-days
-         (map
+         (pmap
           (fn [f]
-            (when (.isDirectory f)
-              (-> (str f "/" ticker ".txt.gz")
-                  utils/read-gzipped
-                  utils/read-edn-per-line))))
+            (utils/read-gzipped
+             (comp parse-line read-string)
+             (str f "/" ticker ".txt.gz"))))
+         doall
          (mapcat identity))))
 
 (def testdd (time (aggregate-ticker "./nly/options/" "NLY" 10)))
-(count testdd)

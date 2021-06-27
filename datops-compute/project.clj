@@ -6,6 +6,7 @@
   :dependencies [[org.clojure/clojure "1.10.1"]
                  [org.clojure/data.json "1.0.0"]
                  [org.clojure/java.jdbc "0.7.12"]
+                 [commons-io/commons-io "2.10.0"]
                  [com.climate/claypoole "1.1.4"]
                  [seancorfield/next.jdbc "1.1.613"]
                  [clojure.java-time "0.3.2"]

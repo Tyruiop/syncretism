@@ -286,7 +286,7 @@
     (info "--- Received:" req "→" query)
     (try
       (db/query db query)
-      (catch Exception _ {:error "Error in query."}))))
+      (catch Exception e (do (println "error:\n" e) {:error "Error in query."})))))
 
 (defn get-if-market
   "Input ts

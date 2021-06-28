@@ -10,7 +10,7 @@
    [datops.shared :refer [config symbols update-tickers-dict]]
    [datops.endpoints :refer [all-endpoints available-endpoints
                              register-failure sort-endpoints]]
-   [datops.time :refer [cur-ny-time market-hour? get-time]]
+   [datops.time :refer [cur-ny-time market-hour?]]
    [datops.greeks :as gks])
   (:gen-class))
 

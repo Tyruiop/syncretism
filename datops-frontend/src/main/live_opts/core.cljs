@@ -71,6 +71,10 @@
    [:regularmarketprice "Stock Market Price" "SMP"]
    [:regularmarketdaylow "Stock Market Day Low" "SMDL"]
    [:regularmarketdayhigh "Stock Market Day High" "SMDH"]
+   [:delta "Delta" "δ"]
+   [:gamma "Gamma" "γ"]
+   [:theta "Theta" "θ"]
+   [:vega "Vega" "ν"]
    ;;[:quotetype "Quote Type" "QT"]
    [:lastcrawl "Last Updated" "LU"]
    ])
@@ -126,6 +130,16 @@
         min-myield (.-value (gdom/getElement "min-myield-value"))
         max-myield (.-value (gdom/getElement "max-myield-value"))        
 
+        ;; Greeks
+        min-delta (.-value (gdom/getElement "min-delta-value"))
+        max-delta (.-value (gdom/getElement "max-delta-value"))
+        min-gamma (.-value (gdom/getElement "min-gamma-value"))
+        max-gamma (.-value (gdom/getElement "max-gamma-value"))
+        min-theta (.-value (gdom/getElement "min-theta-value"))
+        max-theta (.-value (gdom/getElement "max-theta-value"))
+        min-vega (.-value (gdom/getElement "min-vega-value"))
+        max-vega (.-value (gdom/getElement "max-vega-value"))
+        
         ;; Market capitalization
         min-cap (.-value (gdom/getElement "min-cap-value"))
         max-cap (.-value (gdom/getElement "max-cap-value"))
@@ -185,6 +199,16 @@
           "&min-myield=" (js/encodeURIComponent min-myield)
           "&max-myield=" (js/encodeURIComponent max-myield)
 
+          ;; Greeks
+          "&min-delta=" (js/encodeURIComponent min-delta)
+          "&max-delta=" (js/encodeURIComponent max-delta)
+          "&min-gamma=" (js/encodeURIComponent min-gamma)
+          "&max-gamma=" (js/encodeURIComponent max-gamma)
+          "&min-theta=" (js/encodeURIComponent min-theta)
+          "&max-theta=" (js/encodeURIComponent max-theta)
+          "&min-vega=" (js/encodeURIComponent min-vega)
+          "&max-vega=" (js/encodeURIComponent max-vega)
+
           ;; Market cap
           "&min-cap=" (js/encodeURIComponent min-cap)
           "&max-cap=" (js/encodeURIComponent max-cap)
@@ -212,6 +236,10 @@
                      :min-pso min-pso :max-pso max-pso
                      :min-yield min-yield :max-yield max-yield
                      :min-myield min-myield :max-myield max-myield
+                     :min-delta min-delta :max-delta max-delta
+                     :min-gamma min-gamma :max-gamma max-gamma
+                     :min-theta min-theta :max-theta max-theta
+                     :min-vega min-vega :max-vega max-vega
                      :min-cap min-cap :max-cap max-cap
                      :order-by order-by :limit limit :active active
                      })}}))
@@ -416,6 +444,9 @@
                              (or (= id :impliedvolatility)
                                  (= id :yield) (= id :monthlyyield))
                              (gstring/format "%.2f" v)
+
+                             (contains? #{:delta :theta :gamma :vega} id)
+                             (if v (gstring/format "%.4f" v) "")
                              
                              (or (= id :expiration) (= id :lasttradedate))
                              (-> (from-ts (+ (or v 0) offset-exp)) (str/split #",") first)
@@ -581,6 +612,32 @@
         (set! (.-value (gdom/getElement "min-myield-value")) min-myield))
       (when max-myield
         (set! (.-value (gdom/getElement "max-myield-value")) max-myield)))
+
+    ;; greeks
+    (let [min-delta (.get url-params "min-delta")
+          max-delta (.get url-params "max-delta")
+          min-gamma (.get url-params "min-gamma")
+          max-gamma (.get url-params "max-gamma")
+          min-theta (.get url-params "min-theta")
+          max-theta (.get url-params "max-theta")
+          min-vega (.get url-params "min-vega")
+          max-vega (.get url-params "max-vega")]
+      (when min-delta
+        (set! (.-value (gdom/getElement "min-delta-value")) min-delta))
+      (when max-delta
+        (set! (.-value (gdom/getElement "max-delta-value")) max-delta))
+      (when min-gamma
+        (set! (.-value (gdom/getElement "min-gamma-value")) min-gamma))
+      (when max-gamma
+        (set! (.-value (gdom/getElement "max-gamma-value")) max-gamma))
+      (when min-theta
+        (set! (.-value (gdom/getElement "min-theta-value")) min-theta))
+      (when max-theta
+        (set! (.-value (gdom/getElement "max-theta-value")) max-theta))
+      (when min-vega
+        (set! (.-value (gdom/getElement "min-vega-value")) min-vega))
+      (when max-vega
+        (set! (.-value (gdom/getElement "max-vega-value")) max-vega)))
 
     ;; Market cap
     (let [min-cap (.get url-params "min-cap")

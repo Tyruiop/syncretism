@@ -406,7 +406,7 @@
          (keep-indexed
           (fn [idx [id c-name short-name]]
             [:th
-             {:key id :class [(name id)] :title c-name}
+             {:key id :class [(name id)] :title c-name :scope "col"}
              [:p
               {:on-click
                (fn [_]
@@ -434,7 +434,7 @@
                (doall
                 (map
                  (fn [[id _]]
-                   (let [v (get entry id)]
+                   (let [v (get entry id nil)]
                      [:td {:key (str contractsymbol "-" (name id))
                            :class [(name id)
                                    (cond

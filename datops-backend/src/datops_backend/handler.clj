@@ -238,7 +238,7 @@
          (when min-yield
            (str " AND yield >=" min-yield))
          (when max-yield
-           (str " AND yield <=" min-yield))
+           (str " AND yield <=" max-yield))
 
          ;; Monthly yield
          (when min-myield
@@ -250,19 +250,19 @@
          (when min-delta
            (str " AND delta >=" min-delta))
          (when max-delta
-           (str " AND delta <=" min-delta))
+           (str " AND delta <=" max-delta))
          (when min-gamma
            (str " AND gamma >=" min-gamma))
          (when max-gamma
-           (str " AND gamma <=" min-gamma))
+           (str " AND gamma <=" max-gamma))
          (when min-theta
            (str " AND theta >=" min-theta))
          (when max-theta
-           (str " AND theta <=" min-theta))
+           (str " AND theta <=" max-theta))
          (when min-vega
            (str " AND vega >=" min-vega))
          (when max-vega
-           (str " AND vega <=" min-vega))
+           (str " AND vega <=" max-vega))
 
          ;; Market cap
          (when min-cap

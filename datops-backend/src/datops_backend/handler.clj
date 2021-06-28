@@ -97,6 +97,10 @@
            min-pso max-pso
            min-yield max-yield
            min-myield max-myield
+           min-delta max-delta
+           min-gamma max-gamma
+           min-theta max-theta
+           min-vega max-vega
            min-cap max-cap] :as req}]
   (-> req
       (assoc :limit (try (Integer/parseInt limit) (catch Exception e 50)))
@@ -116,6 +120,14 @@
       (assoc :max-yield (try (Double/parseDouble max-yield) (catch Exception e nil)))
       (assoc :min-myield (try (Double/parseDouble min-myield) (catch Exception e nil)))
       (assoc :max-myield (try (Double/parseDouble max-myield) (catch Exception e nil)))
+      (assoc :min-delta (try (Double/parseDouble min-delta) (catch Exception e nil)))
+      (assoc :max-delta (try (Double/parseDouble max-delta) (catch Exception e nil)))
+      (assoc :min-gamma (try (Double/parseDouble min-gamma) (catch Exception e nil)))
+      (assoc :max-gamma (try (Double/parseDouble max-gamma) (catch Exception e nil)))
+      (assoc :min-theta (try (Double/parseDouble min-theta) (catch Exception e nil)))
+      (assoc :max-theta (try (Double/parseDouble max-theta) (catch Exception e nil)))
+      (assoc :min-vega (try (Double/parseDouble min-vega) (catch Exception e nil)))
+      (assoc :max-vega (try (Double/parseDouble max-vega) (catch Exception e nil)))
       (assoc :min-cap (try
                         (long (* 1E9 (Double/parseDouble min-cap)))
                         (catch Exception e nil)))
@@ -229,6 +241,24 @@
            (str " AND monthlyyield >=" min-myield))
          (when max-myield
            (str " AND monthlyyield <=" max-myield))
+
+         ;; Greeks
+         (when min-delta
+           (str " AND delta >=" min-delta))
+         (when max-delta
+           (str " AND delta <=" min-delta))
+         (when min-gamma
+           (str " AND gamma >=" min-gamma))
+         (when max-gamma
+           (str " AND gamma <=" min-gamma))
+         (when min-theta
+           (str " AND theta >=" min-theta))
+         (when max-theta
+           (str " AND theta <=" min-theta))
+         (when min-vega
+           (str " AND vega >=" min-vega))
+         (when max-vega
+           (str " AND vega <=" min-vega))
 
          ;; Market cap
          (when min-cap

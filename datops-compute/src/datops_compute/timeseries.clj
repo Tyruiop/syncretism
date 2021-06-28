@@ -62,15 +62,15 @@
      (partition 2 1 sdata))
     sdata))
 
-(def testdd (time (aggregate-ticker "./clov/options/" "CLOV" 2)))
+(def testdd (time (aggregate-ticker "./aapl/options/" "AAPL" 2)))
 
-(def ddd (process-option (first (filter #(clojure.string/includes? (-> % first) "CLOV230120C00012000") testdd))))
+(def ddd (process-option (first (filter #(clojure.string/includes? (-> % first) "AAPL220617C00125") testdd))))
 (last ddd)
-;; => {:time 1624648502, :contractsymbol "CLOV230120C00012000", :data {:v 113, :expiration 1674172800, :stock-price 12.97, :iv 0.9882813671875, :annual-dividend-rate nil, :last-price 6.3, :strike 12.0, :oi 1371, :annual-dividend-yield nil, :prev-close 13.79, :prev-open 13.43, :ask 6.6, :bid 6.0}}
+;; => {:time 1624650052, :contractsymbol "AAPL220617C00125000", :data {:v 34, :expiration 1655424000, :stock-price 133.11, :iv 0.2829661547851562, :annual-dividend-rate 0.82, :last-price 18.8, :strike 125.0, :oi 10190, :annual-dividend-yield nil, :prev-close 133.41, :prev-open 133.46, :ask 18.8, :bid 18.6}}
 
 (def entry (last ddd))
 
-(def rfr 0.06)
+(def rfr 0.0154)
 
 (defn calc-annual-yield
   [{:keys [annual-dividend-yield annual-dividend-rate stock-price]}]
@@ -143,13 +143,13 @@
      (* s0 eqt (Math/sqrt t) (Math/exp (- (/ (* d1 d1) 2))))
      (* 100 (Math/sqrt (* 2 Math/PI))))))
 
-(calc-d1 (:data entry))
+(def entry2 (assoc-in entry [:data :iv] 0.27747))
 
 (calc-delta-call (:data entry))
-;; => 0.7753990598295412
+;; => 0.6504546155697042
 (calc-gamma (:data entry))
-;; => 0.018691798680041786
+;; => 0.009883982961691243
 (calc-theta-call (:data entry))
-;; => -0.004774392935149536
+;; => -0.020590493144231267
 (calc-vega (:data entry))
-;; => 0.04859403626518364
+;; => 0.48027260942214356

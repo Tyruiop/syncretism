@@ -146,6 +146,10 @@
                          min-pso max-pso
                          min-yield max-yield
                          min-myield max-myield
+                         min-delta max-delta
+                         min-gamma max-gamma
+                         min-theta max-theta
+                         min-vega max-vega
                          min-cap max-cap
                          order-by limit active]
                   :as req}]

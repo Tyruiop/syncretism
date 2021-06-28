@@ -11,7 +11,9 @@
                  [seancorfield/next.jdbc "1.1.613"]
                  [clojure.java-time "0.3.2"]
                  [com.taoensso/timbre "5.1.2"]
-                 [mysql/mysql-connector-java "8.0.23"]]
+                 [mysql/mysql-connector-java "8.0.23"]
+
+                 [distributions "0.1.3-SNAPSHOT"]]
   :main ^:skip-aot datops-compute.core
   :target-path "target/%s"
   :profiles {:uberjar {:aot :all

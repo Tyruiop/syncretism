@@ -446,13 +446,17 @@
 
                              (or (= id :impliedvolatility)
                                  (= id :yield) (= id :monthlyyield))
-                             (gstring/format "%.2f" v)
+                             (if (number? v)
+                               (gstring/format "%.2f" v)
+                               (str v))
 
                              (contains? #{:delta :theta :gamma :vega} id)
-                             (if v (gstring/format "%.4f" v) "")
+                             (if (number? v) (gstring/format "%.4f" v) "")
                              
                              (or (= id :expiration) (= id :lasttradedate))
-                             (-> (from-ts (+ (or v 0) offset-exp)) (str/split #",") first)
+                             (if (number? v)
+                               (-> (from-ts (+ (or v 0) offset-exp)) (str/split #",") first)
+                               (str v))
 
                              (or (= id :ask) (= id :bid) (= id :lastprice)
                                  (= id :regularmarketprice)

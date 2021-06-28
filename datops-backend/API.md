@@ -38,6 +38,10 @@
 
 * `max-sto [float]`: maximum option price / stock price ratio.
 
+* ~~`min-pso [float]`: deprecated~~ (see `min-yield`)
+
+* ~~`max-pso [float]`: deprecated~~ (see `max-yield`)
+
 * `min-yield [float]`: minimum premium / strike price ratio.
 
 * `max-yield [float]`: maximum premium / strike price ratio.

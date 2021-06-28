@@ -56,14 +56,17 @@ bid FLOAT,
 lastTradeDate BIGINT,
 quoteType VARCHAR(15),
 yield FLOAT,
-monthlyYield FLOAT
+monthlyYield FLOAT,
+delta FLOAT,
+gamma FLOAT,
+theta FLOAT,
+vega FLOAT
 ) ENGINE=Aria;")
 
-;; (jdbc/execute! db ["DROP TABLE live"])
-;; (jdbc/execute! db [live-table-def])
-;; (jdbc/execute! db [live-quote-table-def])
-;; (jdbc/execute! db ["ALTER TABLE live ADD COLUMN (quoteType VARCHAR(15))"])
-;; (jdbc/execute! db ["ALTER TABLE live ADD COLUMN (monthlyyield FLOAT)"])
+;; (jdbc/execute! db ["ALTER TABLE live ADD COLUMN (delta FLOAT)"])
+;; (jdbc/execute! db ["ALTER TABLE live ADD COLUMN (gamma FLOAT)"])
+;; (jdbc/execute! db ["ALTER TABLE live ADD COLUMN (theta FLOAT)"])
+;; (jdbc/execute! db ["ALTER TABLE live ADD COLUMN (vega FLOAT)"])
 
 (def live-columns
   [[[:opt :contractSymbol] "contractSymbol"]
@@ -85,7 +88,11 @@ monthlyYield FLOAT
    [[:opt :ask] "ask"]
    [[:opt :bid] "bid"]
    [[:opt :lastTradeDate] "lastTradeDate"]
-   [[:opt :quote-type] "quoteType"]])
+   [[:opt :quote-type] "quoteType"]
+   [[:opt :delta] "delta"]
+   [[:opt :gamma] "gamma"]
+   [[:opt :theta] "theta"]
+   [[:opt :vega] "vega"]])
 
 (def live-columns-nb (count live-columns))
 

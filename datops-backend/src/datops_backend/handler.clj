@@ -342,7 +342,6 @@
                             [symb (json/read-str data :key-fn keyword)]))
                          (into {}))             
              catalysts (get-catalysts symbols)]
-         (println "COUCOU\n" quotes)
          (pr-str {:options res :quotes quotes :catalysts catalysts})))
   (GET "/ops" req
        (let [res (-> req :body slurp (json/read-str :key-fn keyword) run-query)]

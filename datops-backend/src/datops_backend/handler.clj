@@ -94,7 +94,6 @@
            min-exp max-exp
            min-price max-price
            min-sto max-sto
-           min-pso max-pso
            min-yield max-yield
            min-myield max-myield
            min-delta max-delta
@@ -114,8 +113,6 @@
       (assoc :max-price (try (Double/parseDouble max-price) (catch Exception e nil)))
       (assoc :min-sto (try (Double/parseDouble min-sto) (catch Exception e nil)))
       (assoc :max-sto (try (Double/parseDouble max-sto) (catch Exception e nil)))
-      (assoc :min-pso (try (Double/parseDouble min-pso) (catch Exception e nil)))
-      (assoc :max-pso (try (Double/parseDouble max-pso) (catch Exception e nil)))
       (assoc :min-yield (try (Double/parseDouble min-yield) (catch Exception e nil)))
       (assoc :max-yield (try (Double/parseDouble max-yield) (catch Exception e nil)))
       (assoc :min-myield (try (Double/parseDouble min-myield) (catch Exception e nil)))
@@ -143,7 +140,6 @@
                          calls puts
                          stock etf
                          min-sto max-sto
-                         min-pso max-pso
                          min-yield max-yield
                          min-myield max-myield
                          min-delta max-delta
@@ -225,14 +221,6 @@
            (str " AND (100*ask)/regularmarketprice >= " min-sto))
          (when max-sto
            (str " AND (100*ask)/regularmarketprice <= " max-sto))
-
-         ;; Premium/Strike ratio
-         (when min-pso
-           (str " AND ((ask <> 0 AND ask/strike >= " min-pso
-                ") OR (ask = 0 AND lastprice/strike >= " min-pso "))"))
-         (when max-pso
-           (str " AND ((ask <> 0 AND ask/strike <= " max-pso
-                ") OR (ask = 0 AND lastprice/strike <= " max-pso "))"))
 
          ;; Yield
          (when min-yield

@@ -118,10 +118,6 @@
         min-sto (.-value (gdom/getElement "min-sto-value"))
         max-sto (.-value (gdom/getElement "max-sto-value"))
 
-        ;; Premium/strike ratio
-        min-pso (.-value (gdom/getElement "min-pso-value"))
-        max-pso (.-value (gdom/getElement "max-pso-value"))
-
         ;; Yield
         min-yield (.-value (gdom/getElement "min-yield-value"))
         max-yield (.-value (gdom/getElement "max-yield-value"))
@@ -187,10 +183,6 @@
           "&min-sto=" (js/encodeURIComponent min-sto)
           "&max-sto=" (js/encodeURIComponent max-sto)
 
-          ;; Premium/strike ratio
-          "&min-pso=" (js/encodeURIComponent min-pso)
-          "&max-pso=" (js/encodeURIComponent max-pso)
-
           ;; Yield
           "&min-yield=" (js/encodeURIComponent min-yield)
           "&max-yield=" (js/encodeURIComponent max-yield)
@@ -233,7 +225,6 @@
                      :puts puts :calls calls
                      :stock stock :etf etf
                      :min-sto min-sto :max-sto max-sto
-                     :min-pso min-pso :max-pso max-pso
                      :min-yield min-yield :max-yield max-yield
                      :min-myield min-myield :max-myield max-myield
                      :min-delta min-delta :max-delta max-delta
@@ -595,14 +586,6 @@
         (set! (.-value (gdom/getElement "min-sto-value")) min-sto))
       (when max-sto
         (set! (.-value (gdom/getElement "max-sto-value")) max-sto)))
-
-    ;; Premium/Strike
-    (let [min-pso (.get url-params "min-pso")
-          max-pso (.get url-params "max-pso")]
-      (when min-pso
-        (set! (.-value (gdom/getElement "min-pso-value")) min-pso))
-      (when max-pso
-        (set! (.-value (gdom/getElement "max-pso-value")) max-pso)))
 
     ;; Yield
     (let [min-yield (.get url-params "min-yield")

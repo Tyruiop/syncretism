@@ -40,8 +40,20 @@
 	  <li><p><code>etf [true|false]</code>: select etf options.</p></li>
 	  <li><p><code>min-sto [float]</code>: minimum option price / stock price ratio.</p></li>
 	  <li><p><code>max-sto [float]</code>: maximum option price / stock price ratio.</p></li>
-	  <li><p><code>min-pso [float]</code>: minimum premium / strike price ratio.</p></li>
-	  <li><p><code>max-pso [float]</code>: maximum premium / strike price ratio.</p></li>
+	  <li><p><del><code>min-pso [float]</code>: deprecated</del> (see <code>min-yield</code>)</p></li>
+	  <li><p><del><code>max-pso [float]</code>: deprecated</del> (see <code>max-yield</code>)</p></li>
+	  <li><p><code>min-yield [float]</code>: minimum premium / strike price ratio.</p></li>
+	  <li><p><code>max-yield [float]</code>: maximum premium / strike price ratio.</p></li>
+	  <li><p><code>min-myield [float]</code>: minimum yield per month until expiration date.</p></li>
+	  <li><p><code>max-myield [float]</code>: maximum yield per month until expiration date.</p></li>
+	  <li><p><code>min-delta [float]</code>: minimum delta greek.</p></li>
+	  <li><p><code>max-delta [float]</code>: maximum delta greek.</p></li>
+	  <li><p><code>min-gamma [float]</code>: minimum gamma greek.</p></li>
+	  <li><p><code>max-gamma [float]</code>: maximum gamma greek.</p></li>
+	  <li><p><code>min-theta [float]</code>: minimum theta greek.</p></li>
+	  <li><p><code>max-theta [float]</code>: maximum theta greek.</p></li>
+	  <li><p><code>min-vega [float]</code>: minimum vega greek.</p></li>
+	  <li><p><code>max-vega [float]</code>: maximum vega greek.</p></li>
 	  <li><p><code>min-cap [float]</code>: minimum market capitalization (in billions USD).</p></li>
 	  <li><p><code>max-cap [float]</code>: maximum market capitalization (in billions USD).</p></li>
 	  <li><p><code>order-by [default: e_desc]</code>: how to order results, possible values:</p>
@@ -50,8 +62,7 @@
 	      <li><code>iv_desc</code>, <code>iv_asc</code>: implied volatility, descending / ascending.</li>
 	      <li><code>lp_desc</code>, <code>lp_asc</code>: lastprice, descending / ascending.</li>
 	      <li><code>md_desc</code>, <code>md_asc</code>: current stock price, descending / ascending.</li>
-	    </ul>
-	  </li>
+	  </ul></li>
 	  <li><p><code>limit [int]</code>: number of results (max 50).</p></li>
 	  <li><p><code>active [true|false]</code>: if set to true, restricts to options for which volume, open interest, ask, and bid are all <code>&gt; 0</code>.</p></li>
 	</ul>

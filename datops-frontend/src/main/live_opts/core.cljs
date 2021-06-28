@@ -243,7 +243,10 @@
                      :min-cap min-cap :max-cap max-cap
                      :order-by order-by :limit limit :active active
                      })}}))
-            {:keys [quotes options catalysts]} (-> resp :body read-string)]
+            {:keys [quotes options catalysts]} (-> resp :body read-string)
+            quotes (if (contains? quotes :error)
+                     []
+                     quotes)]
         (swap! state #(-> %
                           (assoc :cur-quotes quotes)
                           (assoc :cur-results options)

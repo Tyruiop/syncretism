@@ -10,7 +10,8 @@
    [datops.shared :refer [config symbols update-tickers-dict]]
    [datops.endpoints :refer [all-endpoints available-endpoints
                              register-failure sort-endpoints]]
-   [datops.time :refer [cur-ny-time market-hour? get-time]])
+   [datops.time :refer [cur-ny-time market-hour? get-time]]
+   [datops.greeks :as gks])
   (:gen-class))
 
 (def iter (atom (long 1)))
@@ -163,14 +164,25 @@
         data
         (map
          (fn [opt]
-           {:req-time cur-time
-            :opt (assoc opt :opt-type t :quote-type (:quoteType quote))
-            :quote
-            (dissoc
-             quote
-             ;; Remove redundant / useless data to save some space...
-             :language :exchangeTimezoneName :region :currency :longName :displayName
-             :shortName :market :exchange :messageBoardId)})
+           (let [greeks (try
+                          (gks/calculate-greeks
+                           (assoc
+                            opt
+                            :opt-type t
+                            :annual-dividend-rate (:trailingAnnualDividendRate quote)
+                            :annual-dividend-yield (:tailingAnnualDividendYield quote)
+                            :stock-price (:regularMarketPrice quote)))
+                          (catch Exception e (do (println e) {})))]
+             {:req-time cur-time
+              :opt (merge
+                    (assoc opt :opt-type t :quote-type (:quoteType quote))
+                    greeks)
+              :quote
+              (dissoc
+               quote
+               ;; Remove redundant / useless data to save some space...
+               :language :exchangeTimezoneName :region :currency :longName :displayName
+               :shortName :market :exchange :messageBoardId)}))
          opts)]
     (io/make-parents path)
     (when (and quote (not-empty quote))

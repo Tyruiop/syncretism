@@ -281,11 +281,12 @@
 ;; Functions that will be useful when we try to make the queue smart.
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-(defn append-to-queue
-  "Takes a recently processed entry, and appends the next query time if it's
+(comment
+  (defn append-to-queue
+    "Takes a recently processed entry, and appends the next query time if it's
   not after expiration and not again outside of market hours (not need to request twice...)."
-  [queue {:keys [ticker date next-time]}]
-  (let [n-next-time (-> queue last :next-time inc get-time (max (+ 3600 next-time)))]
-    (if (> n-next-time date)
-      queue
-      (conj queue {:ticker ticker :date date :next-time next-time}))))
+    [queue {:keys [ticker date next-time]}]
+    (let [n-next-time (-> queue last :next-time inc get-time (max (+ 3600 next-time)))]
+      (if (> n-next-time date)
+        queue
+        (conj queue {:ticker ticker :date date :next-time next-time})))))

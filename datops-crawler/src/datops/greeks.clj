@@ -74,10 +74,12 @@
 
         ;; To avoid recalculating common values
         full-data (assoc data :d1 d1 :d2 d2 :yield q :t t :eqt eqt)]
-    {:delta (calc-delta full-data)
-     :gamma (calc-gamma full-data)
-     :theta (calc-theta full-data)
-     :vega (calc-vega full-data)}))
+    (->> [[:delta (calc-delta full-data)]
+          [:gamma (calc-gamma full-data)]
+          [:theta (calc-theta full-data)]
+          [:vega (calc-vega full-data)]]
+         (filter #(-> % last Double/isNaN not))
+         (into {}))))
 
 ;; (calculate-greeks {:v 34, :expiration 1655424000, :stock-price 133.11, :iv 0.2829661547851562, :annual-dividend-rate 0.82, :last-price 18.8, :strike 125.0, :oi 10190, :annual-dividend-yield nil, :prev-close 133.41, :prev-open 133.46, :ask 18.8, :bid 18.6 :opt-type "C"})
 ;; => {:delta 0.6504567155566657, :gamma 0.009884726330871105, :theta -0.020591991134993527, :vega 0.4802358119999822}

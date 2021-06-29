@@ -3,32 +3,41 @@
    [clojure.java.io :as io]
    [java-time :as jt]
    [com.climate.claypoole :as cp]
-   [datops-compute.utils :as utils])
+   [datops-compute.utils :as utils]
+   [datops-compute.greeks :as gks])
   (:import
    [java.sql Timestamp]
    [java.time ZoneId]))
 
 ;; We use https://www.macroption.com/black-scholes-formula/ as reference
 (defn parse-line
-  [{:keys [opt quote req-time]}]
-  [(get opt :contractSymbol)
-   (get opt :opt-type)
-   (get opt :strike)
-   (get opt :expiration)
-   req-time
-   (get opt :ask)
-   (get opt :bid)
-   (get opt :impliedVolatility)
-   (get opt :volume)
-   (get opt :openInterest)
-   (get opt :delta)
-   (get opt :gamma)
-   (get opt :theta)
-   (get opt :vega)
-   (get quote :regularMarketPrice)
-   (get quote :regularMarketVolume)
-   (get quote :regularMarketChange)
-   (get quote :marketCap)])
+  [{:keys [opt quote req-time :as data]}]
+  (let [{:keys [delta gamma theta vega]}
+        (gks/calculate-greeks
+         (assoc
+          opt
+          :opt-type (:opt-type opt)
+          :annual-dividend-rate (:trailingAnnualDividendRate quote)
+          :annual-dividend-yield (:tailingAnnualDividendYield quote)
+          :stock-price (:regularMarketPrice quote)))]
+    [(get opt :contractSymbol)
+     (get opt :opt-type)
+     (get opt :strike)
+     (get opt :expiration)
+     req-time
+     (get opt :ask)
+     (get opt :bid)
+     (get opt :impliedVolatility)
+     (get opt :volume)
+     (get opt :openInterest)
+     (or (get opt :delta) delta)
+     (or (get opt :gamma) gamma)
+     (or (get opt :theta) theta)
+     (or (get opt :vega) vega)
+     (get quote :regularMarketPrice)
+     (get quote :regularMarketVolume)
+     (get quote :regularMarketChange)
+     (get quote :marketCap)]))
 
 (defn aggregate-ticker
   [options-path ticker nb-days]
@@ -213,7 +222,12 @@
 (def testdd (time (aggregate-ticker "./clov/options/" "CLOV" 30)))
 (def res (time (doall (keep align-option-data testdd))))
 
-(spit "clov_series.json" (clojure.data.json/write-str res))
+(def res90 (filter #(-> % last count (= 90)) res))
+(def res90-23 (filter #(-> % first first (clojure.string/includes? "23")) res90))
+
+(spit "labs/clov_series.json" (clojure.data.json/write-str res90-23))
+
+(map (comp count last) res)
 
 (->> testdd
      (mapcat second)

@@ -94,9 +94,12 @@
            min-exp max-exp
            min-price max-price
            min-sto max-sto
-           min-pso max-pso
            min-yield max-yield
            min-myield max-myield
+           min-delta max-delta
+           min-gamma max-gamma
+           min-theta max-theta
+           min-vega max-vega
            min-cap max-cap] :as req}]
   (-> req
       (assoc :limit (try (Integer/parseInt limit) (catch Exception e 50)))
@@ -110,12 +113,18 @@
       (assoc :max-price (try (Double/parseDouble max-price) (catch Exception e nil)))
       (assoc :min-sto (try (Double/parseDouble min-sto) (catch Exception e nil)))
       (assoc :max-sto (try (Double/parseDouble max-sto) (catch Exception e nil)))
-      (assoc :min-pso (try (Double/parseDouble min-pso) (catch Exception e nil)))
-      (assoc :max-pso (try (Double/parseDouble max-pso) (catch Exception e nil)))
       (assoc :min-yield (try (Double/parseDouble min-yield) (catch Exception e nil)))
       (assoc :max-yield (try (Double/parseDouble max-yield) (catch Exception e nil)))
       (assoc :min-myield (try (Double/parseDouble min-myield) (catch Exception e nil)))
       (assoc :max-myield (try (Double/parseDouble max-myield) (catch Exception e nil)))
+      (assoc :min-delta (try (Double/parseDouble min-delta) (catch Exception e nil)))
+      (assoc :max-delta (try (Double/parseDouble max-delta) (catch Exception e nil)))
+      (assoc :min-gamma (try (Double/parseDouble min-gamma) (catch Exception e nil)))
+      (assoc :max-gamma (try (Double/parseDouble max-gamma) (catch Exception e nil)))
+      (assoc :min-theta (try (Double/parseDouble min-theta) (catch Exception e nil)))
+      (assoc :max-theta (try (Double/parseDouble max-theta) (catch Exception e nil)))
+      (assoc :min-vega (try (Double/parseDouble min-vega) (catch Exception e nil)))
+      (assoc :max-vega (try (Double/parseDouble max-vega) (catch Exception e nil)))
       (assoc :min-cap (try
                         (long (* 1E9 (Double/parseDouble min-cap)))
                         (catch Exception e nil)))
@@ -131,9 +140,12 @@
                          calls puts
                          stock etf
                          min-sto max-sto
-                         min-pso max-pso
                          min-yield max-yield
                          min-myield max-myield
+                         min-delta max-delta
+                         min-gamma max-gamma
+                         min-theta max-theta
+                         min-vega max-vega
                          min-cap max-cap
                          order-by limit active]
                   :as req}]
@@ -210,25 +222,35 @@
          (when max-sto
            (str " AND (100*ask)/regularmarketprice <= " max-sto))
 
-         ;; Premium/Strike ratio
-         (when min-pso
-           (str " AND ((ask <> 0 AND ask/strike >= " min-pso
-                ") OR (ask = 0 AND lastprice/strike >= " min-pso "))"))
-         (when max-pso
-           (str " AND ((ask <> 0 AND ask/strike <= " max-pso
-                ") OR (ask = 0 AND lastprice/strike <= " max-pso "))"))
-
          ;; Yield
          (when min-yield
            (str " AND yield >=" min-yield))
          (when max-yield
-           (str " AND yield <=" min-yield))
+           (str " AND yield <=" max-yield))
 
          ;; Monthly yield
          (when min-myield
            (str " AND monthlyyield >=" min-myield))
          (when max-myield
            (str " AND monthlyyield <=" max-myield))
+
+         ;; Greeks
+         (when min-delta
+           (str " AND delta >=" min-delta))
+         (when max-delta
+           (str " AND delta <=" max-delta))
+         (when min-gamma
+           (str " AND gamma >=" min-gamma))
+         (when max-gamma
+           (str " AND gamma <=" max-gamma))
+         (when min-theta
+           (str " AND theta >=" min-theta))
+         (when max-theta
+           (str " AND theta <=" max-theta))
+         (when min-vega
+           (str " AND vega >=" min-vega))
+         (when max-vega
+           (str " AND vega <=" max-vega))
 
          ;; Market cap
          (when min-cap

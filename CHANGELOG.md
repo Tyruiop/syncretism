@@ -1,3 +1,15 @@
+# Week 26, 2021
+
+## Filters
+* Added filters over greeks (delta/gamma/theta/vega)
+
+## UI
+* sticky headers
+* Displays greeks
+
+## Backend
+* Crawler calculates greeks as it goes!
+
 # Week 25, 2021
 
 ## Filters

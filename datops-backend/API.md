@@ -14,6 +14,10 @@
 
 * `max-diff [int]`: maximum difference in percentage between strike and stock price.
 
+* `itm [bool]`: select in the money options.
+
+* `otm [bool]`: select out of the money options.
+
 * `min-ask-bid [float]`: minimum spread between bid and ask.
 
 * `max-ask-bid [float]`: maximum spread between bid and ask.
@@ -38,9 +42,33 @@
 
 * `max-sto [float]`: maximum option price / stock price ratio.
 
-* `min-pso [float]`: minimum premium / strike price ratio.
+* ~~`min-pso [float]`: deprecated~~ (see `min-yield`)
 
-* `max-pso [float]`: maximum premium / strike price ratio.
+* ~~`max-pso [float]`: deprecated~~ (see `max-yield`)
+
+* `min-yield [float]`: minimum premium / strike price ratio.
+
+* `max-yield [float]`: maximum premium / strike price ratio.
+
+* `min-myield [float]`: minimum yield per month until expiration date.
+
+* `max-myield [float]`: maximum yield per month until expiration date.
+
+* `min-delta [float]`: minimum delta greek.
+
+* `max-delta [float]`: maximum delta greek.
+
+* `min-gamma [float]`: minimum gamma greek.
+
+* `max-gamma [float]`: maximum gamma greek.
+
+* `min-theta [float]`: minimum theta greek.
+
+* `max-theta [float]`: maximum theta greek.
+
+* `min-vega [float]`: minimum vega greek.
+
+* `max-vega [float]`: maximum vega greek.
 
 * `min-cap [float]`: minimum market capitalization (in billions USD).
 

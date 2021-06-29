@@ -10,7 +10,8 @@
    [datops.shared :refer [config symbols update-tickers-dict]]
    [datops.endpoints :refer [all-endpoints available-endpoints
                              register-failure sort-endpoints]]
-   [datops.time :refer [cur-ny-time market-hour? get-time]])
+   [datops.time :refer [cur-ny-time market-hour?]]
+   [datops.greeks :as gks])
   (:gen-class))
 
 (def iter (atom (long 1)))
@@ -163,14 +164,25 @@
         data
         (map
          (fn [opt]
-           {:req-time cur-time
-            :opt (assoc opt :opt-type t :quote-type (:quoteType quote))
-            :quote
-            (dissoc
-             quote
-             ;; Remove redundant / useless data to save some space...
-             :language :exchangeTimezoneName :region :currency :longName :displayName
-             :shortName :market :exchange :messageBoardId)})
+           (let [greeks (try
+                          (gks/calculate-greeks
+                           (assoc
+                            opt
+                            :opt-type t
+                            :annual-dividend-rate (:trailingAnnualDividendRate quote)
+                            :annual-dividend-yield (:tailingAnnualDividendYield quote)
+                            :stock-price (:regularMarketPrice quote)))
+                          (catch Exception e (do (println e) {})))]
+             {:req-time cur-time
+              :opt (merge
+                    (assoc opt :opt-type t :quote-type (:quoteType quote))
+                    greeks)
+              :quote
+              (dissoc
+               quote
+               ;; Remove redundant / useless data to save some space...
+               :language :exchangeTimezoneName :region :currency :longName :displayName
+               :shortName :market :exchange :messageBoardId)}))
          opts)]
     (io/make-parents path)
     (when (and quote (not-empty quote))
@@ -269,11 +281,12 @@
 ;; Functions that will be useful when we try to make the queue smart.
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-(defn append-to-queue
-  "Takes a recently processed entry, and appends the next query time if it's
+(comment
+  (defn append-to-queue
+    "Takes a recently processed entry, and appends the next query time if it's
   not after expiration and not again outside of market hours (not need to request twice...)."
-  [queue {:keys [ticker date next-time]}]
-  (let [n-next-time (-> queue last :next-time inc get-time (max (+ 3600 next-time)))]
-    (if (> n-next-time date)
-      queue
-      (conj queue {:ticker ticker :date date :next-time next-time}))))
+    [queue {:keys [ticker date next-time]}]
+    (let [n-next-time (-> queue last :next-time inc get-time (max (+ 3600 next-time)))]
+      (if (> n-next-time date)
+        queue
+        (conj queue {:ticker ticker :date date :next-time next-time})))))

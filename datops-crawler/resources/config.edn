@@ -5,7 +5,7 @@
  :debug false
 
  ;; How often to we save & reorder the queue & the proxies (in seconds)
- :t-reorder 60
+ :t-reorder 5
 
  ;; How often do we fully clean the queue (remove expired options & gather new symbols)
  :t-clean-queue 86400
@@ -17,4 +17,8 @@
  :batch-size 60000
 
  ;; Where to save the options data
- :save-path "options"}
+ :save-path "options"
+
+ ;; Risk free interest rate (ask google)
+ :risk-free 0.0154
+ }

@@ -4,7 +4,7 @@
     <meta charset="utf-8" />
     <meta name="description" content="Search for options.">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-    <link href="main.css?v=7" rel="stylesheet" type="text/css">
+    <link href="main.css?v=8" rel="stylesheet" type="text/css">
     <title>Ops.Syncretism - Options Search</title>
   </head>
   <body>
@@ -151,27 +151,6 @@
 	  </div>
 	</div>
 
-        <div class="filter">
-	  <div class="name">Option premium/Strike ratio</div>
-	  <div class="values">
-	    <div class="send-params">
-	      <p class="sep">range</p>
-	      <input name="min-pso" id="min-pso-value" type="text" placeholder="0">
-	      <p class="sep">to</p>
-	      <input name="max-pso" id="max-pso-value" type="text" placeholder="inf">
-	    </div>
-	  </div>
-	  <div class="descr">
-	    <div class="info"><p>&#128712;</p>
-	      <div class="box">
-		<p><strong>Option premium/Strike ratio</strong> to find options for which
-		  the premium is proportionately small or large compared to its strike
-		price.</p>
-	      </div>
-	    </div>
-	  </div>
-	</div>
-
 	<div class="filter">
 	  <div class="name">Yield</div>
 	  <div class="values">
@@ -206,6 +185,36 @@
 	      <div class="box">
 		<p>The <strong>monthly yield</strong> is calculated with <code>yield/months to expiration</code>. In this calculation and for simplicity, months are blocks of 30 days.</p>
 	      </div>
+	    </div>
+	  </div>
+	</div>
+
+	<div class="filter">
+	  <div class="name">Greeks&nbsp; <span class="hl">(experimental)</span></div>
+	  <div class="values">
+	    <div class="send-params">
+	      <p class="sep"><strong>Delta (δ)</strong> range</p>
+	      <input name="min-delta" id="min-delta-value" type="text" placeholder="-1">
+	      <p class="sep">to</p>
+	      <input name="max-delta" id="max-delta-value" type="text" placeholder="1">
+	    </div>
+	    <div class="send-params">
+	      <p class="sep"><strong>Gamma (γ)</strong> range</p>
+	      <input name="min-gamma" id="min-gamma-value" type="text" placeholder="-1">
+	      <p class="sep">to</p>
+	      <input name="max-gamma" id="max-gamma-value" type="text" placeholder="1">
+	    </div>
+	    <div class="send-params">
+	      <p class="sep"><strong>Theta (θ)</strong> range</p>
+	      <input name="min-theta" id="min-theta-value" type="text" placeholder="-1">
+	      <p class="sep">to</p>
+	      <input name="max-theta" id="max-theta-value" type="text" placeholder="1">
+	    </div>
+	    <div class="send-params">
+	      <p class="sep"><strong>Vega (ν)</strong> range</p>
+	      <input name="min-vega" id="min-vega-value" type="text" placeholder="-1">
+	      <p class="sep">to</p>
+	      <input name="max-vega" id="max-vega-value" type="text" placeholder="1">
 	    </div>
 	  </div>
 	</div>
@@ -271,7 +280,9 @@
 		</div>
 	  </div>
 	  <p class="sep"></p>
-	  <button>Send</button>
+	  <button id="clear">Clear</button>
+	  <p class="sep"></p>
+	  <button id="send">Send</button>
 	</div>
       </div>
     </main>

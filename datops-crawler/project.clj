@@ -11,7 +11,9 @@
                  [clojure.java-time "0.3.2"]
                  [clj-http "3.12.0"]
                  [com.taoensso/timbre "5.1.2"]
-                 [com.velisco/clj-ftp "0.3.12"]]
+                 [com.velisco/clj-ftp "0.3.12"]
+
+                 [distributions "0.1.3-SNAPSHOT"]]
   :main ^:skip-aot datops.core
   :target-path "target/%s"
   :profiles {:uberjar {:aot :all}})

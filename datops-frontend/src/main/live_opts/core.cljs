@@ -497,8 +497,14 @@
     (.addEventListener
      el "keydown"
      (fn [ev] (when (= (.-keyCode ev) 13) (send-query state)))))
-  (doseq [el (.getElementsByTagName js/document "button")]
-    (.addEventListener el "click" (fn [] (send-query state))))
+  (.addEventListener (gdom/getElement "send") "click" (fn [] (send-query state)))
+  (.addEventListener
+   (gdom/getElement "clear") "click"
+   (fn []
+     (doseq [el (.getElementsByTagName js/document "input")]
+       (if (= "checkbox" (.-type el))
+         (set! (.-checked el) "")
+         (set! (.-value el) "")))))
   (let [q-string (.. js/window -location -search)
         url-params (js->clj (new js/URLSearchParams q-string))
         order-by (.get url-params "order-by")

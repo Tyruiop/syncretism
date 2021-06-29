@@ -43,9 +43,11 @@
     (->> selected-days
          (pmap
           (fn [f]
-            (utils/read-gzipped
-             (comp parse-line read-string)
-             (str f "/" ticker ".txt.gz"))))
+            (try
+              (utils/read-gzipped
+               (comp parse-line read-string)
+               (str f "/" ticker ".txt.gz"))
+              (catch Exception _ []))))
          (mapcat identity)
          (group-by #(take 4 %))
          (map (fn [[idcontract data]] [idcontract (map #(drop 4 %) data)]))
@@ -208,8 +210,10 @@
       (let [[start-ts steps] (build-steps start-date end-date)]
         [contract start-ts (align-option-data-helper [] start-ts steps sdata)]))))
 
-(def testdd (time (aggregate-ticker "./nly/options/" "NLY" 10)))
+(def testdd (time (aggregate-ticker "./clov/options/" "CLOV" 30)))
 (def res (time (doall (keep align-option-data testdd))))
+
+(spit "clov_series.json" (clojure.data.json/write-str res))
 
 (->> testdd
      (mapcat second)

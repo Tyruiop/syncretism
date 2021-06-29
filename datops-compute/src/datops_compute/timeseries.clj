@@ -1,30 +1,34 @@
 (ns datops-compute.timeseries
   (:require
    [clojure.java.io :as io]
+   [java-time :as jt]
    [com.climate.claypoole :as cp]
-   [datops-compute.utils :as utils]
-
-   [distributions.core :as dc]))
+   [datops-compute.utils :as utils])
+  (:import
+   [java.sql Timestamp]
+   [java.time ZoneId]))
 
 ;; We use https://www.macroption.com/black-scholes-formula/ as reference
-
 (defn parse-line
   [{:keys [opt quote req-time]}]
-  {:time req-time
-   :contractsymbol (:contractSymbol opt)
-   :data {:oi (:openInterest opt)
-          :v (:volume opt)
-          :ask (:ask opt)
-          :bid (:bid opt)
-          :expiration (:expiration opt)
-          :strike (:strike opt)
-          :iv (:impliedVolatility opt)
-          :last-price (:lastPrice opt)
-          :stock-price (:regularMarketPrice quote)
-          :prev-close (:regularMarketPreviousClose quote)
-          :prev-open (:regularMarketOpen quote)
-          :annual-dividend-yield (:tailingAnnualDividendYield quote)
-          :annual-dividend-rate (:trailingAnnualDividendRate quote)}})
+  [(get opt :contractSymbol)
+   (get opt :opt-type)
+   (get opt :strike)
+   (get opt :expiration)
+   req-time
+   (get opt :ask)
+   (get opt :bid)
+   (get opt :impliedVolatility)
+   (get opt :volume)
+   (get opt :openInterest)
+   (get opt :delta)
+   (get opt :gamma)
+   (get opt :theta)
+   (get opt :vega)
+   (get quote :regularMarketPrice)
+   (get quote :regularMarketVolume)
+   (get quote :regularMarketChange)
+   (get quote :marketCap)])
 
 (defn aggregate-ticker
   [options-path ticker nb-days]
@@ -43,113 +47,153 @@
              (comp parse-line read-string)
              (str f "/" ticker ".txt.gz"))))
          (mapcat identity)
-         (group-by :contractsymbol)
+         (group-by #(take 4 %))
+         (map (fn [[idcontract data]] [idcontract (map #(drop 4 %) data)]))
          doall)))
 
-(defn process-option
+(defn ts-start-of-day
+  "Takes a timestamp, returns the timestamp of the start of that day, NY time.
+  Note that ZoneId/systemDefault is used, but the data is crawled in a Europe/Berlin
+  timezone server."
+  [ts]
+  (let [t-map (-> ts
+                  (Timestamp.)
+                  .toLocalDateTime
+                  (.atZone (ZoneId/systemDefault))
+                  (jt/with-zone-same-instant "America/New_York")
+                  jt/as-map)]
+    (- (int (/ ts 1000)) (:second-of-day t-map))))
+
+(defn get-day-of-week
+  "Takes a timestamp in seconds and returns the day of the week."
+  [ts]
+  (-> ts
+      (* 1000)
+      (Timestamp.)
+      .toLocalDateTime
+      (.atZone (ZoneId/of "America/New_York"))
+      (jt/with-zone-same-instant "America/New_York")
+      jt/as-map
+      :day-of-week))
+
+(def market-open-mins (+ (* 9 60 60) (* 30 60)))
+(def market-mid-mins (+ (* 12 60 60) (* 30 60)))
+(def market-close-mins (* 16 60 60))
+
+(defn build-steps
+  "Given a starting timestamp (in seconds), finds the closest beginning
+  of day, and creates regular intervals [market open, 12:30, market close] on
+  which we align the data, excluding weekends.
+
+  Return [start-point, [intervals]]"
+  [starting ending]
+  (let [start-s (ts-start-of-day (* starting 1000))
+        days (int (Math/ceil (/ (- ending start-s) 86400)))]
+    [start-s
+     (reduce
+      (fn [acc i]
+        (let [day (* i 86400)
+              day-of-week (get-day-of-week (+ start-s day))
+              market-open (+ day market-open-mins)
+              mid-day (+ day market-mid-mins)
+              market-close (+ day market-close-mins)]
+          (if (or (= 6 day-of-week) (= 7 day-of-week))
+            acc
+            (into acc [market-open mid-day market-close]))))
+      []
+      (range days))]))
+
+;; (build-steps 1624615330 1624649106)
+;; => [1624593600 [34200 45000 57600]]
+
+;; Aligning process
+;; 1. take all crawls of a given stock, sort them
+;; 2. set t0 to be the start of the day of the first occurence of the option
+;; 3. go through the day's timestamp
+;; 3.1 closest crawl during market hours for the market opening ts
+;; 3.2 interpolate two closest market hours crawl for mid-market ts
+;; 3.3 closest crawl during market hours for the market close ts
+;; If an option hasn't been crawled during a day, average neighboring days.
+;;
+;; We do it this way because pre-market and post-market crawls can contain inaccurate option
+;; data
+
+(defn average
+  "Linear interpolation of two feature vectors"
+  [ts d1 d2]
+  (let [t1 (first d1)
+        t2 (first d2)
+        w1 (- 1 (/ (- ts t1) (- t2 t1)))
+        w2 (- 1 (/ (- t2 ts) (- t2 t1)))]
+    (into
+     [(int (/ (+ (first d1) (first d2)) 2))]
+     (map
+      (fn [v1 v2]
+        (when (and (number? v1) (number? v2))
+          (+ (* w1 v1) (* w2 v2))))
+      (rest d1) (rest d2)))))
+
+(defn is-active? [[_ ask bid & _]] (and (> ask 0) (> bid 0)))
+
+(defn align-option-data-helper
+  [acc start-ts [ts & n-steps :as steps] [d1 d2 d3 & n-data :as data]]
+  (cond
+    ;; We processed all the steps, done
+    (nil? ts)
+    [nil acc]
+
+    ;; If we reach this, something went wrong, to investigate
+    (nil? d1)
+    [steps acc]
+
+    :else
+    (let [t1 (first d1)
+          t2 (first d2)
+          t3 (first d3)
+          full-ts (+ ts start-ts)
+          dt1 (get-day-of-week t1)
+          dt2 (get-day-of-week t2)
+          dts (get-day-of-week full-ts)]
+      (cond
+        ;; t1    ts   t2
+        ;; |-----|----|     same day
+        (and  (>= full-ts t1) (<= full-ts t2) (= dt1 dt2))
+        (recur (conj acc [ts (average full-ts d1 d2)]) start-ts n-steps data)
+
+        ;; t1    ts   dc   t2
+        ;; |-----|----|----|     different day, means ts is closing time
+        (and  (>= full-ts t1) (>= t2 full-ts) (= dt1 dts))
+        (recur (conj acc [ts d1]) start-ts n-steps data)
+
+        ;; t1    dc   ts   t2
+        ;; |-----|----|----|     different day, means ts is opening time
+        (and  (>= full-ts t1) (>= t2 full-ts) (= dt2 dts))
+        (recur (conj acc [ts d2]) start-ts n-steps data)
+
+        ;; ts    t1   t2
+        ;; |-----|----|     means we don't have any valid value before ts
+        (and (>= t1 full-ts) (>= t2 full-ts))
+        (recur (conj acc [ts d1]) start-ts n-steps data)
+
+        ;; t1    t2   ts
+        ;; |-----|----|---nil  means we don't have any valid value after ts
+        (and (<= t1 full-ts) (<= t2 full-ts) (nil? t3))
+        (conj acc [ts d2])
+
+        ;; t1    t2   ts   t3
+        ;; |-----|----|----|   move along the data
+        :else (recur acc start-ts steps n-data)
+        ))))
+
+(defn align-option-data
   [[contract data]]
-  (let [sdata (sort-by :time data)
-        start-ts (-> sdata first :time)
-        end-ts (-> sdata last :time)]
-    (reduce
-     (fn [acc [d1 d2]]
-       (let [d1 (:data d1)
-             d2 (:data d2)
-             p1 (or (:stock-price d1) (:prev-close d1) (:prev-open d1))
-             p2 (or (:stock-price d2) (:prev-close d2) (:prev-open d2))]
-         (+ acc (Math/pow (- (Math/log p1) (Math/log p2)) 2))))
-     0
-     (partition 2 1 sdata))
-    sdata))
+  (let [sdata (->> data
+                   (sort-by first)
+                   (filter is-active?))
+        start-date (-> sdata first first)
+        end-date (-> sdata last first)
+        [start-ts steps] (build-steps start-date end-date)]
+    [contract start-ts (align-option-data-helper [] start-ts steps sdata)]))
 
-(def testdd (time (aggregate-ticker "./aapl/options/" "AAPL" 2)))
-
-(def ddd (process-option (first (filter #(clojure.string/includes? (-> % first) "AAPL220617C00125") testdd))))
-(last ddd)
-;; => {:time 1624650052, :contractsymbol "AAPL220617C00125000", :data {:v 34, :expiration 1655424000, :stock-price 133.11, :iv 0.2829661547851562, :annual-dividend-rate 0.82, :last-price 18.8, :strike 125.0, :oi 10190, :annual-dividend-yield nil, :prev-close 133.41, :prev-open 133.46, :ask 18.8, :bid 18.6}}
-
-(def entry (last ddd))
-
-(def rfr 0.0154)
-
-(defn calc-annual-yield
-  [{:keys [annual-dividend-yield annual-dividend-rate stock-price]}]
-  (or annual-dividend-yield
-      (/ (or annual-dividend-rate 0) stock-price)))
-
-(defn expiration-years
-  [t]
-  (let [now (/ (System/currentTimeMillis) 1000)
-        time-left (- t now)
-        days (/ time-left 86400)]
-    (/ days 365)))
-
-(defn calc-d1
-  "Following https://www.macroption.com/black-scholes-formula/"
-  [{s0 :stock-price X :strike t :expiration v :iv :as data}]
-  (let [q (calc-annual-yield data)
-        t (expiration-years t)]
-    (/ (+ (Math/log (/ s0 X))
-          (* t (+ (- rfr q) (/ (Math/pow v 2) 2))))
-       (* v (Math/sqrt t)))))
-
-(defn calc-d2
-  [d1 v t]
-  (- d1 (* v (Math/sqrt t))))
-
-(defn calc-delta-call
-  [data]
-  (let [d1 (calc-d1 data)
-        q (calc-annual-yield data)
-        t (expiration-years (:expiration data))]
-    (* (Math/exp (- (* q t)))
-       (dc/cdf (dc/->Normal 0 1) d1))))
-
-(defn calc-gamma
-  [{s0 :stock-price X :strike t :expiration v :iv :as data}]
-  (let [d1 (calc-d1 data)
-        q (calc-annual-yield data)
-        t (expiration-years t)]
-    (*
-     (/ (Math/exp (- (* q t)))
-        (* s0 v (Math/sqrt t)))
-     (/ 1 (Math/sqrt (* 2 Math/PI)))
-     (Math/exp (- (/ (* d1 d1) 2))))))
-
-(defn calc-theta-call
-  [{s0 :stock-price X :strike t :expiration v :iv :as data}]
-  (let [t (expiration-years t)
-        d1 (calc-d1 data)
-        d2 (calc-d2 d1 v t)
-        q (calc-annual-yield data)
-        eqt (Math/exp (- (* q t)))]
-    (*
-     (/ 1 365)
-     (+
-      (- (/
-          (* s0 v eqt (Math/exp (- (/ (* d1 d1) 2))))
-          (* 2 (Math/sqrt t) (Math/sqrt (* 2 Math/PI)))))
-      (-
-       (* rfr X (Math/exp (- (* rfr t))) (dc/cdf (dc/->Normal 0 1) d2)))
-      (* q s0 eqt (dc/cdf (dc/->Normal 0 1) d1))))))
-
-(defn calc-vega
-  [{s0 :stock-price X :strike t :expiration v :iv :as data}]
-  (let [t (expiration-years t)
-        d1 (calc-d1 data)
-        q (calc-annual-yield data)
-        eqt (Math/exp (- (* q t)))]
-    (/
-     (* s0 eqt (Math/sqrt t) (Math/exp (- (/ (* d1 d1) 2))))
-     (* 100 (Math/sqrt (* 2 Math/PI))))))
-
-(def entry2 (assoc-in entry [:data :iv] 0.27747))
-
-(calc-delta-call (:data entry))
-;; => 0.6504546155697042
-(calc-gamma (:data entry))
-;; => 0.009883982961691243
-(calc-theta-call (:data entry))
-;; => -0.020590493144231267
-(calc-vega (:data entry))
-;; => 0.48027260942214356
+(def testdd (time (aggregate-ticker "./nly/options/" "NLY" 10)))
+(align-option-data (first testdd))

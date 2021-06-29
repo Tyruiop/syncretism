@@ -133,28 +133,31 @@
           (+ (* w1 v1) (* w2 v2))))
       (rest d1) (rest d2)))))
 
-(defn is-active? [[_ ask bid & _]] (and (> ask 0) (> bid 0)))
+(defn is-active? [[_ ask bid & _]] (and ask bid (> ask 0) (> bid 0)))
 
 (defn align-option-data-helper
-  [acc start-ts [ts & n-steps :as steps] [d1 d2 d3 & n-data :as data]]
-  (cond
+  [acc start-ts [ts & n-steps :as steps] [d1 d2 d3 :as data]]
+  (if (nil? ts)
     ;; We processed all the steps, done
-    (nil? ts)
-    [nil acc]
+    acc
 
-    ;; If we reach this, something went wrong, to investigate
-    (nil? d1)
-    [steps acc]
-
-    :else
     (let [t1 (first d1)
           t2 (first d2)
           t3 (first d3)
           full-ts (+ ts start-ts)
           dt1 (get-day-of-week t1)
-          dt2 (get-day-of-week t2)
+          dt2 (when d2 (get-day-of-week t2))
           dts (get-day-of-week full-ts)]
       (cond
+        ;; t1    ts  
+        ;; |-----|---nil end of valid data (which should be suspicious)
+        (nil? d2)
+        (reduce
+         (fn [acc ts]
+           (conj acc [ts d1]))
+         acc
+         steps)
+        
         ;; t1    ts   t2
         ;; |-----|----|     same day
         (and  (>= full-ts t1) (<= full-ts t2) (= dt1 dt2))
@@ -170,6 +173,11 @@
         (and  (>= full-ts t1) (>= t2 full-ts) (= dt2 dts))
         (recur (conj acc [ts d2]) start-ts n-steps data)
 
+        ;; t1  dc  ts  dc  t2
+        ;; |---|---|---|---|     all different days
+        (and  (>= full-ts t1) (<= full-ts t2))
+        (recur (conj acc [ts (average full-ts d1 d2)]) start-ts n-steps data)
+
         ;; ts    t1   t2
         ;; |-----|----|     means we don't have any valid value before ts
         (and (>= t1 full-ts) (>= t2 full-ts))
@@ -178,11 +186,15 @@
         ;; t1    t2   ts
         ;; |-----|----|---nil  means we don't have any valid value after ts
         (and (<= t1 full-ts) (<= t2 full-ts) (nil? t3))
-        (conj acc [ts d2])
+        (reduce
+         (fn [acc ts]
+           (conj acc [ts d2]))
+         acc
+         steps)
 
         ;; t1    t2   ts   t3
         ;; |-----|----|----|   move along the data
-        :else (recur acc start-ts steps n-data)
+        :else (recur acc start-ts steps (rest data))
         ))))
 
 (defn align-option-data
@@ -191,9 +203,14 @@
                    (sort-by first)
                    (filter is-active?))
         start-date (-> sdata first first)
-        end-date (-> sdata last first)
-        [start-ts steps] (build-steps start-date end-date)]
-    [contract start-ts (align-option-data-helper [] start-ts steps sdata)]))
+        end-date (-> sdata last first)]
+    (when (and start-date end-date)
+      (let [[start-ts steps] (build-steps start-date end-date)]
+        [contract start-ts (align-option-data-helper [] start-ts steps sdata)]))))
 
 (def testdd (time (aggregate-ticker "./nly/options/" "NLY" 10)))
-(align-option-data (first testdd))
+(def res (time (doall (keep align-option-data testdd))))
+
+(->> testdd
+     (mapcat second)
+     (some (fn [[_ ask bid & _ :as d]] (when (or (nil? ask) (nil? bid)) d))))

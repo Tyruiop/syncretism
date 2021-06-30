@@ -237,7 +237,7 @@
           (fn [[[cs _ _ _] start-ts data]]
             (map
              (fn [[ts feats]]
-               (let [feat-vec (cons (str "\"" cs "\"")
+               (let [feat-vec (cons cs
                                     (cons (+ start-ts ts)
                                           (rest (clean-feats feats))))]
                  (concat feat-vec (drop 2 feat-vec)))) data)))

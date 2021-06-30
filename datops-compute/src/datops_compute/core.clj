@@ -23,7 +23,7 @@
           (recur (assoc acc :timeseries (str/split v #",")) r))
 
         (= arg "--nb-days")
-        (recur (assoc acc :nb-days v) r)
+        (recur (assoc acc :nb-days (Integer/parseInt v)) r)
 
         (= arg "--opts-path")
         (recur (assoc acc :opts-path v) r)))

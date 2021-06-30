@@ -88,13 +88,3 @@
                  " ON DUPLICATE KEY UPDATE "
                  (str/join ", " (map #(str % "= ?") (drop 2 ts-columns))))])]
     (jdbp/execute-batch! ps data)))
-
-
-(repeat ts-columns-nb "?")
-
-(println (str
-          "INSERT INTO timeseries ("
-          /          (str/join ", " ts-columns)
-          ") VALUES (" (str/join ", " (first datops-compute.timeseries/data)) ")"
-          " ON DUPLICATE KEY UPDATE "
-          (str/join ", " (map #(str %1 "=" %2) ts-columns (first datops-compute.timeseries/data)))))

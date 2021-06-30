@@ -245,14 +245,15 @@
 
 (defn process-options
   [option-path tickers nb-days]
-  (doseq [ticker tickers]
-    (info (str "Processing " ticker " series."))
-    (let [nbs (process-option option-path ticker nb-days)]
-      (info (str ticker " series done (" (apply + nbs) ").")))))
+  (let [nb-tickers (count tickers)]
+    (info (str "Processing " nb-tickers " tickers."))
+    (doseq [[i ticker] (map-indexed (fn [i t] [i t]) tickers)]
+      (info (str "Processing " ticker " (" i "/" nb-tickers ") series."))
+      (let [nbs (process-option option-path ticker nb-days)]
+        (info (str ticker " series done (" (apply + nbs) ")."))))))
 
 (defn process-all-options
   "Process all available options for n days"
   [option-path nb-days]
   (let [tickers (utils/find-tickers option-path)]
-    (info (str "Processing " (count tickers) " tickers."))
     (process-options option-path tickers nb-days)))

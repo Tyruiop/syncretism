@@ -43,20 +43,18 @@
   ask FLOAT,
   bid FLOAT,
   impliedVolatility FLOAT,
-  volume INT,
-  openInterest INT,
+  volume DOUBLE,
+  openInterest DOUBLE,
   delta FLOAT,
   gamma FLOAT,
   theta FLOAT,
   vega FLOAT,
-  regularMarketPrice FLOAT,
-  regularMarketVolume INT,
-  regularMarketChange FLOAT,
-  marketCap BIGINT,
+  regularMarketPrice DOUBLE,
+  regularMarketVolume DOUBLE,
+  regularMarketChange DOUBLE,
+  marketCap DOUBLE,
   PRIMARY KEY (contractSymbol, timestamp)
   ) ENGINE=Aria;"]))
-
-(timeseries-table-def)
 
 (def ts-columns
   ["contractSymbol"
@@ -88,30 +86,15 @@
                  (str/join ", " ts-columns)
                  ") VALUES (" (str/join ", " (repeat ts-columns-nb "?")) ")"
                  " ON DUPLICATE KEY UPDATE "
-                 (str/join ", " (map #(str % "= ?") ts-columns)))])]
-    (jdbp/execute-batch! ps data)
-    ))
+                 (str/join ", " (map #(str % "= ?") (drop 2 ts-columns))))])]
+    (jdbp/execute-batch! ps data)))
+
 
 (repeat ts-columns-nb "?")
 
 (println (str
           "INSERT INTO timeseries ("
-          (str/join ", " ts-columns)
+          /          (str/join ", " ts-columns)
           ") VALUES (" (str/join ", " (first datops-compute.timeseries/data)) ")"
           " ON DUPLICATE KEY UPDATE "
           (str/join ", " (map #(str %1 "=" %2) ts-columns (first datops-compute.timeseries/data)))))
-
-(db/execute! db [(str
-                  "INSERT INTO timeseries ("
-                  (str/join ", " ts-columns)
-                  ") VALUES (" (str/join ", " (first datops-compute.timeseries/data)) ")"
-                  " ON DUPLICATE KEY UPDATE "
-                  (str/join ", " (map #(str %1 "=" %2) ts-columns (first datops-compute.timeseries/data))))])
-
-(jdbc/execute! (jdbc/get-datasource db)
-               [(str
-                 "INSERT INTO timeseries ("
-                 (str/join ", " ts-columns)
-                 ") VALUES (" (str/join ", " (first data)) ")"
-                 " ON DUPLICATE KEY UPDATE "
-                 (str/join ", " (map #(str %1 "=" %2) ts-columns (first data))))])

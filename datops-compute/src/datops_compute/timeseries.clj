@@ -246,7 +246,7 @@
 (defn process-options
   [option-path tickers nb-days]
   (let [nb-tickers (count tickers)]
-    (info (str "Processing " nb-tickers " tickers."))
+    (info (str "Processing " nb-tickers " tickers over " nb-days " days."))
     (doseq [[i ticker] (map-indexed (fn [i t] [i t]) tickers)]
       (info (str "Processing " ticker " (" i "/" nb-tickers ") series."))
       (let [nbs (process-option option-path ticker nb-days)]

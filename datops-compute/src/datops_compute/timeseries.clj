@@ -228,7 +228,7 @@
 
 (defn process-option
   [option-path ticker nb-days]
-  (let [data (aggregate-ticker option-path ticker nb-days)]
+  (let [data (doall (aggregate-ticker option-path ticker nb-days))]
     (->> data
          (pmap align-option-data)
          (keep identity)

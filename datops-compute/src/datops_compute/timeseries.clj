@@ -230,7 +230,7 @@
   [option-path ticker nb-days]
   (let [data (aggregate-ticker option-path ticker nb-days)]
     (->> data
-         (map align-option-data)
+         (pmap align-option-data)
          (keep identity)
          doall
          (mapcat

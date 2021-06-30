@@ -254,4 +254,5 @@
   "Process all available options for n days"
   [option-path nb-days]
   (let [tickers (utils/find-tickers option-path)]
+    (info (str "Processing " (count tickers) " tickers."))
     (process-options option-path tickers nb-days)))

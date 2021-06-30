@@ -18,7 +18,7 @@
 (defn find-tickers
   [dir]
   (let [;; Get last date's dir
-        fdir (-> (io/file dir) file-seq last)]
+        fdir (->> (io/file dir) file-seq (filter #(.isDirectory %)) last)]
     (keep
      (fn [f]
        (let [fname (str f)]

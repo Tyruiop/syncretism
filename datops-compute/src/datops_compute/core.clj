@@ -2,12 +2,15 @@
   (:gen-class)
   (:require
    [taoensso.timbre :as timbre :refer [info warn error]]
-   [datops-compute.db-update :as dbu]))
+   [datops-compute.db :as db]))
 
 (defn -main
   [& args]
   (let [set-args (into #{} args)]
+    (when (set-args "--init-db")
+      (info "Initialize time series db")
+      (db/timeseries-table-def))
     (when (set-args "--yields")
       (info "Updating yields across active options.")
-      (dbu/update-live-options 10000)
+      (db/update-live-options 10000)
       (info "Done."))))

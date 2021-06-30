@@ -4,6 +4,7 @@
    [java-time :as jt]
    [com.climate.claypoole :as cp]
    [datops-compute.utils :as utils]
+   [datops-compute.db :as db]
    [datops-compute.greeks :as gks])
   (:import
    [java.sql Timestamp]
@@ -219,6 +220,36 @@
       (let [[start-ts steps] (build-steps start-date end-date)]
         [contract start-ts (align-option-data-helper [] start-ts steps sdata)]))))
 
+(defn clean-feats [feats] (map #(if (ratio? %) (float %) %) feats))
+(defn process-option
+  [option-path ticker nb-days]
+  (let [data (aggregate-ticker option-path ticker nb-days)]
+    (->> data
+         (map align-option-data)
+         (keep identity)
+         doall
+         (mapcat
+          (fn [[[cs _ _ _] start-ts data]]
+            (map
+             (fn [[ts feats]]
+               (cons (str "\"" cs "\"")
+                     (cons (+ start-ts ts)
+                           (rest (clean-feats feats))))) data)))
+         ;;db/write-series
+         )))
+
+(def data (process-option "./clov/options/" "CLOV" 1))
+
+(db/write-series (take 2 data))
+
+(take 2 data)
+;; => (("\"CLOV210820C00006000\"" 1624627800 7.66340964840556 7.36340964840556 1.3521422545338693 1N 639N 0.9675131722336467 0.010736517831614185 -0.005063982102270531 0.003616905866464292 13.375114472608342 3.111122E7 -0.4148853849795585 5.4583977E9) ("\"CLOV210820C00006000\"" 1624638600 7.2 7.0 1.3007847460937496 6 639 0.9668298684368111 0.01175104540970127 -0.004812180917158935 0.0035759306221124225 12.97 50502578 -0.8199997 5293069824))
+
+(defn process-all-options
+  "Process all available options starting today, until previous day"
+  [option-path nb-days]
+  (let [dir ()]))
+
 (def testdd (time (aggregate-ticker "./clov/options/" "CLOV" 30)))
 (def res (time (doall (keep align-option-data testdd))))
 
@@ -226,6 +257,8 @@
 (def res90-23 (filter #(-> % first first (clojure.string/includes? "23")) res90))
 
 (spit "labs/clov_series.json" (clojure.data.json/write-str res90-23))
+(def serie (-> "labs/meme_series93.json" slurp clojure.data.json/read-str (nth 411)))
+(spit "labs/BB210917C00023000.json" (clojure.data.json/write-str serie))
 
 (map (comp count last) res)
 

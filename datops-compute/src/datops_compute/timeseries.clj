@@ -247,7 +247,8 @@
   [option-path tickers nb-days]
   (doseq [ticker tickers]
     (info (str "Processing " ticker " series."))
-    (process-option option-path ticker nb-days)))
+    (let [nbs (process-option option-path ticker nb-days)]
+      (info (str ticker " series done (" (apply + nbs) ").")))))
 
 (defn process-all-options
   "Process all available options for n days"

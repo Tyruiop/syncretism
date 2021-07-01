@@ -20,9 +20,10 @@
 
       <div class="api">
 	<h1 id="api">API</h1>
-	<h2 id="example-use">Example use:</h2>
+	<h2 id="live-option-data">Live option data</h2>
+	<h3 id="example-use">Example use:</h3>
 	<p><code>curl -X GET https://api.syncretism.io/ops  -H "Content-Type: application/json" -d '{"max-price": 0.5, "puts": true}'</code></p>
-	<h2 id="parameters">Parameters</h2>
+	<h3 id="parameters">Parameters</h3>
 	<ul>
 	  <li><p><code>tickers [string]</code>: a list of space or comma separated tickers to restrict or exclude them from the query.</p></li>
 	  <li><p><code>exclude [true|false]</code>: if true, then <code>tickers</code> are excluded. If false, the search is restricted to these tickers.</p></li>
@@ -68,6 +69,20 @@
 	  <li><p><code>limit [int]</code>: number of results (max 50).</p></li>
 	  <li><p><code>active [true|false]</code>: if set to true, restricts to options for which volume, open interest, ask, and bid are all <code>&gt; 0</code>.</p></li>
 	</ul>
+	<h2 id="ladder-request">Ladder request</h2>
+	<h3 id="example-use-1">Example use:</h3>
+	<p><code>curl -X GET https://api.syncretism.io/ops/ladder -H "Content-Type: application/json" -d '{"ticker": "ABEV", "expiration": 1626393600, "opt-type": "C"}'</code></p>
+	<h3 id="parameters-1">Parameters</h3>
+	<p>All parameters are required.</p>
+	<ul>
+	  <li><p><code>ticker [string]</code>: target ticker.</p></li>
+	  <li><p><code>expiration [int]</code>: target expiration date, timestamp in seconds.</p></li>
+	  <li><p><code>opt-type [string]</code>: either <code>C</code> (call) or <code>P</code> (put).</p></li>
+	</ul>
+	<h2 id="historical-data">Historical data</h2>
+	<h3 id="example-use-2">Example use:</h3>
+	<p>Endpoint is <code>/historical</code> and is called by passing an option name as parameter, e.g.:</p>
+	<p><code>curl -X GET https://api.syncretism.io/historical/PYPL210820P00280000</code></p>
       </div>
     </main>
     

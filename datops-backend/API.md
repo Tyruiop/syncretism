@@ -101,3 +101,11 @@ All parameters are required.
 * `expiration [int]`: target expiration date, timestamp in seconds.
 
 * `opt-type [string]`: either `C` (call) or `P` (put).
+
+## Historical data
+
+### Example use:
+
+Endpoint is `/historical` and is called by passing an option name as parameter, e.g.:
+
+`curl -X GET https://api.syncretism.io/historical/PYPL210820P00280000`

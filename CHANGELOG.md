@@ -7,6 +7,7 @@
 * sticky headers
 * Displays greeks
 * Ability to show spread (closest option).
+* Show options in/out of the money with background color
 
 ## Backend
 * Crawler calculates greeks as it goes!

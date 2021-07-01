@@ -175,6 +175,10 @@ th > p > strong > .order {
     border-left-color:var(--link-font-color);
 }
 
+.result.itm {
+    background:#8ebdff;
+}
+
 td.expiration, td.lasttradedate, td.inthemoney, td.opttype {
     text-align: center;
 }

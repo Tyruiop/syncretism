@@ -385,6 +385,11 @@
   [:div {:class ["loading"]}
    [:p "Loading..."]])
 
+(defn in-the-money?
+  [strike price opttype]
+  (or (and (= opttype "C") (>= price strike))
+      (and (= opttype "P") (< price strike))))
+
 (defn landing-results
   [state]
   (let [cur-time (- (cur-local-time) offset)
@@ -419,9 +424,11 @@
        (let [quotes (:cur-quotes @state)]
          (doall
           (map
-           (fn [{:keys [contractsymbol] :as entry}]
+           (fn [{:keys [contractsymbol strike regularmarketprice opttype] :as entry}]
              [:<> {:key (str "d-" contractsymbol)}
-              [:tr.d {:class ["result"]}
+              [:tr.d {:class ["result"
+                              (if (in-the-money? strike regularmarketprice opttype)
+                                "itm" "otm")]}
                (doall
                 (map
                  (fn [[id _]]

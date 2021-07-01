@@ -1,10 +1,12 @@
 # API
 
-## Example use:
+## Live option data
+
+### Example use:
 
 `curl -X GET https://api.syncretism.io/ops  -H "Content-Type: application/json" -d '{"max-price": 0.5, "puts": true}'`
 
-## Parameters
+### Parameters
 
 * `tickers [string]`: a list of space or comma separated tickers to restrict or exclude them from the query.
 
@@ -83,3 +85,19 @@
 * `limit [int]`: number of results (max 50).
 
 * `active [true|false]`: if set to true, restricts to options for which volume, open interest, ask, and bid are all `> 0`.
+
+## Ladder request
+
+### Example use:
+
+`curl -X GET https://api.syncretism.io/ops/ladder -H "Content-Type: application/json" -d '{"ticker": "ABEV", "expiration": 1626393600, "opt-type": "C"}'`
+
+### Parameters
+
+All parameters are required.
+
+* `ticker [string]`: target ticker.
+
+* `expiration [int]`: target expiration date, timestamp in seconds.
+
+* `opt-type [string]`: either `C` (call) or `P` (put).

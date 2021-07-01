@@ -46,5 +46,5 @@
       (info "Gather fundamental data.")
       (process-data tickers)
       (info (str "Fundamental data acquire for " (count tickers)))))
-  (Thread/sleep 60000)
+  (Thread/sleep (* 3 60 60 1000)) ;; wait 3h, so we don't do it so often.
   (recur))

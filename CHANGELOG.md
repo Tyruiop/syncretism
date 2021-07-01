@@ -6,6 +6,7 @@
 ## UI
 * sticky headers
 * Displays greeks
+* Ability to show spread (closest option).
 
 ## Backend
 * Crawler calculates greeks as it goes!
@@ -13,6 +14,10 @@
 
 ## API
 * New endpoint: https://api.syncretism.io/historical/
+* Ability to return option ladder for a given (ticker, opt type, expiration date) triplet.
+
+## Misc
+* Creation of `labs` folder that shows how to consume the data and how to display it.
 
 # Week 25, 2021
 

@@ -61,6 +61,18 @@
                     "dividends" (get events "dividendDate")}])))
          (into {}))))
 
+(defn get-ladder
+  "Given a (ticker, opt-type, expiration) input, returns all corresponding
+  options, to allow for vertical spread calculations."
+  [ticker opttype expiration]
+  (info (str "--- Ladder request " ticker " " expiration " " opttype))
+  (try
+    (db/query
+     db
+     (str "SELECT * FROM live WHERE symbol='" ticker
+          "' AND expiration=" expiration " AND opttype = '" opttype "'"))
+    (catch Exception e [])))
+
 (def order-aliases
   {"e_desc" "expiration desc"
    "e_asc" "expiration asc"
@@ -341,6 +353,9 @@
   (GET "/ops" req
        (let [res (-> req :body slurp (json/read-str :key-fn keyword) run-query)]
          (json/write-str res)))
+  (GET "/ops/ladder/:ticker/:opttype/:expiration"
+       [ticker opttype expiration]
+       (json/write-str (get-ladder ticker opttype expiration)))
   (GET "/historical/:contract" [contract]
        (json/write-str (get-timeseries contract)))
   (GET "/market/status" req (pr-str {:status (get-if-market)}))

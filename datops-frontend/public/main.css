@@ -179,6 +179,10 @@ th > p > strong > .order {
     background:#8ebdff;
 }
 
+.result.act-spread {
+    box-shadow:inset 0 0 5px #14357a;
+}
+
 td.expiration, td.lasttradedate, td.inthemoney, td.opttype {
     text-align: center;
 }
@@ -221,9 +225,12 @@ td.opttype.P > div {
     display:block;
 }
 
-.contractsymbol > div { display:flex; white-space:pre; }
-.contractsymbol > div > a {
-    flex:1;
+.contractsymbol > div { display:flex; white-space:pre; align-items:center; }
+.contractsymbol > div > .spread {
+    margin-right:0.3em; font-weight: bold; font-size:1.1em;
+}
+.contractsymbol > div > span {
+    flex:1; cursor: pointer;
     text-decoration: none;
     font-weight: 600;
     font-family:var(--main-font);

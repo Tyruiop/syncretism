@@ -197,7 +197,8 @@
         (swap! state #(update % :spreads toggle-set contractsymbol)))}
      (if (contains? (:spreads @state) contractsymbol)
        "-"
-       "+")]]
+       "+")
+     [:span "Check spread value"]]]
    [:span
     {:on-click
      (fn []

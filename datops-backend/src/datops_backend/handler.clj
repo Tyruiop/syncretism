@@ -43,6 +43,13 @@
            (map (fn [symb] (str "symbol=" (pr-str symb))) symbs))))
     (catch Exception e [])))
 
+(defn get-timeseries [contract]
+  (try
+    (db/query
+     db
+     (str "SELECT * FROM timeseries WHERE contractsymbol='" contract "'"))
+    (catch Exception e [])))
+
 (defn get-catalysts
   [symbs]
   (let [data (map (juxt :symbol (comp json/read-str :data)) (get-fundamentals symbs))]
@@ -334,6 +341,8 @@
   (GET "/ops" req
        (let [res (-> req :body slurp (json/read-str :key-fn keyword) run-query)]
          (json/write-str res)))
+  (GET "/historical/:contract" [contract]
+       (json/write-str (get-timeseries contract)))
   (GET "/market/status" req (pr-str {:status (get-if-market)}))
   (route/not-found "Not Found"))
 

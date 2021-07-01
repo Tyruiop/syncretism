@@ -9,6 +9,10 @@
 
 ## Backend
 * Crawler calculates greeks as it goes!
+* Ability to created aligned time series based on the collected historical data.
+
+## API
+* New endpoint: https://api.syncretism.io/historical/
 
 # Week 25, 2021
 

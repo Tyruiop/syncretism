@@ -44,6 +44,7 @@
     (catch Exception e [])))
 
 (defn get-timeseries [contract]
+  (info (str "--- timeseries request " contract))
   (try
     (db/query
      db

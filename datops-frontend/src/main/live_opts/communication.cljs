@@ -7,7 +7,7 @@
    
    [live-opts.state :refer [state]]))
 
-(def srv-addr "http://localhost:3000")
+(def srv-addr "https://api.syncretism.io")
 
 (defn get-market-status
   []

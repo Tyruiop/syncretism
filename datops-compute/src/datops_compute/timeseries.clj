@@ -1,15 +1,14 @@
-(ns datops-compute.timeseries
+(ns ^{:doc "Timeseries alignment for crawled data"}
+    datops-compute.timeseries
   (:require
    [clojure.java.io :as io]
    [taoensso.timbre :as timbre :refer [info warn error]]
-   [java-time :as jt]
    [com.climate.claypoole :as cp]
    [datops-compute.utils :as utils]
    [datops-compute.db :as db]
-   [datops-compute.greeks :as gks])
-  (:import
-   [java.sql Timestamp]
-   [java.time ZoneId]))
+   
+   [syncretism.greeks :as gks]
+   [syncretism.time :refer [ts-start-of-day get-day-of-week]]))
 
 ;; We use https://www.macroption.com/black-scholes-formula/ as reference
 (defn parse-line
@@ -64,31 +63,6 @@
          (map (fn [[idcontract data]] [idcontract (map #(drop 4 %) data)]))
          doall)))
 
-(defn ts-start-of-day
-  "Takes a timestamp, returns the timestamp of the start of that day, NY time.
-  Note that ZoneId/systemDefault is used, but the data is crawled in a Europe/Berlin
-  timezone server."
-  [ts]
-  (let [t-map (-> ts
-                  (Timestamp.)
-                  .toLocalDateTime
-                  (.atZone (ZoneId/systemDefault))
-                  (jt/with-zone-same-instant "America/New_York")
-                  jt/as-map)]
-    (- (int (/ ts 1000)) (:second-of-day t-map))))
-
-(defn get-day-of-week
-  "Takes a timestamp in seconds and returns the day of the week."
-  [ts]
-  (-> ts
-      (* 1000)
-      (Timestamp.)
-      .toLocalDateTime
-      (.atZone (ZoneId/of "America/New_York"))
-      (jt/with-zone-same-instant "America/New_York")
-      jt/as-map
-      :day-of-week))
-
 (def market-open-mins (+ (* 9 60 60) (* 30 60)))
 (def market-mid-mins (+ (* 12 60 60) (* 30 60)))
 (def market-close-mins (* 16 60 60))
@@ -115,9 +89,6 @@
             (into acc [market-open mid-day market-close]))))
       []
       (range days))]))
-
-;; (build-steps 1624615330 1624649106)
-;; => [1624593600 [34200 45000 57600]]
 
 ;; Aligning process
 ;; 1. take all crawls of a given stock, sort them

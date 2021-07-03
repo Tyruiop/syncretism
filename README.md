@@ -1,4 +1,4 @@
-# Syncretism
+# Syncretism  [![Clojure CI](https://github.com/Tyruiop/syncretism/actions/workflows/clojure.yml/badge.svg)](https://github.com/Tyruiop/syncretism/actions/workflows/clojure.yml)
 
 [Ops.Syncretism](https://ops.syncretism.io) is an open source options search engine based on [Yahoo! Finance](https://finance.yahoo.com) market data.
 

@@ -10,8 +10,8 @@
    [datops.shared :refer [config symbols update-tickers-dict]]
    [datops.endpoints :refer [all-endpoints available-endpoints
                              register-failure sort-endpoints]]
-   [datops.time :refer [cur-ny-time market-hour?]]
-   [datops.greeks :as gks])
+   [syncretism.time :refer [cur-ny-time market-time]]
+   [syncretism.greeks :as gks])
   (:gen-class))
 
 (def iter (atom (long 1)))
@@ -260,10 +260,10 @@
         old-time (atom 0)]
     (while (not-empty @queue)
       (let [cur-time (System/currentTimeMillis)
-            is-market (market-hour? cur-time)
+            is-market (market-time cur-time)
             cur-op (first @queue)
             endpoint (nth @available-endpoints (mod @iter nb-endpoints))]
-        (if (or is-market (:force-crawl config))
+        (if (or (not= "CLOSED" is-market) (:force-crawl config))
           (do
             (swap! queue #(->> % rest (into [])))
             (future (process-queue (:debug config) endpoint cur-op))

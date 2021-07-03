@@ -7,12 +7,12 @@
   :dependencies [[org.clojure/clojure "1.10.0"]
                  [org.clojure/data.json "1.0.0"]
                  [org.clojure/java.jdbc "0.7.12"]
-                 [clojure.java-time "0.3.2"]
                  [com.taoensso/timbre "5.1.2"]
                  [mysql/mysql-connector-java "8.0.23"]
                  [compojure "1.6.1"]
                  [ring/ring-defaults "0.3.2"]
-                 [ring-cors "0.1.13"]]
+                 [ring-cors "0.1.13"]
+                 [org.clojars.tyruiop/syncretism "0.1.0"]]
   :plugins [[lein-ring "0.12.5"]]
   :ring {:handler datops-backend.handler/app}
   :profiles

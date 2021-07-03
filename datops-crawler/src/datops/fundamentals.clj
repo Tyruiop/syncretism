@@ -4,8 +4,8 @@
    [clojure.data.json :as json]
    [clj-http.client :as http]
    [datops.db :as odb]
-   [datops.time :refer [market-hour?]]
-   [datops.shared :refer [symbols]]))
+   [datops.shared :refer [symbols]]
+   [syncretism.time :refer [market-time]]))
 
 (defn format-address
   [ticker]
@@ -41,7 +41,7 @@
 
 (defn crawler
   []
-  (when (not (market-hour? (System/currentTimeMillis)))
+  (when (not (market-time (System/currentTimeMillis)))
     (let [tickers (keys @symbols)]
       (info "Gather fundamental data.")
       (process-data tickers)

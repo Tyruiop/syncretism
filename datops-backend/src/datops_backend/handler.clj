@@ -2,7 +2,6 @@
   (:require
    [clojure.string :as str]
    [clojure.data.json :as json]
-   [java-time :as jt]
    [compojure.core :refer :all]
    [compojure.handler :as handler]
    [compojure.route :as route]
@@ -10,10 +9,8 @@
    [taoensso.timbre.appenders.core :as appenders]
    [clojure.java.jdbc :as db]
    [ring.middleware.cors :refer [wrap-cors]]
-   [ring.middleware.defaults :refer [wrap-defaults site-defaults]])
-  (:import
-   [java.sql Timestamp]
-   [java.time ZoneId]))
+   [ring.middleware.defaults :refer [wrap-defaults site-defaults]]
+   [syncretism.time :refer [market-time]]))
 
 (timbre/merge-config!
  {:appenders {:println {:enabled? false}
@@ -296,44 +293,6 @@
       (db/query db query)
       (catch Exception _ {:error "Error in query."}))))
 
-(defn get-if-market
-  "Input ts
-  Returns ts if it is a valid market time, otherwise the next possible market time"
-  []
-  (let [d (-> (System/currentTimeMillis)
-              (Timestamp.)
-              .toLocalDateTime
-              (.atZone (ZoneId/systemDefault))
-              (jt/with-zone-same-instant "America/New_York")
-              jt/as-map)
-        {:keys [day-of-week hour-of-day minute-of-hour second-of-day]} d
-        mins (+ minute-of-hour (* hour-of-day 60))]
-    (cond (= 6 day-of-week)   ;; Saturday
-          "CLOSED"
-          
-          (= 7 day-of-week)   ;; Sunday
-          "CLOSED"
-          
-          (< hour-of-day 4)        ;; Pre-market open (4h)
-          "CLOSED"
-          
-          (>= hour-of-day 20) ;; End market open (20h)
-          "CLOSED"
-
-          (and (< hour-of-day 20) (>= hour-of-day 16))
-          "POST"
-
-          (and (>= hour-of-day 4)
-               (or (< hour-of-day 9)
-                   (and (= hour-of-day 9) (< minute-of-hour 30))))
-          "PRE"
-
-          (and (<= hour-of-day 16)
-               (or (>= hour-of-day 10)
-                   (and (= hour-of-day 9) (>= minute-of-hour 30))))
-          "OPEN")))
-
-
 (defroutes app-routes
   (GET "/" [] "Hi :)")
   (GET "/index.html" req (pr-str req))
@@ -359,7 +318,7 @@
        (json/write-str (get-ladder ticker opttype expiration)))
   (GET "/historical/:contract" [contract]
        (json/write-str (get-timeseries contract)))
-  (GET "/market/status" req (pr-str {:status (get-if-market)}))
+  (GET "/market/status" req (pr-str {:status (market-time (System/currentTimeMillis))}))
   (route/not-found "Not Found"))
 
 (def app

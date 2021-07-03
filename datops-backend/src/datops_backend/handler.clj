@@ -41,12 +41,13 @@
     (catch Exception e [])))
 
 (defn get-timeseries [contract]
-  (info (str "--- timeseries request " contract))
-  (try
-    (db/query
-     db
-     (str "SELECT * FROM timeseries WHERE contractsymbol='" contract "'"))
-    (catch Exception e [])))
+  (let [contract (str/replace contract #"[^A-Z0-9]" "")]
+    (info (str "--- timeseries request " contract))
+    (try
+      (db/query
+       db
+       (str "SELECT * FROM timeseries WHERE contractsymbol='" contract "'"))
+      (catch Exception e []))))
 
 (defn get-catalysts
   [symbs]

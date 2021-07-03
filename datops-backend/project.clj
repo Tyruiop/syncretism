@@ -12,7 +12,7 @@
                  [compojure "1.6.1"]
                  [ring/ring-defaults "0.3.2"]
                  [ring-cors "0.1.13"]
-                 [syncretism "0.1.0"]]
+                 [org.clojars.tyruiop/syncretism "0.1.0"]]
   :plugins [[lein-ring "0.12.5"]]
   :ring {:handler datops-backend.handler/app}
   :profiles

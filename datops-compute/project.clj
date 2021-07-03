@@ -12,7 +12,7 @@
                  [com.taoensso/timbre "5.1.2"]
                  [mysql/mysql-connector-java "8.0.23"]
 
-                 [syncretism "0.1.0"]]
+                 [org.clojars.tyruiop/syncretism "0.1.0"]]
   :main ^:skip-aot datops-compute.core
   :target-path "target/%s"
   :profiles {:uberjar {:aot :all

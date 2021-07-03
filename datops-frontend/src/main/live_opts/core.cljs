@@ -245,7 +245,7 @@
 (defn draw-row
   [state cur-time
    {:keys [contractsymbol strike regularmarketprice opttype expiration symbol] :as entry}]
-  (let [quotes (:quotes @state)
+  (let [quotes (:cur-quotes @state)
         next (when (contains? (:spreads @state) contractsymbol)
                (get-next-data contractsymbol symbol expiration opttype))]
     [:<> {:key (str "d-" contractsymbol)}
@@ -305,8 +305,8 @@
         columns-w-names))]
      (when (contains? (:cur-visible-quotes @state) contractsymbol)
        [:tr.q {:key (str "q-" contractsymbol)}
-        [:td {:colspan nb-columns}
-         (show-quote-data contractsymbol (get quotes (:symbol entry)))]])]))
+        [:td {:colSpan nb-columns}
+         (show-quote-data contractsymbol (get quotes symbol))]])]))
 
 (defn landing-results
   [state]

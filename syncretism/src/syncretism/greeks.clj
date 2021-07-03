@@ -1,12 +1,11 @@
-(ns datops.greeks
+(ns syncretism.greeks
   "Following https://www.macroption.com/black-scholes-formula/"
   (:require
-   [distributions.core :as dc]
-   [datops.shared :refer [config]]))
+   [fastmath.random :as fr]))
 
 ;; Risk free interest rate, 
-(def rfr (:risk-free config))
-(def cdf-normal (dc/cdf (dc/->Normal 0 1)))
+(def rfr 0.0154)
+(def cdf-normal (fn [x] (fr/cdf (fr/distribution :normal) x)))
 
 (defn calc-annual-yield
   [{:keys [annual-dividend-yield annual-dividend-rate stock-price]}]
@@ -80,6 +79,3 @@
           [:vega (calc-vega full-data)]]
          (filter #(-> % last Double/isNaN not))
          (into {}))))
-
-;; (calculate-greeks {:v 34, :expiration 1655424000, :stock-price 133.11, :iv 0.2829661547851562, :annual-dividend-rate 0.82, :last-price 18.8, :strike 125.0, :oi 10190, :annual-dividend-yield nil, :prev-close 133.41, :prev-open 133.46, :ask 18.8, :bid 18.6 :opt-type "C"})
-;; => {:delta 0.6504567155566657, :gamma 0.009884726330871105, :theta -0.020591991134993527, :vega 0.4802358119999822}

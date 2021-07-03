@@ -111,9 +111,13 @@ Very early stage, software to do post processing on the crawled data. For the mo
 * can be used to calculate the yield & monthly yield of all non expired options.
 * can be used to create aligned time series from the crawled data.
 
+## Syncretism library `/syncretism`
+
+Contain the shared bits of the different utilities above.
+
 ## Labs `/labs`
 
-Quick examples / experiments regarding what can be done with the data.
+[Quick examples / experiments regarding what can be done with the data](https://github.com/Tyruiop/syncretism-labs).
 
 # Licence
 

@@ -19,6 +19,8 @@
 
 ## Misc
 * Creation of `labs` folder that shows how to consume the data and how to display it.
+* Creation of `syncretism` library, containing all the calculation/"smart" reusable bits.
+* Addition of tests.
 
 # Week 25, 2021
 

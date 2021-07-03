@@ -28,9 +28,6 @@
         (= arg "--opts-path")
         (recur (assoc acc :opts-path v) r)))
 
-;; (parse-args {} ["--yields" "--opts-path" "COUCOU/" "--timeseries" "AAPL,CLOV"])
-;; => {:yields true, :opts-path "COUCOU/", :timeseries ["AAPL" "CLOV"]}
-
 (defn -main
   [& args]
   (let [set-args (parse-args {} args)]

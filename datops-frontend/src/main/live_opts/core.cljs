@@ -404,6 +404,14 @@
         (set! (.-value (gdom/getElement "min-exp-value")) min-exp))
       (when max-exp
         (set! (.-value (gdom/getElement "max-exp-value")) max-exp)))
+    
+    ;; IV
+    (let [min-iv (.get url-params "min-iv")
+          max-iv (.get url-params "max-iv")]
+      (when min-iv
+        (set! (.-value (gdom/getElement "min-iv-value")) min-iv))
+      (when max-iv
+        (set! (.-value (gdom/getElement "max-iv-value")) max-iv)))
 
     ;; Premium
     (let [min-price (.get url-params "min-price")

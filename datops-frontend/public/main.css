@@ -42,7 +42,7 @@
 .m { width:50%; padding:0 13px; }
 .m.right { text-align: right; }
 .menu p > a {
-    cursor: pointer; font-size: 0.9em; text-decoration: none; font-weight: 300;
+    cursor: pointer; font-size: 1.1em; text-decoration: none; font-weight: 300;
     color:var(--link-font-color); margin-left: 7px;
 }
 .menu p > a:hover { text-decoration: underline; }

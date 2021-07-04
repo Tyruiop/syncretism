@@ -70,6 +70,10 @@
         min-exp (.-value (gdom/getElement "min-exp-value"))
         max-exp (.-value (gdom/getElement "max-exp-value"))
 
+        ;; IV
+        min-iv (.-value (gdom/getElement "min-iv-value"))
+        max-iv (.-value (gdom/getElement "max-iv-value"))
+
         ;; Premium
         max-price (.-value (gdom/getElement "max-price-value"))
         min-price (.-value (gdom/getElement "min-price-value"))
@@ -134,6 +138,10 @@
           ;; Expiration
           "&min-exp=" (js/encodeURIComponent min-exp)
           "&max-exp=" (js/encodeURIComponent max-exp)
+
+          ;; IV
+          "&min-iv=" (js/encodeURIComponent min-iv)
+          "&max-iv=" (js/encodeURIComponent max-iv)
 
           ;; Premium
           "&max-price=" (js/encodeURIComponent max-price)

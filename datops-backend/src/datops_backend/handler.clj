@@ -61,7 +61,7 @@
 (defn get-catalysts
   [symbs]
   (let [data (map
-              (juxt :fundamentals/symbol (comp json/read-str :fundamentals/data))
+              (juxt :symbol (comp json/read-str :data))
               (get-fundamentals symbs))]
     (->> data
          (map (fn [[ticker d]]

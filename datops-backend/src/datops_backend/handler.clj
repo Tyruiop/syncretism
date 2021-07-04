@@ -386,6 +386,9 @@
        [ticker opttype expiration]
        (let [q-res (get-ladder ticker opttype expiration)]
          (json/write-str q-res)))
+  (GET "/catalysts/:ticker"
+       [ticker]
+       (json/write-str (get-catalysts [ticker])))
   (GET "/historical/:contract" [contract]
        (json/write-str (get-timeseries contract)))
   (GET "/market/status" req (pr-str {:status (market-time (System/currentTimeMillis))}))

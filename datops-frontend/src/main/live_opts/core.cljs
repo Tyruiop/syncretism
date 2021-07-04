@@ -11,31 +11,31 @@
    [live-opts.communication :refer [get-market-status get-ladder send-query]]))
 
 (def columns-w-names
-  [[:contractsymbol "Contract Symbol" "CS"]
+  [[:contractSymbol "Contract Symbol" "CS"]
    [:symbol "Symbol" "S"]
-   [:opttype "Type" "T"]
+   [:optType "Type" "T"]
    [:strike "Strike" "Str"]
    [:expiration "Expiration" "Exp"]
-   ;;[:lasttradedate "Last Trade Date" "LTD"]
-   [:impliedvolatility "Implied Volatility" "IV"]
+   ;;[:lastTradeDate "Last Trade Date" "LTD"]
+   [:impliedVolatility "Implied Volatility" "IV"]
    [:bid "Bid" "B"]
    [:ask "Ask" "A"]
-   [:lastprice "Last Price" "LP"]
+   [:lastPrice "Last Price" "LP"]
    [:volume "Volume" "V"]
-   [:openinterest "Open Interest" "OI"]
+   [:openInterest "Open Interest" "OI"]
    [:yield "Yield" "Y"]
    [:monthlyyield "Monthly Yield" "MY"]
    ;;[:inthemoney "In the Money" "ItM"]
    ;;[:pchange "Price Change" "PC"]
-   [:regularmarketprice "Stock Market Price" "SMP"]
-   [:regularmarketdaylow "Stock Market Day Low" "SMDL"]
-   [:regularmarketdayhigh "Stock Market Day High" "SMDH"]
+   [:regularMarketPrice "Stock Market Price" "SMP"]
+   [:regularMarketDayLow "Stock Market Day Low" "SMDL"]
+   [:regularMarketDayHigh "Stock Market Day High" "SMDH"]
    [:delta "Delta" "δ"]
    [:gamma "Gamma" "γ"]
    [:theta "Theta" "θ"]
    [:vega "Vega" "ν"]
    ;;[:quotetype "Quote Type" "QT"]
-   [:lastcrawl "Last Updated" "LU"]
+   [:lastCrawl "Last Updated" "LU"]
    ])
 
 (def nb-columns (count columns-w-names))
@@ -85,7 +85,7 @@
           :else "< 1 min")))
 
 (defn show-quote-data
-  [contractsymbol
+  [contractSymbol
    {:keys [symbol displayName longName quoteType
            ask askSize bid bidSize averageDailyVolume10Day averageDailyVolume3Month
            bookValue dividendDate earningsTimestamp epsCurrentYear exchangeDataDelayedBy
@@ -112,7 +112,7 @@
           :target "_blank"}
       "yahoo stock overview"]]
     [:p
-     [:a {:href (str "https://finance.yahoo.com/quote/" contractsymbol)
+     [:a {:href (str "https://finance.yahoo.com/quote/" contractSymbol)
           :target "_blank"}
       "yahoo option overview"]]]
    [:div.columns
@@ -148,9 +148,9 @@
    [:p "Loading..."]])
 
 (defn in-the-money?
-  [strike price opttype]
-  (or (and (= opttype "C") (>= price strike))
-      (and (= opttype "P") (< price strike))))
+  [strike price optType]
+  (or (and (= optType "C") (>= price strike))
+      (and (= optType "P") (< price strike))))
 
 (defn draw-table-header
   [state sort-key reversed]
@@ -186,33 +186,33 @@
     (conj s v)))
 
 (defn draw-contract-symbol
-  [state contractsymbol ticker expiration opttype]
+  [state contractSymbol ticker expiration optType]
   [:<>
    [:div.spread
     [:p
      {:on-click
       (fn []
-        (when (nil? (get-in @state [:ladders [ticker expiration opttype]]))
-          (get-ladder ticker expiration opttype))
-        (swap! state #(update % :spreads toggle-set contractsymbol)))}
-     (if (contains? (:spreads @state) contractsymbol)
+        (when (nil? (get-in @state [:ladders [ticker expiration optType]]))
+          (get-ladder ticker expiration optType))
+        (swap! state #(update % :spreads toggle-set contractSymbol)))}
+     (if (contains? (:spreads @state) contractSymbol)
        "-"
        "+")
      [:span "Check spread value"]]]
    [:span
     {:on-click
      (fn []
-       (if (contains? (:cur-visible-quotes @state) contractsymbol)
-         (swap! state #(update % :cur-visible-quotes disj contractsymbol))
-         (swap! state #(update % :cur-visible-quotes conj contractsymbol))))}
-    contractsymbol]
+       (if (contains? (:cur-visible-quotes @state) contractSymbol)
+         (swap! state #(update % :cur-visible-quotes disj contractSymbol))
+         (swap! state #(update % :cur-visible-quotes conj contractSymbol))))}
+    contractSymbol]
    [:div.marker
-    {:class [(when (contains? (:cur-visible-quotes @state) contractsymbol) "rev")]
+    {:class [(when (contains? (:cur-visible-quotes @state) contractSymbol) "rev")]
      :on-click
      (fn []
-       (if (contains? (:cur-visible-quotes @state) contractsymbol)
-         (swap! state #(update % :cur-visible-quotes disj contractsymbol))
-         (swap! state #(update % :cur-visible-quotes conj contractsymbol))))}
+       (if (contains? (:cur-visible-quotes @state) contractSymbol)
+         (swap! state #(update % :cur-visible-quotes disj contractSymbol))
+         (swap! state #(update % :cur-visible-quotes conj contractSymbol))))}
     " "]])
 
 (defn draw-symbol
@@ -229,44 +229,44 @@
        [:div.catalyst.d [:p "D"] [:div.cat-info (str "dividends: " (get dividends "fmt"))]])]))
 
 (defn get-next-data
-  [contractsymbol ticker expiration opttype]
-  (let [ladder (get-in @state [:ladders [ticker expiration opttype]])]
+  [contractSymbol ticker expiration optType]
+  (let [ladder (get-in @state [:ladders [ticker expiration optType]])]
     (when (not (empty? ladder))
       (let [css (to-array (sort (keys ladder)))
-            target-index (+ (.indexOf css contractsymbol)
-                            (if (= opttype "C") 1 -1))
+            target-index (+ (.indexOf css contractSymbol)
+                            (if (= optType "C") 1 -1))
             ;; If somehow we are at an extremity of the ladder, just go to next available
             target-index (cond (= (.-length css) target-index) (- (.-length css) 2)
                                (= -1 target-index) 1
                                :else target-index)
             target-cs (nth (js->clj css) target-index)]
-        (get-in @state [:ladders [ticker expiration opttype] target-cs])))))
+        (get-in @state [:ladders [ticker expiration optType] target-cs])))))
 
 (defn draw-row
   [state cur-time
-   {:keys [contractsymbol strike regularmarketprice opttype expiration symbol] :as entry}]
+   {:keys [contractSymbol strike regularMarketPrice optType expiration symbol] :as entry}]
   (let [quotes (:cur-quotes @state)
-        next (when (contains? (:spreads @state) contractsymbol)
-               (get-next-data contractsymbol symbol expiration opttype))]
-    [:<> {:key (str "d-" contractsymbol)}
+        next (when (contains? (:spreads @state) contractSymbol)
+               (get-next-data contractSymbol symbol expiration optType))]
+    [:<> {:key (str "d-" contractSymbol)}
      [:tr.d {:class ["result"
-                     (if (in-the-money? strike regularmarketprice opttype)
+                     (if (in-the-money? strike regularMarketPrice optType)
                        "itm" "otm")
                      (when next "act-spread")]}
       (doall
        (map
         (fn [[id _]]
           (let [v (get entry id nil)]
-            [:td {:key (str contractsymbol "-" (name id))
+            [:td {:key (str contractSymbol "-" (name id))
                   :class [(name id)
                           (cond
-                            (= id :inthemoney) (if v "true" "false")
-                            (= id :opttype) v)]
+                            (= id :inTheMoney) (if v "true" "false")
+                            (= id :optType) v)]
                   :title (when (number? v) v)}
              [:div
-              (cond (= id :lastcrawl) (s-to-h-min (- cur-time v))
+              (cond (= id :lastCrawl) (s-to-h-min (- cur-time v))
 
-                    (or (= id :impliedvolatility)
+                    (or (= id :impliedVolatility)
                         (= id :yield) (= id :monthlyyield))
                     (if (number? v)
                       (gstring/format "%.2f" v)
@@ -275,22 +275,22 @@
                     (contains? #{:delta :theta :gamma :vega} id)
                     (if (number? v) (gstring/format "%.4f" v) "")
                     
-                    (or (= id :expiration) (= id :lasttradedate))
+                    (or (= id :expiration) (= id :lastTradeDate))
                     (if (number? v)
                       (-> (from-ts (+ (or v 0) offset-exp)) (str/split #",") first)
                       (str v))
 
-                    (or (= id :ask) (= id :bid) (= id :lastprice))
+                    (or (= id :ask) (= id :bid) (= id :lastPrice))
                     (if (number? v) [:<> "$" (.toFixed (if next (- v (get next id)) v) 2)] v)
 
-                    (or (= id :regularmarketprice)
-                        (= id :regularmarketdaylow)
-                        (= id :regularmarketdayhigh))
+                    (or (= id :regularMarketPrice)
+                        (= id :regularMarketDayLow)
+                        (= id :regularMarketDayHigh))
                     (if (number? v) [:<> "$" (.toFixed v 2)] v)
 
-                    (= id :contractsymbol)
+                    (= id :contractSymbol)
                     (draw-contract-symbol
-                     state contractsymbol symbol expiration opttype)
+                     state contractSymbol symbol expiration optType)
 
                     (= id :symbol)
                     (draw-symbol v)
@@ -298,20 +298,26 @@
                     (= id :strike)
                     (if next (str v "/" (:strike next)) (str v))
 
-                    (= id :openinterest)
+                    (= id :openInterest)
                     (if next (str (min v (get next id))) (str v))
                     
                     :else (str v))]]))
         columns-w-names))]
-     (when (contains? (:cur-visible-quotes @state) contractsymbol)
-       [:tr.q {:key (str "q-" contractsymbol)}
+     (when (contains? (:cur-visible-quotes @state) contractSymbol)
+       [:tr.q {:key (str "q-" contractSymbol)}
         [:td {:colSpan nb-columns}
-         (show-quote-data contractsymbol (get quotes symbol))]])]))
+         (show-quote-data contractSymbol (get quotes symbol))]])]))
 
 (defn landing-results
   [state]
   (let [cur-time (- (cur-local-time) offset)
-        {:keys [sort-key reversed]} (:cur-sort @state)]
+        {:keys [sort-key reversed]} (:cur-sort @state)
+        results (:cur-results @state)
+        d-results (distinct results)
+        limit
+        (let [l (js/parseInt
+                 (.-value (gdom/getElement "limit-value")))]
+          (if (js/isNaN l) 50 l))]
     [:div.content-wrapper
      [:table.results
       (draw-table-header state sort-key reversed)
@@ -320,9 +326,13 @@
         (map
          (partial draw-row state cur-time)
          (cond (and sort-key reversed)
-               (reverse (sort-by (first (nth columns-w-names sort-key)) (:cur-results @state)))
-               sort-key (sort-by (first (nth columns-w-names sort-key)) (:cur-results @state))
-               :else (:cur-results @state))))]]]))
+               (reverse (sort-by (first (nth columns-w-names sort-key)) d-results))
+               sort-key (sort-by (first (nth columns-w-names sort-key)) d-results)
+               :else d-results)))]]
+     (when (= (mod (count results) limit) 0)
+       [:div.more
+        {:on-click (fn [] (send-query state (count results)))}
+        [:p "More results"]])]))
 
 (defn landing [state]
   (r/create-class
@@ -348,8 +358,8 @@
   (doseq [el (.getElementsByTagName js/document "input")]
     (.addEventListener
      el "keydown"
-     (fn [ev] (when (= (.-keyCode ev) 13) (send-query state)))))
-  (.addEventListener (gdom/getElement "send") "click" (fn [] (send-query state)))
+     (fn [ev] (when (= (.-keyCode ev) 13) (send-query state 0)))))
+  (.addEventListener (gdom/getElement "send") "click" (fn [] (send-query state 0)))
   (.addEventListener
    (gdom/getElement "clear") "click"
    (fn []
@@ -404,6 +414,14 @@
         (set! (.-value (gdom/getElement "min-exp-value")) min-exp))
       (when max-exp
         (set! (.-value (gdom/getElement "max-exp-value")) max-exp)))
+    
+    ;; IV
+    (let [min-iv (.get url-params "min-iv")
+          max-iv (.get url-params "max-iv")]
+      (when min-iv
+        (set! (.-value (gdom/getElement "min-iv-value")) min-iv))
+      (when max-iv
+        (set! (.-value (gdom/getElement "max-iv-value")) max-iv)))
 
     ;; Premium
     (let [min-price (.get url-params "min-price")
@@ -506,7 +524,7 @@
          (or (= "true" exclude) (= "on" exclude)))))
     
     ;; Always send query when loading, even if with default values
-    (send-query state))
+    (send-query state 0))
   (rdom/render [(fn []
                   [:<>
                    [landing state]])]

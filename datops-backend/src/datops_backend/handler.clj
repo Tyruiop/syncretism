@@ -8,6 +8,8 @@
    [taoensso.timbre :as timbre :refer [info warn error]]
    [taoensso.timbre.appenders.core :as appenders]
    [clojure.java.jdbc :as db]
+   [next.jdbc :as jdbc]
+   [next.jdbc.prepare :as jdbp]
    [ring.middleware.cors :refer [wrap-cors]]
    [ring.middleware.defaults :refer [wrap-defaults site-defaults]]
    [syncretism.time :refer [market-time]]))
@@ -22,36 +24,45 @@
 
 (defn get-quotes [symbs]
   (try
-    (db/query
-     db
-     (str "SELECT * FROM live_quote WHERE "
-          (str/join
-           " OR "
-           (map (fn [symb] (str "symbol=" (pr-str symb))) symbs))))
+    (with-open [con (jdbc/get-connection db)]
+      (jdbc/execute!
+       con
+       (into
+        [(str "SELECT * FROM live_quote WHERE "
+              (str/join
+               " OR "
+               (map (fn [symb] "symbol=?") symbs)))]
+        symbs)))
     (catch Exception e [])))
 
 (defn get-fundamentals [symbs]
   (try
-    (db/query
-     db
-     (str "SELECT * FROM fundamentals WHERE "
-          (str/join
-           " OR "
-           (map (fn [symb] (str "symbol=" (pr-str symb))) symbs))))
+    (with-open [con (jdbc/get-connection db)]
+      (jdbc/execute!
+       con
+       (into
+        [(str "SELECT * FROM fundamentals WHERE "
+              [(str/join
+                " OR "
+                (map (fn [symb] "symbol=?") symbs))])]
+        symbs)))
     (catch Exception e [])))
 
 (defn get-timeseries [contract]
   (let [contract (str/replace contract #"[^A-Z0-9]" "")]
     (info (str "--- timeseries request " contract))
     (try
-      (db/query
-       db
-       (str "SELECT * FROM timeseries WHERE contractsymbol='" contract "'"))
+      (with-open [con (jdbc/get-connection db)]
+        (jdbc/execute!
+         con
+         ["SELECT * FROM timeseries WHERE contractsymbol=?" contract]))
       (catch Exception e []))))
 
 (defn get-catalysts
   [symbs]
-  (let [data (map (juxt :symbol (comp json/read-str :data)) (get-fundamentals symbs))]
+  (let [data (map
+              (juxt :fundamentals/symbol (comp json/read-str :fundamentals/data))
+              (get-fundamentals symbs))]
     (->> data
          (map (fn [[ticker d]]
                 (let [events (get d "calendarEvents")]
@@ -66,10 +77,17 @@
   [ticker opttype expiration]
   (info (str "--- Ladder request " ticker " " expiration " " opttype))
   (try
-    (db/query
-     db
-     (str "SELECT * FROM live WHERE symbol='" ticker
-          "' AND expiration=" expiration " AND opttype = '" opttype "'"))
+    (with-open [con (jdbc/get-connection db)]
+      (->> (jdbc/execute!
+            con
+            ["SELECT * FROM live WHERE symbol=?  AND expiration=? AND opttype = ?"
+             ticker expiration opttype])
+           (map
+            (fn [d]
+              (->> d
+                   (map (fn [[k v]] [(-> k name keyword) v]))
+                   (into {}))))
+           doall))
     (catch Exception e [])))
 
 (def order-aliases
@@ -88,28 +106,18 @@
 
 (defn parse-tickers
   [tickers exclude]
-  (let [candidates (-> tickers
-                       str/upper-case
-                       (str/split #"[ ,]+"))]
-    (->> candidates
-         (filter #(re-matches #"[A-Z]+" %))
-         (map
-          (fn [t]
-            (if exclude
-              (str "(live.symbol <> \"" t "\")")
-              (str "(live.symbol = \"" t "\")"))))
-         (str/join (if exclude " AND " " OR ")))))
-
-;; (parse-tickers "AAB,BAD TSLA aapl C132" true)
-;; => "(symbol <> AAB) AND (symbol <> BAD) AND (symbol <> TSLA) AND (symbol <> AAPL)"
-;; (parse-tickers "AAB,BAD TSLA aapl C132" false)
-;; => "(symbol = AAB) OR (symbol = BAD) OR (symbol = TSLA) OR (symbol = AAPL)"
+  (let [tick (-> tickers
+                 str/upper-case
+                 (str/split #"[ ,]+"))]
+    ;; Remove empty tickers
+    (filter #(not= % "") tick)))
 
 (defn sanitize-query
   [{:keys [limit
            min-diff max-diff
            min-ask-bid max-ask-bid
            min-exp max-exp
+           min-iv max-iv
            min-price max-price
            min-sto max-sto
            min-yield max-yield
@@ -127,6 +135,8 @@
       (assoc :max-ask-bid (try (Double/parseDouble max-ask-bid) (catch Exception e nil)))
       (assoc :min-exp (try (Integer/parseInt min-exp) (catch Exception e nil)))
       (assoc :max-exp (try (Integer/parseInt max-exp) (catch Exception e nil)))
+      (assoc :min-iv (try (Integer/parseInt min-iv) (catch Exception e nil)))
+      (assoc :max-iv (try (Integer/parseInt max-iv) (catch Exception e nil)))
       (assoc :min-price (try (Double/parseDouble min-price) (catch Exception e nil)))
       (assoc :max-price (try (Double/parseDouble max-price) (catch Exception e nil)))
       (assoc :min-sto (try (Double/parseDouble min-sto) (catch Exception e nil)))
@@ -154,6 +164,7 @@
                          min-diff max-diff itm otm
                          min-ask-bid max-ask-bid
                          min-exp max-exp
+                         min-iv max-iv
                          min-price max-price
                          calls puts
                          stock etf
@@ -165,12 +176,62 @@
                          min-theta max-theta
                          min-vega max-vega
                          min-cap max-cap
-                         order-by limit active]
+                         order-by limit offset active]
                   :as req}]
   (let [order-column (get order-aliases order-by "impliedvolatility desc")
         tickers (if tickers (parse-tickers tickers exclude) "")
         cur-time (int (/ (System/currentTimeMillis) 1000))
-
+        params '()
+        params (conj params (if (number? min-exp)
+                              (+ cur-time (* min-exp 3600 24))
+                              cur-time))
+        params (if max-exp
+                 (conj params (+ cur-time (* max-exp 3600 24)))
+                 params)
+        params (if (> (count tickers) 0)
+                 (conj params tickers)
+                 params)
+        params (if min-diff
+                 (into params [(float (- 1 (/ min-diff 100)))
+                               (float (+ 1 (/ min-diff 100)))])
+                 params)
+        params (if max-diff
+                 (into params [(float (- 1 (/ max-diff 100)))
+                               (float (+ 1 (/ max-diff 100)))])
+                 params)
+        params (if min-ask-bid (conj params min-ask-bid) params)
+        params (if max-ask-bid (conj params max-ask-bid) params)
+        params (if min-iv (conj params min-iv) params)
+        params (if max-iv (conj params max-iv) params)
+        params (if max-price (into params [max-price max-price]) params)
+        params (into params [(if min-price min-price 0.001) (if min-price min-price 0.001)])
+        params (if min-sto (conj params min-sto) params)
+        params (if max-sto (conj params max-sto) params)
+        params (if min-yield (conj params min-yield) params)
+        params (if max-yield (conj params max-yield) params)
+        params (if min-myield (conj params min-myield) params)
+        params (if max-myield (conj params max-myield) params)
+        params (if min-delta (conj params min-delta) params)
+        params (if max-delta (conj params max-delta) params)
+        params (if min-gamma (conj params min-gamma) params)
+        params (if max-gamma (conj params max-gamma) params)
+        params (if min-theta (conj params min-theta) params)
+        params (if max-theta (conj params max-theta) params)
+        params (if min-vega (conj params min-vega) params)
+        params (if max-vega (conj params max-vega) params)
+        params (if min-cap (conj params min-cap) params)
+        params (if max-cap (conj params max-cap) params)
+        params (into params
+                     [(- (int (/ (System/currentTimeMillis) 1000))
+                         (* 24 3600 21))
+                      (- (int (/ (System/currentTimeMillis) 1000))
+                         (* 24 3600 3))
+                      (if (number? offset)
+                        offset
+                        0)
+                      limit])
+        params (into [] (reverse params))
+        
         query
         (str
          ;; Start query
@@ -182,116 +243,123 @@
 
          ;; Minimum expiration date (do not consider expired options (start with this
          ;; to be sure to need AND after)
-         (str " expiration > " (if min-exp (+ cur-time (* min-exp 3600 24)) cur-time))
+         " expiration > ?"
+         
          ;; Max expiration date
-         (when max-exp (str " AND expiration <= " (+ cur-time (* max-exp 3600 24))))
+         (when max-exp
+           " AND expiration <= ?")
 
          ;; Ticker selection
          (when (> (count tickers) 0)
-           (if (or (str/includes? tickers "OR")
-                   (str/includes? tickers "AND"))
-             (str " AND (" tickers ")")
-             (str " AND " tickers)))
+           (if exclude
+             " AND live.symbol NOT IN ?"
+             " AND live.symbol IN ?"))
 
          ;; Stock to strike diff
          (when min-diff
-           (str " AND ((strike <= " (float (- 1 (/ min-diff 100)))
-                " * regularmarketprice)"
-                " OR (strike >= " (float (+ 1 (/ min-diff 100)))
-                " * regularmarketprice))"))
+           " AND ((strike <= ? * regularmarketprice) OR (strike >= ? * regularmarketprice))")
          (when max-diff
-           (str " AND strike >= " (float (- 1 (/ max-diff 100)))
-                " * regularmarketprice"
-                " AND strike <= " (float (+ 1 (/ max-diff 100)))
-                " * regularmarketprice"))
+           " AND strike >= ? * regularmarketprice AND strike <= ? * regularmarketprice")
+
+         ;; ITM/OTM
          (when (not itm)
-           (str " AND (((strike >= regularmarketprice) AND (opttype = \"C\"))"
-                " OR ((strike <= regularmarketprice) AND (opttype = \"P\")))"))
+           (str " AND (((strike >= regularmarketprice) AND (opttype = 'C'))"
+                " OR ((strike <= regularmarketprice) AND (opttype = 'P')))"))
          (when (not otm)
-           (str " AND (((strike <= regularmarketprice) AND (opttype = \"C\"))"
-                " OR ((strike >= regularmarketprice) AND (opttype = \"P\")))"))
+           (str " AND (((strike <= regularmarketprice) AND (opttype = 'C'))"
+                " OR ((strike >= regularmarketprice) AND (opttype = 'P')))"))
 
          ;; Ask bid spread
          (when min-ask-bid
-           (str " AND ask - bid >=" min-ask-bid))
+           " AND ask - bid >= ?")
          (when max-ask-bid
-           (str " AND ask - bid <=" max-ask-bid))
+           " AND ask - bid <= ?")
+
+         ;; IV
+         (when min-iv
+           " AND impliedvolatility >= ?")
+         (when max-iv
+           " AND impliedvolatility <= ?")
 
          ;; Premium (put a minimum price by default not to show options with no premium
          (when max-price
-           (str " AND ((ask <> 0 AND ask <= " max-price ") OR (ask = 0 AND lastprice <= " max-price "))"))
-         " AND ((ask <> 0 AND ask >= " (if min-price min-price 0.001)
+           (str " AND ((ask <> 0 AND ask <= ? "
+                ") OR (ask = 0 AND lastprice <= ?))"))
+         " AND ((ask <> 0 AND ask >= ?"
          ;; Here we do this because sometimes, yahoo resets all ask prices to 0
          ;; this allows us to check last price if it is the case
-         ") OR (ask = 0 AND lastprice >= " (if min-price min-price 0.001) "))"
+         ") OR (ask = 0 AND lastprice >= ?"
+         "))"
 
          ;; Opt-type
-         (when (not puts) " AND opttype <> \"P\"")
-         (when (not calls) " AND opttype <> \"C\"")
+         (when (not puts) " AND opttype <> 'P'")
+         (when (not calls) " AND opttype <> 'C'")
 
          ;; Stock type
-         (cond (and etf (not stock)) " AND quotetype = \"ETF\""
-               (and stock (not etf)) " AND quotetype <> \"ETF\""
+         (cond (and etf (not stock)) " AND quotetype = 'ETF'"
+               (and stock (not etf)) " AND quotetype <> 'ETF'"
                :else "")
 
          ;; Stock/Option price ratio
          (when min-sto
-           (str " AND (100*ask)/regularmarketprice >= " min-sto))
+           " AND (100*ask)/regularmarketprice >= ?")
          (when max-sto
-           (str " AND (100*ask)/regularmarketprice <= " max-sto))
+           " AND (100*ask)/regularmarketprice <= ?")
 
          ;; Yield
          (when min-yield
-           (str " AND yield >=" min-yield))
+           " AND yield >= ?")
          (when max-yield
-           (str " AND yield <=" max-yield))
+           " AND yield <= ?")
 
          ;; Monthly yield
          (when min-myield
-           (str " AND monthlyyield >=" min-myield))
+           " AND monthlyyield >= ?")
          (when max-myield
-           (str " AND monthlyyield <=" max-myield))
+           " AND monthlyyield <= ?")
 
          ;; Greeks
          (when min-delta
-           (str " AND delta >=" min-delta))
+           " AND delta >= ?")
          (when max-delta
-           (str " AND delta <=" max-delta))
+           " AND delta <= ?")
          (when min-gamma
-           (str " AND gamma >=" min-gamma))
+           " AND gamma >= ?")
          (when max-gamma
-           (str " AND gamma <=" max-gamma))
+           " AND gamma <= ?")
          (when min-theta
-           (str " AND theta >=" min-theta))
+           " AND theta >= ?")
          (when max-theta
-           (str " AND theta <=" max-theta))
+           " AND theta <= ?")
          (when min-vega
-           (str " AND vega >=" min-vega))
+           " AND vega >= ?")
          (when max-vega
-           (str " AND vega <=" max-vega))
+           " AND vega <= ?")
 
          ;; Market cap
          (when min-cap
-           (str " AND JSON_VALUE(live_quote.data, '$.marketCap') >= " min-cap))
+           " AND JSON_VALUE(live_quote.data, '$.marketCap') >= ?")
          (when max-cap
-           (str " AND JSON_VALUE(live_quote.data, '$.marketCap') <= " max-cap))
+           " AND JSON_VALUE(live_quote.data, '$.marketCap') <= ?")
 
          (when active
            " AND ask > 0 AND bid > 0 AND volume > 0 AND openinterest > 0")
          )
 
         ;; Last traded in the last week (old "active" flag, by default for the moment)
-        query (str query (str " AND lasttradedate > "
-                              (- (int (/ (System/currentTimeMillis) 1000))
-                                 (* 24 3600 21))
-                              " AND lastcrawl > "
-                              (- (int (/ (System/currentTimeMillis) 1000))
-                                 (* 24 3600 3))))
+        query (str query " AND lasttradedate > ? AND lastcrawl > ?")
         query (str query " ORDER BY " order-column)
-        query (str query " LIMIT " (min (or limit 50) 50))]
-    (info "--- Received:" req "→" query)
+        query (str query " LIMIT ?, ?")]
+    (info "--- Received:" req " → " query " → " params)
     (try
-      (db/query db query)
+      (with-open [con (jdbc/get-connection db)]
+        (->> (jdbc/execute! con (into [query] params))
+             (map
+              (fn [d]
+                (->> d
+                     (map (fn [[k v]] [(-> k name keyword) v]))
+                     (into {}))))
+             doall))
       (catch Exception _ {:error "Error in query."}))))
 
 (defroutes app-routes
@@ -306,7 +374,7 @@
              quotes (->> symbols
                          get-quotes
                          (map
-                          (fn [{symb :symbol data :data}]
+                          (fn [{symb :live_quote/symbol data :live_quote/data}]
                             [symb (json/read-str data :key-fn keyword)]))
                          (into {}))             
              catalysts (get-catalysts symbols)]
@@ -316,7 +384,8 @@
          (json/write-str res)))
   (GET "/ops/ladder/:ticker/:opttype/:expiration"
        [ticker opttype expiration]
-       (json/write-str (get-ladder ticker opttype expiration)))
+       (let [q-res (get-ladder ticker opttype expiration)]
+         (json/write-str q-res)))
   (GET "/historical/:contract" [contract]
        (json/write-str (get-timeseries contract)))
   (GET "/market/status" req (pr-str {:status (market-time (System/currentTimeMillis))}))

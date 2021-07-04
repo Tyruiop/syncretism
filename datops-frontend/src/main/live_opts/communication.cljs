@@ -7,7 +7,8 @@
    
    [live-opts.state :refer [state]]))
 
-(def srv-addr "https://api.syncretism.io")
+;; (def srv-addr "https://api.syncretism.io")
+(def srv-addr "http://localhost:3000")
 
 (defn get-market-status
   []
@@ -30,8 +31,8 @@
           clj-data (js->clj data :keywordize-keys true)
           ladder (->> clj-data
                       (map
-                       (fn [{:keys [contractsymbol] :as d}]
-                         [contractsymbol d]))
+                       (fn [{:keys [contractSymbol] :as d}]
+                         [contractSymbol d]))
                       (into {}))]
       (swap! state #(assoc-in % [:ladders [ticker expiration opttype]] ladder)))))
 
@@ -50,8 +51,9 @@
    "md_asc" {:sort-key 11 :reversed false}})
 
 (defn send-query
-  [state]
-  (swap! state #(assoc % :status :loading))
+  [state offset]
+  (when (= 0 offset)
+    (swap! state #(assoc % :status :loading)))
   (let [;; Ticker selection
         tickers (.-value (gdom/getElement "tickers-value"))
         exclude (.-checked (gdom/getElement "exclude"))
@@ -69,6 +71,10 @@
         ;; Exp date
         min-exp (.-value (gdom/getElement "min-exp-value"))
         max-exp (.-value (gdom/getElement "max-exp-value"))
+
+        ;; IV
+        min-iv (.-value (gdom/getElement "min-iv-value"))
+        max-iv (.-value (gdom/getElement "max-iv-value"))
 
         ;; Premium
         max-price (.-value (gdom/getElement "max-price-value"))
@@ -135,6 +141,10 @@
           "&min-exp=" (js/encodeURIComponent min-exp)
           "&max-exp=" (js/encodeURIComponent max-exp)
 
+          ;; IV
+          "&min-iv=" (js/encodeURIComponent min-iv)
+          "&max-iv=" (js/encodeURIComponent max-iv)
+
           ;; Premium
           "&max-price=" (js/encodeURIComponent max-price)
           "&min-price=" (js/encodeURIComponent min-price)
@@ -189,6 +199,7 @@
                      :min-diff min-diff :max-diff max-diff :otm otm :itm itm
                      :min-ask-bid min-ask-bid :max-ask-bid max-ask-bid
                      :min-exp min-exp :max-exp max-exp
+                     :min-iv min-iv :max-iv max-iv
                      :min-price min-price :max-price max-price
                      :puts puts :calls calls
                      :stock stock :etf etf
@@ -200,15 +211,20 @@
                      :min-theta min-theta :max-theta max-theta
                      :min-vega min-vega :max-vega max-vega
                      :min-cap min-cap :max-cap max-cap
-                     :order-by order-by :limit limit :active active
+                     :order-by order-by :limit limit :offset offset :active active
                      })}}))
             {:keys [quotes options catalysts]} (-> resp :body read-string)
             quotes (if (contains? quotes :error)
                      []
                      quotes)]
-        (swap! state #(-> %
-                          (assoc :cur-quotes quotes)
-                          (assoc :cur-results options)
-                          (assoc :cur-catalysts catalysts)
-                          (assoc :cur-sort (get order-aliases order-by))
-                          (assoc :status :results)))))))
+        (if (= 0 offset)
+          (swap! state #(-> %
+                            (assoc :cur-quotes quotes)
+                            (assoc :cur-results options)
+                            (assoc :cur-catalysts catalysts)
+                            (assoc :cur-sort (get order-aliases order-by))
+                            (assoc :status :results)))
+          (swap! state #(-> %
+                            (update :cur-quotes merge quotes)
+                            (update :cur-results into options)
+                            (update :cur-catalysts merge catalysts))))))))

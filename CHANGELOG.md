@@ -2,16 +2,19 @@
 
 ## Filters
 * Added filters over greeks (delta/gamma/theta/vega)
+* Added filter over IV
 
 ## UI
 * sticky headers
 * Displays greeks
 * Ability to show spread (closest option).
 * Show options in/out of the money with background color
+* Pagination of results
 
 ## Backend
 * Crawler calculates greeks as it goes!
 * Ability to created aligned time series based on the collected historical data.
+* Pagination of results
 
 ## API
 * New endpoint: https://api.syncretism.io/historical/
@@ -22,6 +25,7 @@
 * Creation of `syncretism` library, containing all the calculation/"smart" reusable bits.
 * Addition of tests.
 * Added CI to the repo.
+* Massive SQL vulnerability fixed.
 
 # Week 25, 2021
 

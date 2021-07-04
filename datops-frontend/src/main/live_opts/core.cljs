@@ -311,7 +311,12 @@
 (defn landing-results
   [state]
   (let [cur-time (- (cur-local-time) offset)
-        {:keys [sort-key reversed]} (:cur-sort @state)]
+        {:keys [sort-key reversed]} (:cur-sort @state)
+        results (:cur-results @state)
+        limit
+        (let [l (js/parseInt
+                 (.-value (gdom/getElement "limit-value")))]
+          (if (js/isNaN l) 50 l))]
     [:div.content-wrapper
      [:table.results
       (draw-table-header state sort-key reversed)
@@ -320,9 +325,13 @@
         (map
          (partial draw-row state cur-time)
          (cond (and sort-key reversed)
-               (reverse (sort-by (first (nth columns-w-names sort-key)) (:cur-results @state)))
-               sort-key (sort-by (first (nth columns-w-names sort-key)) (:cur-results @state))
-               :else (:cur-results @state))))]]]))
+               (reverse (sort-by (first (nth columns-w-names sort-key)) results))
+               sort-key (sort-by (first (nth columns-w-names sort-key)) results)
+               :else results)))]]
+     (when (= (mod (count results) limit) 0)
+       [:div.more
+        {:on-click (fn [] (send-query state (count results)))}
+        [:p "More results"]])]))
 
 (defn landing [state]
   (r/create-class
@@ -348,8 +357,8 @@
   (doseq [el (.getElementsByTagName js/document "input")]
     (.addEventListener
      el "keydown"
-     (fn [ev] (when (= (.-keyCode ev) 13) (send-query state)))))
-  (.addEventListener (gdom/getElement "send") "click" (fn [] (send-query state)))
+     (fn [ev] (when (= (.-keyCode ev) 13) (send-query state 0)))))
+  (.addEventListener (gdom/getElement "send") "click" (fn [] (send-query state 0)))
   (.addEventListener
    (gdom/getElement "clear") "click"
    (fn []
@@ -514,7 +523,7 @@
          (or (= "true" exclude) (= "on" exclude)))))
     
     ;; Always send query when loading, even if with default values
-    (send-query state))
+    (send-query state 0))
   (rdom/render [(fn []
                   [:<>
                    [landing state]])]

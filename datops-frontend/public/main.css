@@ -281,6 +281,14 @@ tr.q > td { padding:0 !important; }
 .column > .entry { display:flex; border-bottom:4px #eee solid; margin-top:5px; }
 .column > .entry > .value { flex:1; text-align:right; }
 
+.more {
+    margin:auto; margin-top:2%; padding:10px 20px; border:3px #333 solid;
+    width:200px; text-align: center; cursor:pointer; background:rgba(0,0,0,0.1);
+}
+.more:hover {
+    background:#fff;
+}
+
 .api { margin:0 15%; }
 .api li { margin-left: 1em; margin-bottom:0.5em; }
 .api code { background-color:#efefef; padding:5px; }

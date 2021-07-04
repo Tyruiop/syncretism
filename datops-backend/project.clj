@@ -7,6 +7,7 @@
   :dependencies [[org.clojure/clojure "1.10.0"]
                  [org.clojure/data.json "1.0.0"]
                  [org.clojure/java.jdbc "0.7.12"]
+                 [seancorfield/next.jdbc "1.1.613"]
                  [com.taoensso/timbre "5.1.2"]
                  [mysql/mysql-connector-java "8.0.23"]
                  [compojure "1.6.1"]

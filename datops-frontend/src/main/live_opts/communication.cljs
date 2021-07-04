@@ -7,7 +7,8 @@
    
    [live-opts.state :refer [state]]))
 
-(def srv-addr "https://api.syncretism.io")
+;; (def srv-addr "https://api.syncretism.io")
+(def srv-addr "http://localhost:3000")
 
 (defn get-market-status
   []
@@ -30,8 +31,8 @@
           clj-data (js->clj data :keywordize-keys true)
           ladder (->> clj-data
                       (map
-                       (fn [{:keys [contractsymbol] :as d}]
-                         [contractsymbol d]))
+                       (fn [{:keys [contractSymbol] :as d}]
+                         [contractSymbol d]))
                       (into {}))]
       (swap! state #(assoc-in % [:ladders [ticker expiration opttype]] ladder)))))
 

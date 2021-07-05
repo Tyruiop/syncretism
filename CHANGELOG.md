@@ -1,3 +1,5 @@
+# Week 27, 2021
+
 # Week 26, 2021
 
 ## Filters
@@ -17,11 +19,11 @@
 * Pagination of results
 
 ## API
-* New endpoint: https://api.syncretism.io/historical/
+* New endpoint: https://api.syncretism.io/historical/, see https://github.com/Tyruiop/syncretism-labs/blob/main/labs/comparing_two_options.ipynb for an example.
 * Ability to return option ladder for a given (ticker, opt type, expiration date) triplet.
 
 ## Misc
-* Creation of `labs` folder that shows how to consume the data and how to display it.
+* Creation of `syncertism-labs` repository that shows how to consume data and how to display it.
 * Creation of `syncretism` library, containing all the calculation/"smart" reusable bits.
 * Addition of tests.
 * Added CI to the repo.

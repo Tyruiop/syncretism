@@ -42,9 +42,9 @@
        con
        (into
         [(str "SELECT * FROM fundamentals WHERE "
-              [(str/join
-                " OR "
-                (map (fn [symb] "symbol=?") symbs))])]
+              (str/join
+               " OR "
+               (map (fn [symb] "symbol=?") symbs)))]
         symbs)))
     (catch Exception e [])))
 
@@ -60,9 +60,10 @@
 
 (defn get-catalysts
   [symbs]
-  (let [data (map
-              (juxt :symbol (comp json/read-str :data))
-              (get-fundamentals symbs))]
+  (let [d (get-fundamentals symbs)
+        data (map
+              (juxt :fundamentals/symbol (comp json/read-str :fundamentals/data))
+              d)]
     (->> data
          (map (fn [[ticker d]]
                 (let [events (get d "calendarEvents")]
@@ -189,7 +190,7 @@
                  (conj params (+ cur-time (* max-exp 3600 24)))
                  params)
         params (if (> (count tickers) 0)
-                 (conj params tickers)
+                 (into params tickers)
                  params)
         params (if min-diff
                  (into params [(float (- 1 (/ min-diff 100)))
@@ -251,9 +252,12 @@
 
          ;; Ticker selection
          (when (> (count tickers) 0)
-           (if exclude
-             " AND live.symbol NOT IN ?"
-             " AND live.symbol IN ?"))
+           (str
+            " AND ("
+            (if exclude
+              (str/join " AND " (map (fn [_] "live.symbol <> ?") tickers))
+              (str/join " OR " (map (fn [_] "live.symbol = ?") tickers)))
+            ")"))
 
          ;; Stock to strike diff
          (when min-diff

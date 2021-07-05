@@ -43,8 +43,8 @@
   []
   (when (= "CLOSED" (market-time (System/currentTimeMillis)))
     (let [tickers (keys @symbols)]
-      (info "Gather fundamental data.")
+      (info (str "Gathering fundamental data for " (count tickers) " symbols."))
       (process-data tickers)
-      (info (str "Fundamental data acquire for " (count tickers)))))
+      (info (str "Fundamental data acquisition for " (count tickers) " symbols"))))
   (Thread/sleep (* 3 60 60 1000)) ;; wait 3h, so we don't do it so often.
   (recur))

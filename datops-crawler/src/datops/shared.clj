@@ -60,13 +60,22 @@
 ;; For column 4 (etf), Y|N
 (defn build-nyse-dict
   []
-  (reduce
-   (fn [acc [symb sec-name exchange _ etf _ _ _]]
-     (assoc acc symb {:name sec-name :is-etf (= etf "Y") :exchange exchange :exp-dates #{}}))
-   {}
-   (filter
-    (fn [entry] (= "N" (nth entry 6)))
-    (-> "otherlisted.txt" slurp (csv/read-csv :separator \|)))))
+  (->> (try
+         (-> "otherlisted.txt" slurp (csv/read-csv :separator \|) doall)
+         (catch Exception _
+           (do
+             (println "Error in otherlisted.txt's structure, manually parsing.")
+             (->> "otherlisted.txt"
+                  slurp str/split-lines rest
+                  (map #(str/split % #"\|"))
+                  drop-last))))
+       (filter (fn [entry] (= "N" (nth entry 6))))
+       (reduce
+        (fn [acc [symb sec-name exchange _ etf _ _ _]]
+          (assoc
+           acc symb
+           {:name sec-name :is-etf (= etf "Y") :exchange exchange :exp-dates #{}}))
+        {})))
 
 ;; Symbols Map
 ;; -----------

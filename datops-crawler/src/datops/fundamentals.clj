@@ -41,7 +41,7 @@
 
 (defn crawler
   []
-  (when (not (market-time (System/currentTimeMillis)))
+  (when (= "CLOSED" (market-time (System/currentTimeMillis)))
     (let [tickers (keys @symbols)]
       (info "Gather fundamental data.")
       (process-data tickers)

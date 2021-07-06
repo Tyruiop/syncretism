@@ -106,7 +106,7 @@
    "mdl_asc" "regularmarketdaylow asc"})
 
 (defn parse-tickers
-  [tickers exclude]
+  [tickers]
   (let [tick (-> tickers
                  str/upper-case
                  (str/split #"[ ,]+"))]
@@ -178,9 +178,10 @@
                          min-vega max-vega
                          min-cap max-cap
                          order-by limit offset active]
-                  :as req}]
+                  :as req
+                  :or {etf true stock true itm true otm true puts true calls true}}]
   (let [order-column (get order-aliases order-by "impliedvolatility desc")
-        tickers (if tickers (parse-tickers tickers exclude) "")
+        tickers (if tickers (parse-tickers tickers) "")
         cur-time (int (/ (System/currentTimeMillis) 1000))
         params '()
         params (conj params (if (number? min-exp)

@@ -16,9 +16,9 @@
 
 * `max-diff [int]`: maximum difference in percentage between strike and stock price.
 
-* `itm [bool]`: select in the money options.
+* `itm [bool]`: select in the money options, **default: true**.
 
-* `otm [bool]`: select out of the money options.
+* `otm [bool]`: select out of the money options, **default: true**.
 
 * `min-ask-bid [float]`: minimum spread between bid and ask.
 
@@ -28,17 +28,21 @@
 
 * `max-exp [int]`: maximum days until expiration.
 
+* `min-iv [float]`: minimum implied volatility.
+
+* `max-iv [float]`: maximum implied volatility.
+
 * `min-price [float]`: minimum option premium.
 
 * `max-price [float]`: maximum option premium.
 
-* `calls [true|false]`: select call options.
+* `calls [true|false]`: select call options **default: true**.
 
-* `puts [true|false]`: select put options.
+* `puts [true|false]`: select put options **default: true**.
 
-* `stock [true|false]`: select normal stocks.
+* `stock [true|false]`: select normal stocks **default: true**.
 
-* `etf [true|false]`: select etf options.
+* `etf [true|false]`: select etf options **default: true**.
 
 * `min-sto [float]`: minimum option price / stock price ratio.
 
@@ -83,6 +87,8 @@
   * `md_desc`, `md_asc`: current stock price, descending / ascending.
   
 * `limit [int]`: number of results (max 50).
+
+* `offset [int]`: for pagination (e.g. if you got 50 result, set offset to 50 for the next ones).
 
 * `active [true|false]`: if set to true, restricts to options for which volume, open interest, ask, and bid are all `> 0`.
 

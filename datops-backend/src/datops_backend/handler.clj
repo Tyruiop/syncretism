@@ -230,7 +230,9 @@
                       (if (number? offset)
                         offset
                         0)
-                      limit])
+                      (if (number? limit)
+                        limit
+                        50)])
         params (into [] (reverse params))
         
         query
@@ -289,11 +291,12 @@
          (when max-price
            (str " AND ((ask <> 0 AND ask <= ? "
                 ") OR (ask = 0 AND lastprice <= ?))"))
-         " AND ((ask <> 0 AND ask >= ?"
-         ;; Here we do this because sometimes, yahoo resets all ask prices to 0
-         ;; this allows us to check last price if it is the case
-         ") OR (ask = 0 AND lastprice >= ?"
-         "))"
+         (str
+          " AND ((ask <> 0 AND ask >= ?"
+          ;; Here we do this because sometimes, yahoo resets all ask prices to 0
+          ;; this allows us to check last price if it is the case
+          ") OR (ask = 0 AND lastprice >= ?"
+          "))")
 
          ;; Opt-type
          (when (not puts) " AND opttype <> 'P'")

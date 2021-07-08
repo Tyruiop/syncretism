@@ -390,6 +390,9 @@
   (GET "/ops" req
        (let [res (-> req :body slurp (json/read-str :key-fn keyword) run-query)]
          (json/write-str res)))
+  (POST "/ops" req
+        (let [res (-> req :body slurp (json/read-str :key-fn keyword) run-query)]
+          (json/write-str res)))
   (GET "/ops/ladder/:ticker/:opttype/:expiration"
        [ticker opttype expiration]
        (let [q-res (get-ladder ticker opttype expiration)]

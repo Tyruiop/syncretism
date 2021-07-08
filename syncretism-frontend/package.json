@@ -1,0 +1,13 @@
+{
+  "name": "synfron",
+  "version": "0.0.1",
+  "private": true,
+  "devDependencies": {
+    "shadow-cljs": "^2.11.13"
+  },
+  "dependencies": {
+    "idb-keyval": "^3.2.0",
+    "react": "^17.0.1",
+    "react-dom": "^17.0.1"
+  }
+}

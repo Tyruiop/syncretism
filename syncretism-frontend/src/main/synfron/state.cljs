@@ -28,14 +28,19 @@
     {;; Which options have their info box opened
      :full-view #{}
      ;; search result
-     :data [1]}
+     :data {}}
 
     :alert nil
     }))
 
-(defn print-state [] (println @app-state))
-
 (defn swap-view [view] (swap! app-state #(assoc % :cur-view view)))
+(defn reset-alert [] (swap! app-state #(assoc % :alert nil)))
+(defn trigger-alert
+  [class text]
+  (swap! app-state #(assoc % :alert {:class class :text text}))
+  (js/setTimeout reset-alert 5000))
+
+;; Filter functions
 (defn swap-filter-search [txt]
   (swap! app-state #(assoc-in % [:filters :search] (if (= txt "") nil txt))))
 (defn toggle-filter-management []
@@ -49,8 +54,27 @@
 (defn save-filter [title data]
   (swap! app-state #(assoc-in % [:filters :saved (str (random-uuid))] [title data])))
 
-(defn reset-alert [] (swap! app-state #(assoc % :alert nil)))
-(defn trigger-alert
-  [class text]
-  (swap! app-state #(assoc % :alert {:class class :text text}))
-  (js/setTimeout reset-alert 5000))
+
+;; Options listing functions
+(defn set-data [data]
+  (swap! app-state #(assoc-in % [:options :data] data)))
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; Service worker handling (communication between app & SW)
+(def worker (js/Worker. "/js/worker.js"))
+(defn err-message
+  [message]
+  (println "Unknown message:" message))
+(defn parse-message
+  [e]
+  (let [{:keys [message data]} (js->clj (.-data e) :keywordize-keys true)]
+    (case message
+      "pong" (println data)
+      "search" (do
+                 (set-data data)
+                 (swap-view :options))
+      (err-message message))))
+(.. worker (addEventListener "message" parse-message))
+
+(defn test-sw []
+  (.postMessage worker (clj->js {:message "ping"})))

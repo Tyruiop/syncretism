@@ -9,13 +9,11 @@
 (def srv-addr "http://localhost:3000")
 
 (defn search
-  [params]
+  [params proc-fn]
   (go
     (let [resp
           (<! (http/post
                (str srv-addr "/ops")
                {:with-credentials? false
-                :json-params params}))
-          {:keys [quotes options catalysts]} {}
-          res (-> resp :body js/JSON.parse (js->clj :keywordize-keys true))]
-      res)))
+                :json-params params}))]
+      (-> resp :body js/JSON.parse (js->clj :keywordize-keys true) proc-fn))))

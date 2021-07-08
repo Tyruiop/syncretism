@@ -5,6 +5,45 @@
    [synfron.filters-def :as defs]
    [synfron.state :as state]))
 
+(defn load-filter
+  [f-data]
+  (state/toggle-filter-management)
+  (state/set-cur-filter f-data))
+
+(defn collect-filter
+  []
+  (let [vals
+        (map
+         (fn [el]
+           [(.-id el)
+            (if (= (.-type el) "checkbox")
+              (.-checked el)
+              (.-value el))])
+         (array-seq (.getElementsByTagName js/document "input")))]
+    (into {} vals)))
+
+(defn trigger-search
+  []
+  (let [filter-data (collect-filter)
+        clean-filter (->> filter-data
+                          (keep
+                           (fn [[k v]]
+                             (when (and v (not= v ""))
+                               [k
+                                (if (boolean? v)
+                                  v
+                                  (try (js/parseFloat v) (catch js/Error _ 0)))])))
+                          (into {}))]
+    (.postMessage state/worker (clj->js {:message "search" :data clean-filter}))))
+
+(defn save-filter
+  []
+  (let [filter-data (collect-filter)
+        filter-title (js/prompt "Enter filter title")]
+    (when filter-title
+      (state/save-filter filter-title filter-data)
+      (state/trigger-alert :success (str "Filter " filter-title " saved.")))))
+
 (defmulti render-filter :type)
 
 (defmethod render-filter :checkboxes
@@ -21,7 +60,7 @@
      [:h3 {:class ["title"]} f-title]
      (reduce
       (fn [acc {c-name :name descr :descr id :id}]
-        (let [cur-val (get cur-vals id false)]
+        (let [cur-val (get cur-vals id true)]
           (conj
            acc
            [:div {:class ["checkbox"]}
@@ -57,40 +96,17 @@
       [:input {:type "number" :step 0.01 :id min-id :default-value min-v
                :on-blur (fn [ev]
                           (state/update-cur-filter
-                           min-id (.. ev -target -value)))}]
+                           min-id (.. ev -target -value)))
+               :on-key-down (fn [ev] (when (= (.-keyCode ev) 13) (trigger-search)))}]
       [:label {:for max-id} "to"]
       [:input {:type "number" :step 0.01 :id max-id :default-value max-v
                :on-blur (fn [ev]
                           (state/update-cur-filter
-                           max-id (.. ev -target -value)))}]]]))
+                           max-id (.. ev -target -value)))
+               :on-key-down (fn [ev] (when (= (.-keyCode ev) 13) (trigger-search)))}]]]))
 
 (defmethod render-filter :default
   [_] nil)
-
-(defn load-filter
-  [f-data]
-  (state/toggle-filter-management)
-  (state/set-cur-filter f-data))
-
-(defn collect-filter
-  []
-  (let [vals
-        (map
-         (fn [el]
-           [(.-id el)
-            (if (= (.-type el) "checkbox")
-              (.-checked el)
-              (.-value el))])
-         (array-seq (.getElementsByTagName js/document "input")))]
-    (into {} vals)))
-
-(defn save-filter
-  []
-  (let [filter-data (collect-filter)
-        filter-title (js/prompt "Enter filter title")]
-    (when filter-title
-      (state/save-filter filter-title filter-data)
-      (state/trigger-alert :success (str "Filter " filter-title " saved.")))))
 
 (defn filter-management
   []
@@ -117,7 +133,7 @@
    [:header {:class ["filter-header"]}
     [:div {:class ["filter-general"]}
      [:button {:on-click (fn [] (state/toggle-filter-management))}
-      "Manage existing filter"]
+      "Manage existing filters"]
      [:button {:on-click (fn [] (save-filter))} "Save current filter"]
      [:button
       {:on-click
@@ -137,4 +153,7 @@
     (reduce
      #(conj %1 (render-filter %2))
      [:<>]
-     defs/all-filters)]])
+     defs/all-filters)]
+   [:footer {:class ["filter-footer"]}
+    [:div {:class ["filter-general"]}
+     [:button {:on-click trigger-search} "Search"]]]])

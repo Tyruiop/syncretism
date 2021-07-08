@@ -3,4 +3,8 @@
 
 (defn render
   []
-  [:div [:h1 "COUCOU"]])
+  [:div
+   (doall
+    (map
+     #(do [:p (str %)])
+     (get-in @state/app-state [:options :data :options])))])

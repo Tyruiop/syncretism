@@ -121,3 +121,9 @@ input[type="number"] { width:3em; margin:0 0.5em; }
 .filter > .criterias { display:flex; }
 .filter > .criterias > .checkbox { margin-right: 0.5em; }
 .filter > .criterias > .checkbox > label { margin-right:0.2em; }
+
+.filter-footer {
+    display:flex; flex-wrap: wrap;
+    border-top:3px #555 solid;
+}
+.filter-footer > .filter-general { text-align: right; }

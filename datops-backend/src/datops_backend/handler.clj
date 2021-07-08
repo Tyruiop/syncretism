@@ -391,8 +391,16 @@
        (let [res (-> req :body slurp (json/read-str :key-fn keyword) run-query)]
          (json/write-str res)))
   (POST "/ops" req
-        (let [res (-> req :body slurp (json/read-str :key-fn keyword) run-query)]
-          (json/write-str res)))
+        (let [res (-> req :body slurp (json/read-str :key-fn keyword) run-query)
+              symbols (map :symbol res)
+              quotes (->> symbols
+                          get-quotes
+                          (map
+                           (fn [{symb :live_quote/symbol data :live_quote/data}]
+                             [symb (json/read-str data :key-fn keyword)]))
+                          (into {}))             
+              catalysts (get-catalysts symbols)]
+          (json/write-str {:options res :quotes quotes :catalysts catalysts})))
   (GET "/ops/ladder/:ticker/:opttype/:expiration"
        [ticker opttype expiration]
        (let [q-res (get-ladder ticker opttype expiration)]

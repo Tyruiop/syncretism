@@ -49,7 +49,9 @@
                                (str/includes?
                                 lc-f-title (str/lower-case f-search))))
                      "hidden")]}
-     [:h3 {:class ["title"]} f-title]
+     [:div {:class ["title"]}
+      [:h3 f-title]
+      (when descr [:p descr])]
      [:div {:class ["criterias"]}
       [:label {:for min-id} "from"]
       [:input {:type "number" :step 0.01 :id min-id :default-value min-v
@@ -70,6 +72,26 @@
   (state/toggle-filter-management)
   (state/set-cur-filter f-data))
 
+(defn collect-filter
+  []
+  (let [vals
+        (map
+         (fn [el]
+           [(.-id el)
+            (if (= (.-type el) "checkbox")
+              (.-checked el)
+              (.-value el))])
+         (array-seq (.getElementsByTagName js/document "input")))]
+    (into {} vals)))
+
+(defn save-filter
+  []
+  (let [filter-data (collect-filter)
+        filter-title (js/prompt "Enter filter title")]
+    (when filter-title
+      (state/save-filter filter-title filter-data)
+      (state/trigger-alert :success (str "Filter " filter-title " saved.")))))
+
 (defn filter-management
   []
   (let [saved-filters (get-in @state/app-state [:filters :saved])]
@@ -83,7 +105,8 @@
            [:p f-name]
            [:button {:on-click (fn [] (load-filter f-data))} "Load"]
            [:button {:on-click (fn [] (state/forget-filter f-id))} "Delete"]]))
-       [:<>]
+       [:<> [:div {:class ["close"] :on-click (fn [] (state/toggle-filter-management))}
+             [:p "close"]]]
        saved-filters)]]))
 
 (defn render
@@ -95,7 +118,7 @@
     [:div {:class ["filter-general"]}
      [:button {:on-click (fn [] (state/toggle-filter-management))}
       "Manage existing filter"]
-     [:button "Save current filter"]
+     [:button {:on-click (fn [] (save-filter))} "Save current filter"]
      [:button
       {:on-click
        (fn []
@@ -106,7 +129,7 @@
          (state/set-cur-filter {}))}
       "Clear filter"]]
     [:div {:class ["filter-search"]}
-     [:label {:for "filter-search"} "Search for a filter"]
+     [:label {:for "filter-search"} "Search for a filter "]
      [:input
       {:id "filter-search" :type "text" :placeholder "E.g. \"premium\""
        :on-input (fn [e] (state/swap-filter-search (.. e -target -value)))}]]]

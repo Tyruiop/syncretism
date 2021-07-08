@@ -27,6 +27,11 @@
      [:div {:class "title"}
       [:h3 "Ops.Syncretism"]]]))
 
+(defn draw-alert
+  [{:keys [class text]}]
+  [:div {:class ["alert" (name class)]}
+   [:p text]])
+
 (defn main-ui []
   (r/create-class
    {:reagent-render
@@ -37,7 +42,9 @@
         (case (:cur-view @state/app-state)
           :home (home/render)
           :options (options/render)
-          :search (filters/render))]])
+          :search (filters/render))]
+       (when-let [alert (:alert @state/app-state)]
+         (draw-alert alert))])
 
     :display-name "main"
 

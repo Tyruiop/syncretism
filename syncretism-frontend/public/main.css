@@ -1,0 +1,123 @@
+* { box-sizing: border-box; margin:0; padding: 0; }
+
+input::-webkit-outer-spin-button,
+input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+/* Firefox */
+input[type=number] {
+  -moz-appearance: textfield;
+}
+
+input:invalid {
+    border-color:#c00;
+}
+
+:root {
+    --header-height:6vh;
+    --header-bg: #fff;
+    --default-margin:10%;
+
+    --button-bg:#555;
+    --button-bg-hover:#eee;
+    --button-fg:#fff;
+    --button-fg-hover:#333;
+}
+
+.hidden { display:none !important; }
+.foreground-wrapper {
+    z-index:100;
+    background:rgba(255,255,255,0.8);
+    position:fixed;
+    top:0; bottom:0; left:0; right:0;
+}
+.alert {
+    position:sticky; bottom:0; width:20%;
+    z-index:1000; background:rgba(255,255,255,0.8); padding:20px;
+}
+.alert.success {
+    background:rgba(150,255,150,0.8);
+}
+
+.top {
+    z-index:10;
+    top:0;
+    position:fixed;
+    width:100%;
+    background:var(--header-bg);
+    display: flex; align-items: center;
+}
+.top-menu {
+    display:flex;
+    margin-left:var(--default-margin);
+    flex:1;
+}
+.menu {
+    height:var(--header-height);
+    padding:0 15px;
+    cursor:pointer; color:#555;
+    border-bottom: 3px #fff solid;
+    display:flex; align-items: center; justify-content: center;
+}
+.menu.selected { color:#000; border-bottom-color:#08f; }
+.menu:hover {
+    color:#000;
+}
+.top > .title {
+    margin-right:var(--default-margin);
+}
+.top > .title > h3 { font-family: serif; }
+
+main {
+    position:relative; top:var(--header-height);
+    margin:10px calc(2*var(--default-margin));
+    margin-bottom:5vh;
+}
+
+.filter-mgmt {
+    top:50%;
+    margin:0 calc(2*var(--default-margin));
+    position:relative;
+    background:#fff;
+    transform: translateY(-50%);
+    padding:15px;
+}
+.filter-mgmt > .close {
+    position:absolute; top:10px; right:10px; cursor:pointer; color:#c00;
+}
+.filter-mgmt > .close:hover { text-decoration:underline; }
+
+.filter-header {
+    display:flex; flex-wrap: wrap;
+    border-bottom:3px #555 solid;
+}
+.filter-general { flex:1; }
+.filter-general > button {
+    background:var(--button-bg);
+    border:none;
+    border-top:3px var(--button-bg) solid;
+    padding:5px 15px;
+    color:var(--button-fg);
+    font-weight: bold;
+    cursor:pointer;
+}
+.filter-general > button:hover {
+    background:var(--button-bg-hover);
+    border-color:var(--button-bg-hover);
+    color:var(--button-fg-hover);
+}
+
+.filter {
+    display:flex; align-items: center;
+    padding:5px;
+    border:1px #ddd solid;
+    margin:5px 0;
+}
+.filter:hover { border-color:#555; }
+.filter > .title { flex:1; }
+input[type="number"] { width:3em; margin:0 0.5em; }
+.filter > .criterias { display:flex; }
+.filter > .criterias > .checkbox { margin-right: 0.5em; }
+.filter > .criterias > .checkbox > label { margin-right:0.2em; }

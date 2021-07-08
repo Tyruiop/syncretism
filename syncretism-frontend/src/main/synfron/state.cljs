@@ -29,6 +29,8 @@
      :full-view #{}
      ;; search result
      :data [1]}
+
+    :alert nil
     }))
 
 (defn print-state [] (println @app-state))
@@ -44,3 +46,11 @@
   (swap! app-state #(assoc-in % [:filters :values] v)))
 (defn update-cur-filter [k v]
   (swap! app-state #(assoc-in % [:filters :values k] v)))
+(defn save-filter [title data]
+  (swap! app-state #(assoc-in % [:filters :saved (str (random-uuid))] [title data])))
+
+(defn reset-alert [] (swap! app-state #(assoc % :alert nil)))
+(defn trigger-alert
+  [class text]
+  (swap! app-state #(assoc % :alert {:class class :text text}))
+  (js/setTimeout reset-alert 5000))

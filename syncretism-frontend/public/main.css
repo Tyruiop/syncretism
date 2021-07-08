@@ -26,6 +26,12 @@ input:invalid {
     --button-fg-hover:#333;
 }
 
+@media only screen and (max-width: 1000px) {
+    :root {
+        --default-margin:2%;
+    }
+}
+
 .hidden { display:none !important; }
 .foreground-wrapper {
     z-index:100;
@@ -73,7 +79,7 @@ input:invalid {
 main {
     position:relative; top:var(--header-height);
     margin:10px calc(2*var(--default-margin));
-    margin-bottom:5vh;
+    padding-bottom:3vh;
 }
 
 .filter-mgmt {

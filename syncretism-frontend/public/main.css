@@ -188,7 +188,7 @@ input[type="number"] { width:3em; margin:0 0.5em; }
 .options {
     display:table;
     border-collapse: separate;
-    border-spacing:0px 4px;
+    border-spacing:0px 5px;
     margin:auto;
 }
 .options > .row {
@@ -213,6 +213,7 @@ input[type="number"] { width:3em; margin:0 0.5em; }
     padding:4px 4px;
     min-width: 5em;
 }
+.options > .row > .cell.buttons { white-space: nowrap; padding-right:1em; }
 .options > .row.header > .cell > p { position:relative; }
 .options > .row.header > .cell > p > span {
     display:none; z-index:19;

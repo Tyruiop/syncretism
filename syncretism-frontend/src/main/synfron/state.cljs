@@ -1,5 +1,8 @@
 (ns synfron.state
-  (:require [reagent.core :as r]))
+  (:require
+   [cljs.reader :refer [read-string]]
+   [reagent.core :as r]
+   ["idb-keyval" :as idb]))
 
 (def app-state
   (r/atom
@@ -59,22 +62,49 @@
   (js/setTimeout reset-alert 5000))
 (defn toggle-sidebar [] (swap! app-state #(update % :sidebar not)))
 
+;; To call every time the state needs to be saved locally.
+(def key-name "syncretism-local")
+(defn save-state
+  []
+  (let [clean-state (-> @app-state
+                        (assoc-in [:options :data] {})
+                        (assoc-in [:options :ladder] {})
+                        (assoc-in [:options :spreads] #{}))]
+    (->
+     (js/Promise.resolve
+      (idb/set key-name (pr-str clean-state)))
+     (.then (fn [_] (trigger-alert :success "Saved user state."))))))
+;; To load
+(defn load-state
+  []
+  (-> (idb/get key-name)
+      (.then
+       (fn [data]
+         (when data
+           (reset! app-state (read-string data)))))
+      (.catch
+       (fn [err]
+         (.log js/console "No data saved.")))))
+
 ;; Filter functions
 (defn swap-filter-search [txt]
   (swap! app-state #(assoc-in % [:filters :search] (if (= txt "") nil txt))))
 (defn forget-filter [id]
-  (swap! app-state #(update-in % [:filters :saved] dissoc id)))
+  (swap! app-state #(update-in % [:filters :saved] dissoc id))
+  (save-state))
 (defn set-cur-filter [v]
   (swap! app-state #(assoc-in % [:filters :values] v)))
 (defn update-cur-filter [k v]
   (swap! app-state #(assoc-in % [:filters :values k] v)))
 (defn save-filter [title data]
-  (swap! app-state #(assoc-in % [:filters :saved (str (random-uuid))] [title data])))
+  (swap! app-state #(assoc-in % [:filters :saved (str (random-uuid))] [title data]))
+  (save-state))
 
 
 ;; Options listing functions
 (defn toggle-column [col-id]
-  (swap! app-state #(update-in % [:options :columns] toggle-set col-id)))
+  (swap! app-state #(update-in % [:options :columns] toggle-set col-id))
+  (save-state))
 (defn set-data [data]
   (swap! app-state #(assoc-in % [:options :data] data)))
 (defn append-data
@@ -92,7 +122,8 @@
 (defn toggle-tracked-options [cs data]
   (if (contains? (get-in @app-state [:home :tracked-options]) cs)
     (swap! app-state #(update-in % [:home :tracked-options] dissoc cs))
-    (swap! app-state #(update-in % [:home :tracked-options] assoc cs data))))
+    (swap! app-state #(update-in % [:home :tracked-options] assoc cs data)))
+  (save-state))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Service worker handling (communication between app & SW)

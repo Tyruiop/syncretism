@@ -23,6 +23,7 @@
 
 (defn init
   []
+  (state/load-state)
   (rdom/render
    [(fn [] [ui/main-ui])]
    (gdom/getElement "app")))

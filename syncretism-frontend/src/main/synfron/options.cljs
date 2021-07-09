@@ -185,7 +185,7 @@
         next (when activ-spread? (ladder-next data))]
     [:div {:class ["row" (when inTheMoney "itm")]
            :key (str "row-" contractSymbol)}
-     [:div {:class ["cell"]}
+     [:div {:class ["cell" "buttons"]}
       [:button
        {:on-click (fn [] (state/toggle-tracked-options contractSymbol data))
         :class [(when tracked? "tracked")]}

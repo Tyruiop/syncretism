@@ -25,13 +25,60 @@
    [:gamma "Gamma" "γ"]
    [:theta "Theta" "θ"]
    [:vega "Vega" "ν"]
-   [:quotetype "Quote Type" "QT"]
+   [:quoteType "Quote Type" "QT"]
    [:lastCrawl "Last Updated" "LU"]])
+
+(defn opt-sidebar
+  []
+  (let [activ-cols (get-in @state/app-state [:options :columns])
+        sidebar (get-in @state/app-state [:options :sidebar])]
+    [:div {:class ["opt-sidebar" (when sidebar "show")]}
+     [:div
+      {:class ["opt-sidebar-toggle"]
+       :on-click state/toggle-sidebar}
+      [:p (if sidebar "<" ">")]]
+     [:h3 "Columns"]
+     [:div.columns 
+      (doall
+       (map
+        (fn [[col-id col-name abbrev]]
+          (let [col-c-id (str "col-c-" (name col-id))]
+            [:div {:class ["col-choice"]
+                   :key col-c-id}
+             [:input
+              {:type "checkbox" :id col-c-id :default-checked (contains? activ-cols col-id)
+               :on-change (fn [ev] (state/toggle-column col-id))}]
+             [:label {:for col-c-id} (str col-name " (" abbrev ")")]]))
+        columns-w-names))]]))
+
+(defn row
+  [{:keys [contractSymbol] :as data}]
+  (let [activ-cols (get-in @state/app-state [:options :columns])]
+    [:div {:class ["row"]
+           :key (str "row-" contractSymbol)}
+     (->> columns-w-names
+          (keep
+           (fn [[col-id _ _]]
+             (when (contains? activ-cols col-id)
+               [:div {:class ["col"]
+                      :key (str (name col-id) "-" contractSymbol)}
+                [:p (get data col-id)]])))
+          doall)]))
 
 (defn render
   []
-  [:div
-   (doall
-    (map
-     #(do [:p (str %)])
-     (get-in @state/app-state [:options :data :options])))])
+  (let [activ-cols (get-in @state/app-state [:options :columns])]
+    [:<>
+     (opt-sidebar)
+     [:div {:class ["options"]}
+      [:div {:class ["row" "header"]}
+       (->> columns-w-names
+            (keep
+             (fn [[col-id descr abbrev]]
+               (when (contains? activ-cols col-id)
+                 [:div {:class ["col"]
+                        :key (str (name col-id) "-header")}
+                  [:p abbrev [:span descr]]]))))]
+      (->> (get-in @state/app-state [:options :data :options])
+           (map row)
+           doall)]]))

@@ -13,25 +13,34 @@
     :filters
     {;; Current values of different filters
      :values {}
-     
      ;; Are we searching for a specific filter
      :search nil
-
      ;; Window to load/delete existing filter
      :management false
-
      ;; List of saved filters
      :saved {1 ["Cheap near the money options" {"max-price" 0.05}]
              2 ["Expensive options" {"min-price" 10.0}]}}
 
     :options
     {;; Which options have their info box opened
-     :full-view #{}
+     :infobox #{}
+     ;; Whether the option sidebar is visible
+     :sidebar true
+     ;; Which columns do we show (with sane defaults)
+     :columns #{:contractSymbol :symbol :optType :strike
+                :expiration :impliedVolatility :bid :ask :lastPice
+                :volume :openInterest}
      ;; search result
      :data {}}
 
+    ;; Is there an alert to display on FE.
     :alert nil
     }))
+
+(defn toggle-set [s el]
+  (if (contains? s el)
+    (disj s el)
+    (conj s el)))
 
 (defn swap-view [view] (swap! app-state #(assoc % :cur-view view)))
 (defn reset-alert [] (swap! app-state #(assoc % :alert nil)))
@@ -56,6 +65,9 @@
 
 
 ;; Options listing functions
+(defn toggle-sidebar [] (swap! app-state #(update-in % [:options :sidebar] not)))
+(defn toggle-column [col-id]
+  (swap! app-state #(update-in % [:options :columns] toggle-set col-id)))
 (defn set-data [data]
   (swap! app-state #(assoc-in % [:options :data] data)))
 

@@ -36,4 +36,5 @@
        (case message
          "ping" (js/postMessage (clj->js {:message "pong"}))
          "search" (search data)
+         "ladder" (ladder data)
          (err-message message))))))

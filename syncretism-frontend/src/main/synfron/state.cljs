@@ -10,8 +10,7 @@
     :sidebar true
 
     :home
-    {:tracked-options #{}
-     :data []}
+    {:tracked-options {}}
 
     :filters
     {;; Current values of different filters
@@ -87,8 +86,10 @@
                            distinct)))))
 (defn toggle-spread [cs]
   (swap! app-state #(update-in % [:options :spreads] toggle-set cs)))
-(defn toggle-tracked-options [cs]
-  (swap! app-state #(update-in % [:home :tracked-options] toggle-set cs)))
+(defn toggle-tracked-options [cs data]
+  (if (contains? (get-in @app-state [:home :tracked-options]) cs)
+    (swap! app-state #(update-in % [:home :tracked-options] dissoc cs))
+    (swap! app-state #(update-in % [:home :tracked-options] assoc cs data))))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Service worker handling (communication between app & SW)
@@ -105,7 +106,8 @@
                  (set-data data)
                  (swap-view :options))
       "search-append" (append-data data)
-      "ladder" (swap! app-state #(update-in % [:options :ladder] merge data))
+      "ladder" (let [[ladder-def ladder-data] data]
+                 (swap! app-state #(assoc-in % [:options :ladder ladder-def] ladder-data)))
       (err-message message))))
 (.. worker (addEventListener "message" parse-message))
 

@@ -111,8 +111,25 @@
      (when (> (get dividends "raw") now)
        [:div.catalyst.d [:p "D"] [:div.cat-info (str "dividends: " (get dividends "fmt"))]])]))
 
+(defn ladder-next
+  [{:keys [contractSymbol symbol expiration optType]}]
+  (let [ladder (get-in @state/app-state [:options :ladder [symbol expiration optType]])]
+    (when (not (empty? ladder))
+      (let [css (to-array (sort (keys ladder)))
+            target-index (+ (.indexOf css contractSymbol)
+                            (if (= optType "C") 1 -1))
+            ;; If somehow we are at an extremity of the ladder, just go to next available
+            target-index (cond (= (.-length css) target-index) (- (.-length css) 2)
+                               (= -1 target-index) 1
+                               :else target-index)
+            target-cs (nth (js->clj css) target-index)]
+        (println "COUCOU" target-cs)
+        (get-in
+         @state/app-state
+         [:options :ladder [symbol expiration optType] target-cs])))))
+
 (defn draw-cell
-  [id v]
+  [next id v]
   (cond
     (= id :symbol)
     (draw-symbol v)
@@ -134,23 +151,44 @@
         (= id :regularMarketDayHigh))
     [:p (if (number? v) [:<> "$" (.toFixed v 2)] v)]
 
+    (= id :strike)
+    [:p (if next (str v "/" (:strike next)) (str v))]
+
+    (= id :openInterest)
+    [:p (if next (str (min v (get next id))) (str v))]
+
     :else [:p (str v)]))
+
+(defn spread-button
+  [{ticker :symbol expiration :expiration
+    optType :optType contractSymbol :contractSymbol}]
+  (when (nil?
+         (get-in
+          @state/app-state
+          [:options :ladder [ticker expiration optType]]))
+    (.postMessage
+     state/worker
+     (clj->js {:message "ladder" :data [ticker expiration optType]})))
+  (state/toggle-spread contractSymbol))
 
 (defn row
   [{:keys [contractSymbol] :as data}]
   (let [activ-cols (get-in @state/app-state [:options :columns])
-        activ-spreads (get-in @state/app-state [:options :spreads])
-        tracked (get-in @state/app-state [:home :tracked-options])]
+        activ-spread?
+        (contains? (get-in @state/app-state [:options :spreads]) contractSymbol)
+        tracked?
+        (contains? (get-in @state/app-state [:home :tracked-options]) contractSymbol)
+        next (when activ-spread? (ladder-next data))]
     [:div {:class ["row"]
            :key (str "row-" contractSymbol)}
      [:div {:class ["cell"]}
-      [:button {:on-click
-                (fn [] (state/toggle-tracked-options contractSymbol))
-                :class [(when (contains? tracked contractSymbol) "tracked")]}
-       (if (contains? tracked contractSymbol) "forget" "follow")]
-      [:button {:on-click (fn [] (state/toggle-spread contractSymbol))
-                :class [(when (contains? activ-spreads contractSymbol) "spread")]}
-       (if (contains? activ-spreads contractSymbol) "close" "spread")]]
+      [:button
+       {:on-click (fn [] (state/toggle-tracked-options contractSymbol data))
+        :class [(when tracked? "tracked")]}
+       (if tracked? "forget" "follow")]
+      [:button
+       {:on-click (fn [] (spread-button data)) :class [(when activ-spread? "spread")]}
+       (if activ-spread? "close" "spread")]]
      (->> columns-w-names
           (keep
            (fn [[col-id _ _]]
@@ -158,7 +196,7 @@
                [:div {:class ["cell"]
                       :key (str (name col-id) "-" contractSymbol)}
                 (let [v (get data col-id)]
-                  (draw-cell col-id v))])))
+                  (draw-cell next col-id v))])))
           doall)]))
 
 (defn render

@@ -32,7 +32,7 @@
                        (fn [{:keys [contractSymbol] :as d}]
                          [contractSymbol d]))
                       (into {}))]
-      (proc-fn {[ticker expiration opttype] ladder}))))
+      (proc-fn [[ticker expiration opttype] ladder]))))
 
 (defn search
   [params proc-fn]

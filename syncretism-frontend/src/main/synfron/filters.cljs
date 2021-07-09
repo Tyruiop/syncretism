@@ -56,6 +56,39 @@
       (state/save-filter filter-title filter-data)
       (state/trigger-alert :success (str "Filter " filter-title " saved.")))))
 
+(defn render-checkbox
+  [c-name id cur-val]
+  [:div {:class ["checkbox"]}
+   [:label {:for id} c-name]
+   [:input {:type "checkbox" :id id
+            :on-change
+            (fn [e]
+              (state/update-cur-filter id (.. e -target -checked)))
+            :checked cur-val}]])
+
+(defn render-text
+  [c-name placeholder id cur-val]
+  [:div {:class ["text"]}
+   [:label {:for id} c-name]
+   [:input {:type "text" :id id :placeholder placeholder
+            :on-change
+            (fn [e]
+              (state/update-cur-filter id (.. e -target -value)))
+            :value cur-val}]])
+
+(defn render-select
+  [c-name id options cur-val]
+  [:div {:class ["select"]}
+   [:label {:for id} c-name]
+   (reduce
+    (fn [acc [tag o-id]]
+      (conj acc [:option {:value o-id} tag]))
+    [:select {:id id
+              :value (or cur-val "")
+              :on-change (fn [e]
+                           (state/update-cur-filter id (.. e -target -value)))}]
+    options)])
+
 (defmulti render-filter :type)
 
 (defmethod render-filter :checkboxes
@@ -73,15 +106,7 @@
      (reduce
       (fn [acc {c-name :name descr :descr id :id}]
         (let [cur-val (get cur-vals id true)]
-          (conj
-           acc
-           [:div {:class ["checkbox"]}
-            [:label {:for id} c-name]
-            [:input {:type "checkbox" :id id
-                     :on-change
-                     (fn [e]
-                       (state/update-cur-filter id (.. e -target -checked)))
-                     :checked cur-val}]])))
+          (conj acc (render-checkbox c-name id cur-val))))
       [:div {:class ["criterias"]}]
       entries)]))
 
@@ -120,6 +145,35 @@
                :on-key-down (fn [ev]
                               (when (= (.-keyCode ev) 13)
                                 (trigger-search)))}]]]))
+
+(defmethod render-filter :misc
+  [{f-title :title entries :entries}]
+  (let [lc-f-title (str/lower-case f-title)
+        f-search (get-in @state/app-state [:filters :search])
+        cur-vals (get-in @state/app-state [:filters :values])]
+    [:div {:class ["filter"
+                   (when (and f-search
+                              (not
+                               (str/includes?
+                                lc-f-title (str/lower-case f-search))))
+                     "hidden")]}
+     [:div {:class ["title"]}
+      [:h3 f-title]]
+     (reduce
+      (fn [acc {f-name :name f-type :type ph :placeholder id :id options :options}]
+        (cond (= f-type :checkbox)
+              (let [cur-val (get cur-vals id true)]
+                (conj acc (render-checkbox f-name id cur-val)))
+
+              (= f-type :text)
+              (let [cur-val (get cur-vals id "")]
+                (conj acc (render-text f-name ph id cur-val)))
+
+              (= f-type :select)
+              (let [cur-val (get cur-vals id)]
+                (conj acc (render-select f-name id options cur-val)))))
+      [:div {:class ["criterias"]}]
+      entries)]))
 
 (defmethod render-filter :default
   [_] nil)

@@ -10,7 +10,10 @@
     :sidebar true
 
     :home
-    {:tracked-options {}}
+    {:tracked-options {}
+     :columns #{:contractSymbol :symbol :optType :strike
+                :expiration :impliedVolatility :bid :ask :lastPrice
+                :volume :openInterest :lastCrawl}}
 
     :filters
     {;; Current values of different filters
@@ -20,15 +23,15 @@
      ;; Window to load/delete existing filter
      :management false
      ;; List of saved filters
-     :saved {1 ["Cheap near the money options" {"max-price" 0.05}]
-             2 ["Expensive options" {"min-price" 10.0}]}}
+     :saved {1 ["Cheap near the money options" {"max-price" 0.05 "max-diff" 10}]
+             2 ["θ crush" {"min-price" 10.0 "max-exp" 60 "otm" false}]}}
 
     :options
     {;; Which options have their info box opened
      :infobox #{}
      ;; Which columns do we show (with sane defaults)
      :columns #{:contractSymbol :symbol :optType :strike
-                :expiration :impliedVolatility :bid :ask :lastPice
+                :expiration :impliedVolatility :bid :ask :lastPrice
                 :volume :openInterest}
      ;; search result
      :data {}

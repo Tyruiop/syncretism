@@ -88,4 +88,28 @@
       :id "stock"}
      {:name "ETF"
       :descr "Search exchange traded funds."
-      :id "etf"}]}])
+      :id "etf"}]}
+
+   {:title "Miscellaneous"
+    :type :misc
+    :entries
+    [{:name "Tickers: "
+      :type :text
+      :placeholder "e.g. AMC, GME"
+      :id "tickers"}
+     {:name "Exclude "
+      :type :checkbox
+      :id "exclude"}
+     {:name "Order by "
+      :type :select
+      :id "order-by"
+      :options [["Expiration ↓" "e_desc"]
+                ["Expiration ↑" "e_asc"]
+                ["Implied Volatility ↓" "iv_desc"]
+                ["Implied Volatility ↑" "iv_asc"]
+                ["Premium ↓" "lp_desc"]
+                ["Premium ↑" "lp_asc"]]}
+     {:name "Active"
+      :type :checkbox
+      :descr "Only check options for which ask, bid, OI, and V are > 0."
+      :id "active"}]}])

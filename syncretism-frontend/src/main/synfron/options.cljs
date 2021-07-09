@@ -115,18 +115,19 @@
   [{:keys [contractSymbol symbol expiration optType]}]
   (let [ladder (get-in @state/app-state [:options :ladder [symbol expiration optType]])]
     (when (not (empty? ladder))
-      (let [css (to-array (sort (keys ladder)))
-            target-index (+ (.indexOf css contractSymbol)
-                            (if (= optType "C") 1 -1))
-            ;; If somehow we are at an extremity of the ladder, just go to next available
-            target-index (cond (= (.-length css) target-index) (- (.-length css) 2)
-                               (= -1 target-index) 1
-                               :else target-index)
-            target-cs (nth (js->clj css) target-index)]
-        (println "COUCOU" target-cs)
-        (get-in
-         @state/app-state
-         [:options :ladder [symbol expiration optType] target-cs])))))
+      (try
+        (let [css (to-array (sort (map name (keys ladder))))
+              target-index (+ (.indexOf css contractSymbol)
+                              (if (= optType "C") 1 -1))
+              ;; If somehow we are at an extremity of the ladder, just go to next available
+              target-index (cond (= (.-length css) target-index) (- (.-length css) 2)
+                                 (= -1 target-index) 1
+                                 :else target-index)
+              target-cs (nth (js->clj css) target-index)]
+          (get-in
+           @state/app-state
+           [:options :ladder [symbol expiration optType] (keyword target-cs)]))
+        (catch js/Error _ nil)))))
 
 (defn draw-cell
   [next id v]
@@ -145,6 +146,9 @@
     [:p (if (number? v)
           (.toFixed v 2)
           (str v))]
+
+    (or (= id :ask) (= id :bid) (= id :lastPrice))
+    (if (number? v) [:<> "$" (.toFixed (if next (- v (get next id)) v) 2)] v)
 
     (or (= id :regularMarketPrice)
         (= id :regularMarketDayLow)
@@ -172,14 +176,14 @@
   (state/toggle-spread contractSymbol))
 
 (defn row
-  [{:keys [contractSymbol] :as data}]
+  [{:keys [contractSymbol inTheMoney] :as data}]
   (let [activ-cols (get-in @state/app-state [:options :columns])
         activ-spread?
         (contains? (get-in @state/app-state [:options :spreads]) contractSymbol)
         tracked?
         (contains? (get-in @state/app-state [:home :tracked-options]) contractSymbol)
         next (when activ-spread? (ladder-next data))]
-    [:div {:class ["row"]
+    [:div {:class ["row" (when inTheMoney "itm")]
            :key (str "row-" contractSymbol)}
      [:div {:class ["cell"]}
       [:button

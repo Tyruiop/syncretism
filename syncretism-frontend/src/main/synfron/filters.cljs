@@ -134,17 +134,16 @@
        :on-click state/toggle-sidebar}
       [:p (if sidebar "<" ">")]]
      [:h3 "Saved filters"]
-     [:div.filters
-      (reduce
-       (fn [acc [f-id [f-name f-data]]]
-         (conj
-          acc
-          [:div {:class ["filter-mgmt-entry"]}
-           [:p f-name]
-           [:button {:on-click (fn [] (load-filter f-data))} "Load"]
-           [:button {:on-click (fn [] (state/forget-filter f-id))} "Delete"]]))
-       [:<>]
-       saved-filters)]]))
+     (reduce
+      (fn [acc [f-id [f-name f-data]]]
+        (conj
+         acc
+         [:div {:class ["filter-mgmt-entry"]}
+          [:p f-name]
+          [:button {:on-click (fn [] (load-filter f-data))} "Load"]
+          [:button {:on-click (fn [] (state/forget-filter f-id))} "Delete"]]))
+      [:<>]
+      saved-filters)]))
 
 (defn render
   []

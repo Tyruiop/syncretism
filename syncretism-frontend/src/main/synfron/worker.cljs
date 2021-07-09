@@ -22,6 +22,12 @@
                                             :data res})))]
     (com/search filter-data proc-fn)))
 
+(defn ladder
+  [ladder-def]
+  (println "Getting ladder" ladder-def)
+  (let [proc-fn (fn [res] (js/postMessage (clj->js {:message "ladder" :data res})))]
+    (com/get-ladder ladder-def proc-fn)))
+
 (defn init []
   (js/self.addEventListener
    "message"

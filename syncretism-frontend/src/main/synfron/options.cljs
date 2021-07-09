@@ -138,12 +138,19 @@
 
 (defn row
   [{:keys [contractSymbol] :as data}]
-  (let [activ-cols (get-in @state/app-state [:options :columns])]
+  (let [activ-cols (get-in @state/app-state [:options :columns])
+        activ-spreads (get-in @state/app-state [:options :spreads])
+        tracked (get-in @state/app-state [:home :tracked-options])]
     [:div {:class ["row"]
            :key (str "row-" contractSymbol)}
      [:div {:class ["cell"]}
-      [:button "track"]
-      [:button "spread"]]
+      [:button {:on-click
+                (fn [] (state/toggle-tracked-options contractSymbol))
+                :class [(when (contains? tracked contractSymbol) "tracked")]}
+       (if (contains? tracked contractSymbol) "forget" "follow")]
+      [:button {:on-click (fn [] (state/toggle-spread contractSymbol))
+                :class [(when (contains? activ-spreads contractSymbol) "spread")]}
+       (if (contains? activ-spreads contractSymbol) "close" "spread")]]
      (->> columns-w-names
           (keep
            (fn [[col-id _ _]]

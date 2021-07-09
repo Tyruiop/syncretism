@@ -32,7 +32,11 @@
                 :expiration :impliedVolatility :bid :ask :lastPice
                 :volume :openInterest}
      ;; search result
-     :data {}}
+     :data {}
+     ;; option ladders
+     :ladder {}
+     ;; Which options do we want to see a spread for
+     :spreads #{}}
 
     ;; Is there an alert to display on FE.
     :alert nil
@@ -81,6 +85,10 @@
                       #(-> %
                            (into options)
                            distinct)))))
+(defn toggle-spread [cs]
+  (swap! app-state #(update-in % [:options :spreads] toggle-set cs)))
+(defn toggle-tracked-options [cs]
+  (swap! app-state #(update-in % [:home :tracked-options] toggle-set cs)))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Service worker handling (communication between app & SW)
@@ -97,6 +105,7 @@
                  (set-data data)
                  (swap-view :options))
       "search-append" (append-data data)
+      "ladder" (swap! app-state #(update-in % [:options :ladder] merge data))
       (err-message message))))
 (.. worker (addEventListener "message" parse-message))
 

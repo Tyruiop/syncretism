@@ -17,7 +17,7 @@
       (-> resp :body read-string :status))))
 
 (defn get-ladder
-  [ticker expiration opttype]
+  [[ticker expiration opttype] proc-fn]
   (go
     (let [resp
           (<! (http/get
@@ -32,7 +32,7 @@
                        (fn [{:keys [contractSymbol] :as d}]
                          [contractSymbol d]))
                       (into {}))]
-      (assoc-in {} [:ladders [ticker expiration opttype]] ladder))))
+      (proc-fn {[ticker expiration opttype] ladder}))))
 
 (defn search
   [params proc-fn]

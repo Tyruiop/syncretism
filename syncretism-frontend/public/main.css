@@ -41,7 +41,8 @@ input:invalid {
     z-index:1000; background:rgba(255,255,255,0.8); padding:20px;
 }
 .alert.success {
-    background:rgba(150,255,150,0.8);
+    border:2px rgba(150,255,150,1);
+    background:rgba(150,255,150,0.5);
 }
 
 .top {

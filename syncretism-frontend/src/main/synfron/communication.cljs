@@ -8,6 +8,32 @@
 ;; (def srv-addr "https://api.syncretism.io")
 (def srv-addr "http://localhost:3000")
 
+(defn get-market-status
+  []
+  (go
+    (let [resp
+          (<! (http/get (str srv-addr "/market/status")
+                        {:with-credentials? false}))]
+      (-> resp :body read-string :status))))
+
+(defn get-ladder
+  [ticker expiration opttype]
+  (go
+    (let [resp
+          (<! (http/get
+               (str srv-addr "/ops/ladder/" ticker "/" opttype "/" expiration)
+               {:with-credentials? false}))
+          data (->> resp
+                    :body
+                    (.parse js/JSON))
+          clj-data (js->clj data :keywordize-keys true)
+          ladder (->> clj-data
+                      (map
+                       (fn [{:keys [contractSymbol] :as d}]
+                         [contractSymbol d]))
+                      (into {}))]
+      (assoc-in {} [:ladders [ticker expiration opttype]] ladder))))
+
 (defn search
   [params proc-fn]
   (go

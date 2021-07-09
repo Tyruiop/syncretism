@@ -13,8 +13,13 @@
 (defn search
   [filter-data]
   (println "Sending search" filter-data)
-  (let [proc-fn (fn [res]
-                  (js/postMessage (clj->js {:message "search" :data res})))]
+  (let [append? (and (number? (:offset filter-data)) (> (:offset filter-data) 0))
+        proc-fn (fn [res]
+                  (js/postMessage (clj->js {:message
+                                            (if append?
+                                              "search-append"
+                                              "search")
+                                            :data res})))]
     (com/search filter-data proc-fn)))
 
 (defn init []

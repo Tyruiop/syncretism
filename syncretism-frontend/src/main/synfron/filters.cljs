@@ -5,10 +5,36 @@
    [synfron.filters-def :as defs]
    [synfron.state :as state]))
 
+(defn clear-filter
+  []
+  (doseq [el (array-seq (.getElementsByTagName js/document "input"))]
+    (if (= (.-type el) "checkbox")
+      (set! (.-checked el) false)
+      (set! (.-value el) "")))
+  (state/set-cur-filter {}))
+
 (defn load-filter
   [f-data]
-  (state/toggle-filter-management)
+  (clear-filter)
   (state/set-cur-filter f-data))
+
+(defn trigger-search
+  ([] (trigger-search nil))
+  ([offset]
+   (let [filter-data (get-in @state/app-state [:filters :values])
+         filter-data (if (number? offset)
+                       (assoc filter-data :offset offset)
+                       filter-data)
+         clean-filter (->> filter-data
+                           (keep
+                            (fn [[k v]]
+                              (when (and v (not= v ""))
+                                [k
+                                 (if (boolean? v)
+                                   v
+                                   (try (js/parseFloat v) (catch js/Error _ 0)))])))
+                           (into {}))]
+     (.postMessage state/worker (clj->js {:message "search" :data clean-filter})))))
 
 (defn collect-filter
   []
@@ -21,20 +47,6 @@
               (.-value el))])
          (array-seq (.getElementsByTagName js/document "input")))]
     (into {} vals)))
-
-(defn trigger-search
-  []
-  (let [filter-data (collect-filter)
-        clean-filter (->> filter-data
-                          (keep
-                           (fn [[k v]]
-                             (when (and v (not= v ""))
-                               [k
-                                (if (boolean? v)
-                                  v
-                                  (try (js/parseFloat v) (catch js/Error _ 0)))])))
-                          (into {}))]
-    (.postMessage state/worker (clj->js {:message "search" :data clean-filter}))))
 
 (defn save-filter
   []
@@ -69,7 +81,7 @@
                      :on-change
                      (fn [e]
                        (state/update-cur-filter id (.. e -target -checked)))
-                     :default-checked cur-val}]])))
+                     :checked cur-val}]])))
       [:div {:class ["criterias"]}]
       entries)]))
 
@@ -93,26 +105,36 @@
       (when descr [:p descr])]
      [:div {:class ["criterias"]}
       [:label {:for min-id} "from"]
-      [:input {:type "number" :step 0.01 :id min-id :default-value min-v
-               :on-blur (fn [ev]
-                          (state/update-cur-filter
-                           min-id (.. ev -target -value)))
-               :on-key-down (fn [ev] (when (= (.-keyCode ev) 13) (trigger-search)))}]
+      [:input {:type "number" :step 0.01 :id min-id :value min-v
+               :on-change (fn [ev]
+                            (state/update-cur-filter
+                             min-id (.. ev -target -value)))
+               :on-key-down (fn [ev]
+                              (when (= (.-keyCode ev) 13)
+                                (trigger-search)))}]
       [:label {:for max-id} "to"]
-      [:input {:type "number" :step 0.01 :id max-id :default-value max-v
-               :on-blur (fn [ev]
-                          (state/update-cur-filter
-                           max-id (.. ev -target -value)))
-               :on-key-down (fn [ev] (when (= (.-keyCode ev) 13) (trigger-search)))}]]]))
+      [:input {:type "number" :step 0.01 :id max-id :value max-v
+               :on-change (fn [ev]
+                            (state/update-cur-filter
+                             max-id (.. ev -target -value)))
+               :on-key-down (fn [ev]
+                              (when (= (.-keyCode ev) 13)
+                                (trigger-search)))}]]]))
 
 (defmethod render-filter :default
   [_] nil)
 
-(defn filter-management
+(defn filter-sidebar
   []
-  (let [saved-filters (get-in @state/app-state [:filters :saved])]
-    [:div {:class ["foreground-wrapper"]}
-     [:div {:class ["filter-mgmt"]}
+  (let [saved-filters (get-in @state/app-state [:filters :saved])
+        sidebar (:sidebar @state/app-state)]
+    [:div {:class ["sidebar" (when sidebar "show")]}
+     [:div
+      {:class ["sidebar-toggle"]
+       :on-click state/toggle-sidebar}
+      [:p (if sidebar "<" ">")]]
+     [:h3 "Saved filters"]
+     [:div.filters
       (reduce
        (fn [acc [f-id [f-name f-data]]]
          (conj
@@ -121,28 +143,18 @@
            [:p f-name]
            [:button {:on-click (fn [] (load-filter f-data))} "Load"]
            [:button {:on-click (fn [] (state/forget-filter f-id))} "Delete"]]))
-       [:<> [:div {:class ["close"] :on-click (fn [] (state/toggle-filter-management))}
-             [:p "close"]]]
+       [:<>]
        saved-filters)]]))
 
 (defn render
   []
   [:<>
-   (when (-> @state/app-state :filters :management)
-     (filter-management))
+   (filter-sidebar)
    [:header {:class ["filter-header"]}
     [:div {:class ["filter-general"]}
-     [:button {:on-click (fn [] (state/toggle-filter-management))}
-      "Manage existing filters"]
      [:button {:on-click (fn [] (save-filter))} "Save current filter"]
      [:button
-      {:on-click
-       (fn []
-         (doseq [el (array-seq (.getElementsByTagName js/document "input"))]
-           (if (= (.-type el) "checkbox")
-             (set! (.-checked el) false)
-             (set! (.-value el) "")))
-         (state/set-cur-filter {}))}
+      {:on-click (fn [] (clear-filter))}
       "Clear filter"]]
     [:div {:class ["filter-search"]}
      [:label {:for "filter-search"} "Search for a filter "]

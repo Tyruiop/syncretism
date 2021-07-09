@@ -6,6 +6,9 @@
    {;; :home | :options | :search
     :cur-view :search
 
+    ;; Whether the sidebar is visible
+    :sidebar true
+
     :home
     {:tracked-options #{}
      :data []}
@@ -24,8 +27,6 @@
     :options
     {;; Which options have their info box opened
      :infobox #{}
-     ;; Whether the option sidebar is visible
-     :sidebar true
      ;; Which columns do we show (with sane defaults)
      :columns #{:contractSymbol :symbol :optType :strike
                 :expiration :impliedVolatility :bid :ask :lastPice
@@ -36,6 +37,8 @@
     ;; Is there an alert to display on FE.
     :alert nil
     }))
+
+(defn print-cur-filter [] (println (get-in @app-state [:filters :values])))
 
 (defn toggle-set [s el]
   (if (contains? s el)
@@ -48,12 +51,11 @@
   [class text]
   (swap! app-state #(assoc % :alert {:class class :text text}))
   (js/setTimeout reset-alert 5000))
+(defn toggle-sidebar [] (swap! app-state #(update % :sidebar not)))
 
 ;; Filter functions
 (defn swap-filter-search [txt]
   (swap! app-state #(assoc-in % [:filters :search] (if (= txt "") nil txt))))
-(defn toggle-filter-management []
-  (swap! app-state #(update-in % [:filters :management] not)))
 (defn forget-filter [id]
   (swap! app-state #(update-in % [:filters :saved] dissoc id)))
 (defn set-cur-filter [v]
@@ -65,11 +67,20 @@
 
 
 ;; Options listing functions
-(defn toggle-sidebar [] (swap! app-state #(update-in % [:options :sidebar] not)))
 (defn toggle-column [col-id]
   (swap! app-state #(update-in % [:options :columns] toggle-set col-id)))
 (defn set-data [data]
   (swap! app-state #(assoc-in % [:options :data] data)))
+(defn append-data
+  [{:keys [catalysts options quotes]}]
+  (swap! app-state #(update-in % [:options :data :catalysts] merge catalysts))
+  (swap! app-state #(update-in % [:options :data :quotes] merge quotes))
+  (swap! app-state (fn [old]
+                     (update-in
+                      old [:options :data :options]
+                      #(-> %
+                           (into options)
+                           distinct)))))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Service worker handling (communication between app & SW)
@@ -85,6 +96,7 @@
       "search" (do
                  (set-data data)
                  (swap-view :options))
+      "search-append" (append-data data)
       (err-message message))))
 (.. worker (addEventListener "message" parse-message))
 

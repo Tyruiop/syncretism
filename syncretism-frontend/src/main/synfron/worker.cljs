@@ -28,6 +28,16 @@
   (let [proc-fn (fn [res] (js/postMessage (clj->js {:message "ladder" :data res})))]
     (com/get-ladder ladder-def proc-fn)))
 
+(defn contract
+  [cs]
+  (let [proc-fn (fn [res] (js/postMessage (clj->js {:message "contract" :data res})))]
+    (com/get-contract cs proc-fn)))
+
+(defn historical
+  [cs]
+  (let [proc-fn (fn [res] (js/postMessage (clj->js {:message "historical" :data res})))]
+    (com/get-historical cs proc-fn)))
+
 (defn init []
   (js/self.addEventListener
    "message"
@@ -37,4 +47,6 @@
          "ping" (js/postMessage (clj->js {:message "pong"}))
          "search" (search data)
          "ladder" (ladder data)
+         "contract" (contract data)
+         "historical" (historical data)
          (err-message message))))))

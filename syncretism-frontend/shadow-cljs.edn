@@ -8,8 +8,7 @@
  :dependencies
  [[cljs-http "0.1.46"]
   [reagent "1.1.0"]
-  [com.cognitect/transit-cljs "0.8.264"]
-  [cljs-bean "1.6.0"]]
+  [metasoarous/oz "1.6.0-alpha34"]]
 
  :builds
  {:frontend

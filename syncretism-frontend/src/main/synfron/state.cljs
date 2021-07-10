@@ -4,6 +4,8 @@
    [reagent.core :as r]
    ["idb-keyval" :as idb]))
 
+(def worker (js/Worker. "/js/worker.js"))
+
 (def app-state
   (r/atom
    {;; :home | :options | :search
@@ -16,7 +18,8 @@
     {:tracked-options {}
      :columns #{:contractSymbol :symbol :optType :strike
                 :expiration :impliedVolatility :bid :ask :lastPrice
-                :volume :openInterest :lastCrawl}}
+                :volume :openInterest :lastCrawl}
+     :historical {}}
 
     :filters
     {;; Current values of different filters
@@ -48,6 +51,7 @@
     }))
 
 (defn print-cur-filter [] (println (get-in @app-state [:filters :values])))
+(defn print-cur-hist [] (println (map #(get % "timestamp") (take 5 (get-in @app-state [:historical])))))
 
 (defn toggle-set [s el]
   (if (contains? s el)
@@ -123,13 +127,24 @@
   (swap! app-state #(update-in % [:options :spreads] toggle-set cs)))
 (defn toggle-tracked-options [cs data]
   (if (contains? (get-in @app-state [:home :tracked-options]) cs)
-    (swap! app-state #(update-in % [:home :tracked-options] dissoc cs))
-    (swap! app-state #(update-in % [:home :tracked-options] assoc cs data)))
+    (do
+      (swap! app-state #(update-in % [:home :tracked-options] dissoc cs))
+      (swap! app-state #(update-in % [:home :historical] dissoc cs)))
+    (do
+      (swap! app-state #(update-in % [:home :tracked-options] assoc cs data))
+      (.postMessage worker (clj->js {:message "historical" :data cs}))))
   (save-state))
+
+
+;; Dashboard functions
+(defn init-historical [cs data]
+  (swap! app-state
+         #(assoc-in % [:home :historical cs] {:data data :left "bid" :right "delta"})))
+(defn toggle-chart [cs side v]
+  (swap! app-state #(assoc-in % [:home :historical cs side] v)))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Service worker handling (communication between app & SW)
-(def worker (js/Worker. "/js/worker.js"))
 (defn err-message
   [message]
   (println "Unknown message:" message))
@@ -144,6 +159,10 @@
       "search-append" (append-data data)
       "ladder" (let [[ladder-def ladder-data] data]
                  (swap! app-state #(assoc-in % [:options :ladder ladder-def] ladder-data)))
+      "contract" (let [[cs cs-data] data]
+                   (swap! app-state #(assoc-in % [:home :tracked-options cs] data)))
+      "historical" (let [[cs cs-data] data]
+                     (init-historical cs cs-data))
       (err-message message))))
 (.. worker (addEventListener "message" parse-message))
 

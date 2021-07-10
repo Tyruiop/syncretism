@@ -43,3 +43,29 @@
                {:with-credentials? false
                 :json-params params}))]
       (-> resp :body js/JSON.parse (js->clj :keywordize-keys true) proc-fn))))
+
+(defn get-historical
+  [cs proc-fn]
+  (go
+    (let [resp
+          (<! (http/get
+               (str srv-addr "/ops/historical/" cs)
+               {:with-credentials? false}))
+          data (->> resp
+                    :body
+                    (.parse js/JSON))
+          clj-data (js->clj data :keywordize-keys true)]
+      (proc-fn [cs clj-data]))))
+
+(defn get-contract
+  [cs proc-fn]
+  (go
+    (let [resp
+          (<! (http/get
+               (str srv-addr "/ops/" cs)
+               {:with-credentials? false}))
+          data (->> resp
+                    :body
+                    (.parse js/JSON))
+          clj-data (js->clj data :keywordize-keys true)]
+      (proc-fn [cs clj-data]))))

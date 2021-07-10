@@ -43,12 +43,12 @@ input:invalid {
 
 .hidden { display:none !important; }
 .alert {
-    position:sticky; bottom:0; width:20%;
+    position:fixed; bottom:0; width:20%;
     z-index:1000; background:rgba(255,255,255,0.8); padding:20px;
 }
 .alert.success {
-    border:2px rgba(150,255,150,1);
-    background:rgba(150,255,150,0.5);
+    border:2px rgba(150,255,150,1) solid;
+    background:rgba(150,255,150,0.2);
 }
 
 .top {
@@ -238,3 +238,23 @@ input[type="number"] { width:3em; margin:0 0.5em; }
     padding-top: 10px;
     text-align: center;
 }
+
+
+/* Home/dashboard CSS */
+.empty-wrapper {
+    height:60vh; display:flex; align-items: center; justify-content: center;
+}
+.empty { color:#888; }
+.empty .click { color:#222; cursor:pointer; }
+.empty .click:hover { text-decoration: underline; }
+
+
+.chart {
+    display:flex; flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+.chart > .chart-left {
+    text-align: right;
+}
+.chart > div { flex:1; }

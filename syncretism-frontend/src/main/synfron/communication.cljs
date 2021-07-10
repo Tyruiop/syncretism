@@ -36,7 +36,6 @@
 
 (defn search
   [params proc-fn]
-  (println "HERE goes params: " params)
   (go
     (let [resp
           (<! (http/post

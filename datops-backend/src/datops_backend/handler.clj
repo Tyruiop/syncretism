@@ -35,6 +35,14 @@
         symbs)))
     (catch Exception e [])))
 
+(defn get-contract [contract]
+  (try
+    (with-open [con (jdbc/get-connection db)]
+      (jdbc/execute!
+       con
+       ["SELECT * FROM live WHERE contractSymbol = ?" contract]))
+    (catch Exception e [])))
+
 (defn get-fundamentals [symbs]
   (try
     (with-open [con (jdbc/get-connection db)]
@@ -400,8 +408,8 @@
                              [symb (json/read-str data :key-fn keyword)]))
                           (into {}))             
               catalysts (get-catalysts symbols)]
-          (println res)
           (json/write-str {:options res :quotes quotes :catalysts catalysts})))
+  (GET "/ops/:cs" [cs] (json/write-str (get-contract cs)))
   (GET "/ops/ladder/:ticker/:opttype/:expiration"
        [ticker opttype expiration]
        (let [q-res (get-ladder ticker opttype expiration)]

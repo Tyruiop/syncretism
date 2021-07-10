@@ -158,7 +158,7 @@ main {
 .filter:hover { border-color:#555; }
 .filter > .title { flex:1; }
 input[type="number"] { width:3em; margin:0 0.5em; }
-.filter > .criterias { display:flex; align-items:center; }
+.filter > .criterias { display:flex; align-items:center; flex-wrap:wrap;}
 .filter > .criterias > .checkbox { margin-right: 0.5em; }
 .filter > .criterias > .checkbox > label { margin-right:0.2em; }
 .filter > .criterias input[type="text"], .filter > .criterias select

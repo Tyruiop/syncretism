@@ -400,6 +400,7 @@
                              [symb (json/read-str data :key-fn keyword)]))
                           (into {}))             
               catalysts (get-catalysts symbols)]
+          (println res)
           (json/write-str {:options res :quotes quotes :catalysts catalysts})))
   (GET "/ops/ladder/:ticker/:opttype/:expiration"
        [ticker opttype expiration]

@@ -15,9 +15,10 @@
  {:frontend
   {:target :browser
    :compiler-options {:optimizations :advanced}
-   :modules {:shared {:entries []}
+   :modules {;; :shared {:entries []}
              :main {:init-fn synfron.core/init
-                    :depends-on #{:shared}}
+                    ;; :depends-on #{:shared}
+                    }
              :worker {:init-fn synfron.worker/init
-                      :depends-on #{:shared}
+                      ;; :depends-on #{:shared}
                       :web-worker true}}}}}

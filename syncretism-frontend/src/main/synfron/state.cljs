@@ -67,6 +67,8 @@
 (defn save-state
   []
   (let [clean-state (-> @app-state
+                        (assoc :cur-view :home)
+                        (assoc :alert nil)
                         (assoc-in [:options :data] {})
                         (assoc-in [:options :ladder] {})
                         (assoc-in [:options :spreads] #{}))]

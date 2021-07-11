@@ -108,7 +108,9 @@
                 ["Implied Volatility ↓" "iv_desc"]
                 ["Implied Volatility ↑" "iv_asc"]
                 ["Premium ↓" "lp_desc"]
-                ["Premium ↑" "lp_asc"]]}
+                ["Premium ↑" "lp_asc"]
+                ["Stock Price ↓" "md_desc"]
+                ["Stock Price ↑" "md_asc"]]}
      {:name "Active"
       :type :checkbox
       :descr "Only check options for which ask, bid, OI, and V are > 0."

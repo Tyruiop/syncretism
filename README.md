@@ -89,12 +89,27 @@ to run it on the port 3001 for example.
 
 [Avaiable here](datops-backend/API.md).
 
-
-## Frontend `/datops-frontend`
+## Frontend `/syncretism-frontend`
 
 Depends on `NodeJS`.
 
-Change the server address in `src/live_opts/core.cljs` to point to your local `datops-backend`, in the above example
+Change the server address in `src/live_opts/communication.cljs` to point to your local `datops-backend`, in the above example
+it would become `"http://localhost:3000/"`.
+
+Build with
+```
+npm install
+./node_modules/.bin/shadow-cljs release :frontend
+```
+
+Copy & paste the `/public` folder wherever your local http server is.
+
+
+## [DEPRECATED] Frontend `/datops-frontend`
+
+Depends on `NodeJS`.
+
+Change the server address in `src/live_opts/communication.cljs` to point to your local `datops-backend`, in the above example
 it would become `"http://localhost:3000/"`.
 
 Build with

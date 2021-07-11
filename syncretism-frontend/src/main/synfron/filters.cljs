@@ -27,7 +27,9 @@
             (if (= (.-type el) "checkbox")
               (.-checked el)
               (.-value el))])
-         (array-seq (.getElementsByTagName js/document "input")))]
+         (into
+          (array-seq (.getElementsByTagName js/document "input"))
+          (array-seq (.getElementsByTagName js/document "select"))))]
     (into {} vals)))
 
 (defn trigger-search
@@ -44,7 +46,9 @@
                                 [k
                                  (cond (boolean? v) v
 
-                                       (= "tickers" k) v
+                                       (or (= "order-by" k)
+                                           (= "tickers" k))
+                                       v
 
                                        :else
                                        (try (js/parseFloat v) (catch js/Error _ 0)))])))

@@ -33,8 +33,8 @@
      ;; Window to load/delete existing filter
      :management false
      ;; List of saved filters
-     :saved {1 ["Cheap near the money options" {"max-price" 0.05 "max-diff" 10}]
-             2 ["θ crush" {"min-price" 10.0 "max-exp" 60 "itm" false}]}}
+     :saved {2 ["θ crush" {"min-price" 10.0 "max-exp" 60 "itm" false}]
+             3 ["YOLO" {"min-exp" 250, "stock" true, "calls" true, "max-diff" 10, "itm" false, "puts" true, "max-price" 1, "etf" false, "otm" true, "exclude" true, "order-by" "md_desc", "active" true}]}}
 
     :options
     {;; Which options have their info box opened

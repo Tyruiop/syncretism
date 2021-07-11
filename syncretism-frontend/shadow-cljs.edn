@@ -1,0 +1,22 @@
+{:source-paths
+ ["src/dev"
+  "src/main"
+  "src/test"]
+
+ :dev-http {8080 "public"}
+
+ :dependencies
+ [[cljs-http "0.1.46"]
+  [reagent "1.1.0"]
+  [metasoarous/oz "1.6.0-alpha34"]]
+
+ :builds
+ {:frontend
+  {:target :browser
+   :compiler-options {:optimizations :advanced}
+   :modules {:shared {:entries []}
+             :main {:init-fn synfron.core/init
+                    :depends-on #{:shared}}
+             :worker {:init-fn synfron.worker/init
+                      :depends-on #{:shared}
+                      :web-worker true}}}}}

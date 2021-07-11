@@ -1,0 +1,16 @@
+{
+  "name": "synfron",
+  "version": "0.0.1",
+  "private": true,
+  "devDependencies": {
+    "shadow-cljs": "^2.11.13"
+  },
+  "dependencies": {
+    "idb-keyval": "^3.2.0",
+    "react": "^17.0.1",
+    "react-dom": "^17.0.1",
+    "vega": "^5.20.2",
+    "vega-embed": "^6.18.2",
+    "vega-lite": "^5.1.0"
+  }
+}

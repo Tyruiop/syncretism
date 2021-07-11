@@ -1,0 +1,13 @@
+{
+    "name": "Ops.Syncretism",
+    "short_name": "Ops.S",
+    "lang": "en-US",
+    "start_url": "/",
+    "display": "standalone",
+    "icons": [
+	{
+	    "src": "logo.png",
+	    "sizes": "144x144"
+	}
+    ]
+}

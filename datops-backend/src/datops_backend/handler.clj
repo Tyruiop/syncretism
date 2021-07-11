@@ -35,6 +35,14 @@
         symbs)))
     (catch Exception e [])))
 
+(defn get-contract [contract]
+  (try
+    (with-open [con (jdbc/get-connection db)]
+      (jdbc/execute!
+       con
+       ["SELECT * FROM live WHERE contractSymbol = ?" contract]))
+    (catch Exception e [])))
+
 (defn get-fundamentals [symbs]
   (try
     (with-open [con (jdbc/get-connection db)]
@@ -270,11 +278,9 @@
 
          ;; ITM/OTM
          (when (not itm)
-           (str " AND (((strike >= regularmarketprice) AND (opttype = 'C'))"
-                " OR ((strike <= regularmarketprice) AND (opttype = 'P')))"))
+           " AND inTheMoney <> true")
          (when (not otm)
-           (str " AND (((strike <= regularmarketprice) AND (opttype = 'C'))"
-                " OR ((strike >= regularmarketprice) AND (opttype = 'P')))"))
+           " AND inTheMoney = true")
 
          ;; Ask bid spread
          (when min-ask-bid
@@ -390,6 +396,18 @@
   (GET "/ops" req
        (let [res (-> req :body slurp (json/read-str :key-fn keyword) run-query)]
          (json/write-str res)))
+  (POST "/ops" req
+        (let [res (-> req :body slurp (json/read-str :key-fn keyword) run-query)
+              symbols (map :symbol res)
+              quotes (->> symbols
+                          get-quotes
+                          (map
+                           (fn [{symb :live_quote/symbol data :live_quote/data}]
+                             [symb (json/read-str data :key-fn keyword)]))
+                          (into {}))             
+              catalysts (get-catalysts symbols)]
+          (json/write-str {:options res :quotes quotes :catalysts catalysts})))
+  (GET "/ops/:cs" [cs] (json/write-str (get-contract cs)))
   (GET "/ops/ladder/:ticker/:opttype/:expiration"
        [ticker opttype expiration]
        (let [q-res (get-ladder ticker opttype expiration)]
@@ -397,7 +415,7 @@
   (GET "/catalysts/:ticker"
        [ticker]
        (json/write-str (get-catalysts [ticker])))
-  (GET "/historical/:contract" [contract]
+  (GET "/ops/historical/:contract" [contract]
        (json/write-str (get-timeseries contract)))
   (GET "/market/status" req (pr-str {:status (market-time (System/currentTimeMillis))}))
   (route/not-found "Not Found"))

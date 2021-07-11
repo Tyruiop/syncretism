@@ -8,6 +8,7 @@
 * Ability to save/load custom filters
 * Added donation link (`Buy me a coffee`)
 * Uses backend API instead of custom endpoint.
+* Ability to search for filters instead of having to go through them all.
 
 ## API
 * New endpoint: `/ops/CONTRACTNAME` to get data about a specific contract.

@@ -5,8 +5,8 @@
    [cljs.reader :refer [read-string]]
    [cljs.core.async :as async :refer [<! go]]))
 
-(def srv-addr "http://syncretism.io:3001")
-;; (def srv-addr "http://localhost:3000")
+(def srv-addr "https://api.syncretism.io")
+;;(def srv-addr "http://syncretism.io:3001")
 
 (defn get-market-status
   []

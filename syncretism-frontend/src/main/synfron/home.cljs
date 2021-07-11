@@ -1,5 +1,6 @@
 (ns synfron.home
   (:require
+   [clojure.string :as str]
    [oz.core :as oc]
    [synfron.state :as state]))
 
@@ -34,12 +35,16 @@
   [:div.empty-wrapper
    [:div.empty
     [:p "You are not tracking any options yet, start by "
-     [:span.click {:on-click (fn [] (state/swap-view :search))} "searching some"] "."]]])
+     [:span.click {:on-click (fn [] (state/swap-view :search))} "searching"]
+     " and "
+     [:button {:class ["follow"]} "following"]
+     " one."]]])
 
 (def right-color "#a51140")
 (defn render-graph
   [cs {:keys [data left right]}]
-  (let [id-prefix (str "chart-" cs "-")]
+  (let [id-prefix (str "chart-" cs "-")
+        data (doall (map (fn [d] (update d :timestamp from-ts)) data))]
     [:div.chart
      [:div.chart-top
       [:select
@@ -47,13 +52,17 @@
         :on-change (fn [ev] (state/toggle-chart cs :left (.. ev -target -value)))}
        [:option {:value "bid"} "Bid"]
        [:option {:value "volume"} "Volume"]
-       [:option {:value "openInterest"} "Open Interest"]]
+       [:option {:value "openInterest"} "Open Interest"]
+       [:option {:value "impliedVolatility"} "Implied Volatility"]
+       [:option {:value "regularMarketPrice"} "Stock Price"]]
       [:select
        {:value (or right "")
         :on-change (fn [ev] (state/toggle-chart cs :right (.. ev -target -value)))}
        [:option {:value "delta"} "Delta"]
        [:option {:value "gamma"} "Gamma"]
-       [:option {:value "theta"} "theta"]]]
+       [:option {:value "theta"} "Theta"]
+       [:option {:value "vega"} "Veta"]
+       [:option {:value "impliedVolatility"} "Implied Volatility"]]]
      [oc/vega-lite
       {:data {:values data},
        :vconcat
@@ -89,12 +98,25 @@
            :type "quantitative", 
            :axis {:tickCount 3, :grid false}}}}]}]]))
 
+(defn render-option
+  [cs]
+  (let [{:keys [symbol optType expiration] :as data}
+        (get-in @state/app-state [:home :tracked-options cs])
+        historical (get-in @state/app-state [:home :historical cs])]
+    [:div {:class ["dash-option"]}
+     [:h3
+      [:p (str symbol " " optType " " (-> expiration from-ts (str/split #",") first))]
+      [:button {:on-click (fn [] (state/toggle-tracked-options cs data))} "forget"]]
+     [:div {:class ["cols"]}]
+     (render-graph cs historical)]))
+
 (defn render-tracked
   []
-  [:div
-   (when (get-in @state/app-state [:home :historical])
-     (let [cs (-> @state/app-state :home :historical keys first)]
-       (render-graph cs (get-in @state/app-state [:home :historical cs]))))])
+  (reduce
+   (fn [acc cs]
+     (conj acc (render-option cs)))
+   [:div {:class ["table-tracked"]}]
+   (-> @state/app-state :home :historical keys)))
 
 (defn render
   []

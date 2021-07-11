@@ -30,7 +30,7 @@
      :management false
      ;; List of saved filters
      :saved {1 ["Cheap near the money options" {"max-price" 0.05 "max-diff" 10}]
-             2 ["θ crush" {"min-price" 10.0 "max-exp" 60 "otm" false}]}}
+             2 ["θ crush" {"min-price" 10.0 "max-exp" 60 "itm" false}]}}
 
     :options
     {;; Which options have their info box opened
@@ -139,7 +139,8 @@
 ;; Dashboard functions
 (defn init-historical [cs data]
   (swap! app-state
-         #(assoc-in % [:home :historical cs] {:data data :left "bid" :right "delta"})))
+         #(assoc-in % [:home :historical cs] {:data data :left "bid" :right "delta"}))
+  (save-state))
 (defn toggle-chart [cs side v]
   (swap! app-state #(assoc-in % [:home :historical cs side] v)))
 

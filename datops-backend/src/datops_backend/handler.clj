@@ -278,11 +278,9 @@
 
          ;; ITM/OTM
          (when (not itm)
-           (str " AND (((strike >= regularmarketprice) AND (opttype = 'C'))"
-                " OR ((strike <= regularmarketprice) AND (opttype = 'P')))"))
+           " AND inTheMoney <> true")
          (when (not otm)
-           (str " AND (((strike <= regularmarketprice) AND (opttype = 'C'))"
-                " OR ((strike >= regularmarketprice) AND (opttype = 'P')))"))
+           " AND inTheMoney = true")
 
          ;; Ask bid spread
          (when min-ask-bid

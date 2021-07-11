@@ -9,7 +9,7 @@
 (def app-state
   (r/atom
    {;; :home | :options | :search
-    :cur-view :search
+    :cur-view :home
 
     ;; Whether the sidebar is visible
     :sidebar true

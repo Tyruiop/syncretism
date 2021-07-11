@@ -285,7 +285,7 @@ button.tracked {
 
 /* Home/dashboard CSS */
 .empty-wrapper {
-    height:60vh; display:flex; align-items: center; justify-content: center;
+    height:75vh; display:flex; align-items: center; justify-content: center;
 }
 .empty { color:#888; }
 .empty .click { color:#222; cursor:pointer; }
@@ -293,7 +293,7 @@ button.tracked {
 
 .dash-option {
     border:5px #eee solid;
-    margin-top: 15px;
+    margin-top: 20px;
 }
 .dash-option > h3 {
     padding:10px; background:#eee; display:flex;

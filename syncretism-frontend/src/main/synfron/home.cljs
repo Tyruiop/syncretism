@@ -138,8 +138,6 @@
 (defn render
   []
   (let [home (:home @state/app-state)]
-    [:<>
-     [:div [:h2 "Dashboard"]]
-     (if (empty? (:tracked-options home))
-       (render-empty)
-       (render-tracked))]))
+    (if (empty? (:tracked-options home))
+      (render-empty)
+      (render-tracked))))

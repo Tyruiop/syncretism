@@ -15,11 +15,15 @@
     :sidebar true
 
     :home
-    {:tracked-options {}
+    {;; Which options are being tracked + their data
+     :tracked-options {}
      :columns #{:contractSymbol :symbol :optType :strike
                 :expiration :impliedVolatility :bid :ask :lastPrice
                 :volume :openInterest :lastCrawl}
-     :historical {}}
+     ;; Store historical data
+     :historical {}
+     ;; User spreads, relie on the data in `:options :ladder`
+     :spreads #{}}
 
     :filters
     {;; Current values of different filters
@@ -52,6 +56,8 @@
 
 (defn print-cur-filter [] (println (get-in @app-state [:filters :values])))
 (defn print-cur-hist [] (println (map #(get % "timestamp") (take 5 (get-in @app-state [:historical])))))
+(defn print-home-spreads [] (println (get-in @app-state [:home :spreads])))
+(defn print-catalysts [] (println (get-in @app-state [:options :data :catalysts])))
 
 (defn toggle-set [s el]
   (if (contains? s el)
@@ -63,7 +69,7 @@
 (defn trigger-alert
   [class text]
   (swap! app-state #(assoc % :alert {:class class :text text}))
-  (js/setTimeout reset-alert 5000))
+  (js/setTimeout reset-alert 2500))
 (defn toggle-sidebar [] (swap! app-state #(update % :sidebar not)))
 
 ;; To call every time the state needs to be saved locally.
@@ -123,8 +129,8 @@
                       #(-> %
                            (into options)
                            distinct)))))
-(defn toggle-spread [cs]
-  (swap! app-state #(update-in % [:options :spreads] toggle-set cs)))
+(defn toggle-spread [home? cs]
+  (swap! app-state #(update-in % [(if home? :home :options) :spreads] toggle-set cs)))
 (defn toggle-tracked-options [cs data]
   (if (contains? (get-in @app-state [:home :tracked-options]) cs)
     (do

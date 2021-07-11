@@ -1,3 +1,5 @@
+@import url('https://fonts.googleapis.com/css2?family=Inconsolata&family=Source+Sans+Pro:wght@300;400;600&family=Source+Serif+Pro&display=swap');
+
 * { box-sizing: border-box; margin:0; padding: 0; font-family:sans-serif; }
 
 input::-webkit-outer-spin-button,
@@ -19,6 +21,8 @@ input:invalid {
     --header-height:6vh;
     --header-bg: #fff;
     --default-margin:10%;
+    --serif-font: 'Source Serif Pro', serif;
+    --sans-serif-font: 'Source Sans Pro', sans-serif;
 
     --menu-border-color:#06a;
     
@@ -68,7 +72,7 @@ input:invalid {
     height:var(--header-height);
     padding:0 15px;
     cursor:pointer; color:#555;
-    border-bottom: 3px #fff solid;
+    border-bottom: 5px #fff solid;
     display:flex; align-items: center; justify-content: center;
 }
 .menu.selected { color:#000; border-bottom-color:var(--menu-border-color); }
@@ -78,7 +82,20 @@ input:invalid {
 .top > .title {
     margin-right:var(--default-margin);
 }
-.top > .title > h3 { font-family: serif; }
+.top > .title > h1 { font-family: var(--serif-font); }
+.top-right-menu {
+    display:flex; align-items: center;
+    margin-right: 1em; border-right:1px #ddd solid; padding-right:1em;
+}
+.top-right-menu > p {
+    margin-left:0.7em;
+}
+.top-right-menu > p > a {
+    text-decoration:none; color:#555;
+}
+.top-right-menu > p > a:hover {
+    text-decoration: underline; color:#000;
+}
 
 main {
     position:relative; top:var(--header-height);
@@ -91,22 +108,23 @@ main {
     position:fixed; z-index:20;
     left:calc(-1*var(--sidebar-width));
     width:var(--sidebar-width);
-    background:#eee;
+    border-bottom:2px #555 solid;
+    border-right:2px #555 solid;
+    border-radius:5px;
 }
 .sidebar.show {
     left:0;
 }
 .sidebar > h3 {
-    border:2px #555 solid;
-    border-left:0px; border-right:1px #555 solid;
+    border-bottom:2px #555 solid;
     display:flex; align-items: center;
     padding:10px; height:50px; color:var(--sidebar-header-fg);
     background:var(--sidebar-header-bg);
 }
 .sidebar-toggle {
     position:absolute;
-    left:100%; cursor:pointer;
-    padding:10px;
+    left:100%; cursor:pointer; display:flex; align-content: center;
+    padding:10px 6px;
     height:50px;
     font-size: 1.5em; font-weight: bold;
     background:var(--sidebar-header-bg);
@@ -117,8 +135,9 @@ main {
 
 /* search view css */
 .sidebar > .filter-mgmt-entry {
+    margin:5px;
     padding:5px;
-    border-bottom:1px #e0e0e0 solid;
+    border:1px #e0e0e0 solid;
 }
 .sidebar > .filter-mgmt-entry > p {
     font-weight:bold;
@@ -202,6 +221,7 @@ input[type="number"] { width:3em; margin:0 0.5em; }
     background:var(--opt-itm-color);
 }
 .options > .row.header {
+    z-index:10;
     position:sticky;
     top:var(--header-height);
     background:#fff;
@@ -211,7 +231,7 @@ input[type="number"] { width:3em; margin:0 0.5em; }
 .options > .row > .cell {
     display:table-cell;
     padding:4px 4px;
-    min-width: 5em;
+    padding-right:1.4em;
 }
 .options > .row > .cell.buttons { white-space: nowrap; padding-right:1em; }
 .options > .row.header > .cell > p { position:relative; }
@@ -223,18 +243,19 @@ input[type="number"] { width:3em; margin:0 0.5em; }
 .options > .row.header > .cell > p:hover > span {
     display:block;
 }
-button.follow, .options button, .options-footer button {
+label.follow, button.follow, .options button, .options-footer button {
     padding:3px 5px; margin-left:0.2em;
     background:#eee; border:1px #aaa solid;
-    border-radius:4px; cursor:pointer;
+    border-radius:4px; cursor:pointer; font-weight: normal;
 }
-button.follow:hover, .options button:hover, .options-footer button:hover {
+label.follow:hover, button.follow:hover, .options button:hover,
+.options-footer button:hover {
     background:#fafafa;
 }
-.options button.spread {
+button.spread {
     background:#fca;
 }
-.options button.tracked {
+button.tracked {
     background:#cfa;
 }
 .options-footer {
@@ -242,6 +263,25 @@ button.follow:hover, .options button:hover, .options-footer button:hover {
     text-align: center;
 }
 
+.symb { display:flex; align-items:center; }
+.symb > .catalyst {
+    border-radius:5px;
+    margin-left:0.5em;
+    background:#333;
+    color:#fff;
+    font-weight: bold;
+    padding:0 5px;
+    text-align: center;
+    position:relative;
+}
+.symb > .catalyst > .cat-info {
+    display:none; position:absolute; top:110%; left:110%; width:200px;
+    background:#333; color:#fff;
+    padding:3px; z-index: 5;
+}
+.symb > .catalyst:hover > .cat-info {
+    display:block;
+}
 
 /* Home/dashboard CSS */
 .empty-wrapper {
@@ -258,10 +298,19 @@ button.follow:hover, .options button:hover, .options-footer button:hover {
 .dash-option > h3 {
     padding:10px; background:#eee; display:flex;
 }
-.dash-option > p { flex:1; }
+.dash-option > h3 > p { flex:1; display:flex; align-items:center; }
+
+.options.tracker { width:100%; }
+.options.tracker > .row.header { position:static; }
+.options.tracker > .row { border:0 !important; }
+.options.tracker > .row > .cell { display:table-cell; min-width:0; }
+.options.tracker > .row:hover { box-shadow:inset 0 0 0 1px #eee; }
+.options.tracker > .row.header:hover { box-shadow:inset 0 0 0 3px #333; }
+
+input[type="checkbox"]:checked + .chart { display:flex !important; }
 .chart {
     padding:15px;
-    display:flex; flex-direction: column;
+    display:none; flex-direction: column;
     align-items: center;
     justify-content: center;
 }

@@ -100,16 +100,16 @@
 
 (defn draw-symbol
   [ticker]
-  (let [catalysts (get-in @state/app-state [:options :data :catalysts ticker])
+  (let [catalysts (get-in @state/app-state [:options :data :catalysts (keyword ticker)])
         now (cur-ny-time)
-        earnings (-> catalysts (get "earnings") first)
-        dividends (get catalysts "dividends")]
+        earnings (-> catalysts :earnings first)
+        dividends (:dividends catalysts)]
     [:div.symb
      [:p ticker]
-     (when (> (get earnings "raw") now)
-       [:div.catalyst.e [:p "E"] [:div.cat-info (str "earnings: " (get earnings "fmt"))]])
-     (when (> (get dividends "raw") now)
-       [:div.catalyst.d [:p "D"] [:div.cat-info (str "dividends: " (get dividends "fmt"))]])]))
+     (when (> (:raw earnings) now)
+       [:div.catalyst.e [:p "E"] [:div.cat-info (str "earnings: " (:fmt earnings))]])
+     (when (> (:raw dividends) now)
+       [:div.catalyst.d [:p "D"] [:div.cat-info (str "dividends: " (:fmt dividends))]])]))
 
 (defn ladder-next
   [{:keys [contractSymbol symbol expiration optType]}]
@@ -134,6 +134,9 @@
   (cond
     (= id :symbol)
     (draw-symbol v)
+
+    (= id :lastCrawl)
+    (s-to-h-min (- (- (cur-local-time) offset) v))
     
     (or (= id :expiration) (= id :lastTradeDate))
     [:p
@@ -165,7 +168,8 @@
 
 (defn spread-button
   [{ticker :symbol expiration :expiration
-    optType :optType contractSymbol :contractSymbol}]
+    optType :optType contractSymbol :contractSymbol}
+   home?]
   (when (nil?
          (get-in
           @state/app-state
@@ -173,7 +177,7 @@
     (.postMessage
      state/worker
      (clj->js {:message "ladder" :data [ticker expiration optType]})))
-  (state/toggle-spread contractSymbol))
+  (state/toggle-spread home? contractSymbol))
 
 (defn row
   [{:keys [contractSymbol inTheMoney] :as data}]
@@ -191,7 +195,7 @@
         :class [(when tracked? "tracked")]}
        (if tracked? "forget" "follow")]
       [:button
-       {:on-click (fn [] (spread-button data)) :class [(when activ-spread? "spread")]}
+       {:on-click (fn [] (spread-button data false)) :class [(when activ-spread? "spread")]}
        (if activ-spread? "close" "spread")]]
      (->> columns-w-names
           (keep

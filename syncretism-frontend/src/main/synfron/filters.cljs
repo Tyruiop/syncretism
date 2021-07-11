@@ -18,24 +18,6 @@
   (clear-filter)
   (state/set-cur-filter f-data))
 
-(defn trigger-search
-  ([] (trigger-search nil))
-  ([offset]
-   (let [filter-data (get-in @state/app-state [:filters :values])
-         filter-data (if (number? offset)
-                       (assoc filter-data :offset offset)
-                       filter-data)
-         clean-filter (->> filter-data
-                           (keep
-                            (fn [[k v]]
-                              (when (and v (not= v ""))
-                                [k
-                                 (if (boolean? v)
-                                   v
-                                   (try (js/parseFloat v) (catch js/Error _ 0)))])))
-                           (into {}))]
-     (.postMessage state/worker (clj->js {:message "search" :data clean-filter})))))
-
 (defn collect-filter
   []
   (let [vals
@@ -47,6 +29,28 @@
               (.-value el))])
          (array-seq (.getElementsByTagName js/document "input")))]
     (into {} vals)))
+
+(defn trigger-search
+  ([] (trigger-search nil))
+  ([offset]
+   (let [filter-data (collect-filter)
+         filter-data (if (number? offset)
+                       (assoc filter-data :offset offset)
+                       filter-data)
+         clean-filter (->> filter-data
+                           (keep
+                            (fn [[k v]]
+                              (when (not= v "")
+                                [k
+                                 (cond (boolean? v) v
+
+                                       (= "tickers" k) v
+
+                                       :else
+                                       (try (js/parseFloat v) (catch js/Error _ 0)))])))
+                           (into {}))]
+     (state/set-cur-filter filter-data)
+     (.postMessage state/worker (clj->js {:message "search" :data clean-filter})))))
 
 (defn save-filter
   []
@@ -74,6 +78,9 @@
             :on-change
             (fn [e]
               (state/update-cur-filter id (.. e -target -value)))
+            :on-key-down (fn [ev]
+                           (when (= (.-keyCode ev) 13)
+                             (trigger-search)))
             :value cur-val}]])
 
 (defn render-select

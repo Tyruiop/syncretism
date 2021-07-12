@@ -29,7 +29,9 @@
       [:p [:a {:href "https://ops.syncretism.io/api.html" :target "_blank"} "API"]]
       [:p [:a {:href "https://discord.gg/qBWD5Sus3d" :target "_blank"} "Discord"]]
       [:p [:a {:href "https://www.buymeacoffee.com/syncretism" :target "_blank"}
-           "Buy me a coffee"]]]
+           "Buy me a coffee"]]
+      [:p [:a {:href "mailto:contact@syncretism.io"}
+           "Contact"]]]
      [:div {:class "title"}
       [:h1 "Ops.Syncretism"]]]))
 

@@ -324,4 +324,5 @@ input[type="checkbox"]:checked + .chart { display:flex !important; }
     .dash-option { overflow:auto; }
     .top-right-menu > p:first-child { display:none; }
     .top-right-menu > p:nth-child(2) { display:none; }
+    .top-right-menu > p:nth-child(5) { display:none; }
 }

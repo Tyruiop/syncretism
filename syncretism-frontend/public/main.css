@@ -40,8 +40,9 @@ input:invalid {
 
 @media only screen and (max-width: 900px) {
     :root {
+	--header-height:10vh;
+	--sidebar-width:30%;
         --default-margin:2%;
-	--sidebar-width:80%;
     }
 }
 
@@ -320,8 +321,7 @@ input[type="checkbox"]:checked + .chart { display:flex !important; }
 
 
 @media only screen and (max-width: 900px) {
-    .sidebar {
-	width:auto;
-    }
     .dash-option { overflow:auto; }
+    .top-right-menu > p:first-child { display:none; }
+    .top-right-menu > p:nth-child(2) { display:none; }
 }

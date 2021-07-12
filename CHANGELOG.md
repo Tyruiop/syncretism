@@ -1,3 +1,8 @@
+# Week 28, 2021
+
+## UI
+* Work on making the UI more smartphone friendly.
+
 # Week 27, 2021
 
 ## UI

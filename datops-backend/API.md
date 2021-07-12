@@ -112,7 +112,11 @@ the difference between `POST` and `GET` is that `GET` will only return options d
 
 ### Example use:
 
-`curl -X GET https://api.syncretism.io/ops/ladder -H "Content-Type: application/json" -d '{"ticker": "ABEV", "expiration": 1626393600, "opt-type": "C"}'`
+`curl -X GET https://api.syncretism.io/ops/ladder/PAYO/C/1626393600`
+
+i.e. `ops/ladder/TICKER/OPT-TYPE/EXPIRATION`
+
+note that the expiration date must be unique.
 
 ### Parameters
 

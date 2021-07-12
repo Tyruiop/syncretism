@@ -111,7 +111,9 @@ main {
     border-bottom:2px #555 solid;
     border-right:2px #555 solid;
     border-radius:5px;
+    background: #fff;
 }
+.sidebar > div { background:#fff; }
 .sidebar.show {
     left:0;
 }
@@ -315,3 +317,11 @@ input[type="checkbox"]:checked + .chart { display:flex !important; }
     justify-content: center;
 }
 .chart > .chart-top > select { margin:3px 7px; }
+
+
+@media only screen and (max-width: 900px) {
+    .sidebar {
+	width:auto;
+    }
+    .dash-option { overflow:auto; }
+}

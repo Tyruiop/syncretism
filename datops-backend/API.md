@@ -1,10 +1,26 @@
 # API
 
-## Live option data
+## Get a specific contract
+
+### Example use:
+
+`curl -X GET https://api.syncretism.io/ops/AAPL210716C00145000`
+
+Will return all the latest information about `AAPL210716C00145000`.
+
+## Search for options
 
 ### Example use:
 
 `curl -X GET https://api.syncretism.io/ops  -H "Content-Type: application/json" -d '{"max-price": 0.5, "puts": true}'`
+
+or
+
+`curl -X POST https://api.syncretism.io/ops  -H "Content-Type: application/json" -d '{"max-price": 0.5, "puts": true}'`
+
+the difference between `POST` and `GET` is that `GET` will only return options data, while the `POST` method will also return **the underlying's stock quotes and catalysts**.
+
+`{"options": […], "quotes": […], "catalysts": […]}`.
 
 ### Parameters
 
@@ -112,6 +128,6 @@ All parameters are required.
 
 ### Example use:
 
-Endpoint is `/historical` and is called by passing an option name as parameter, e.g.:
+Endpoint is `/ops/historical` and is called by passing an option name as parameter, e.g.:
 
-`curl -X GET https://api.syncretism.io/historical/PYPL210820P00280000`
+`curl -X GET https://api.syncretism.io/ops/historical/PYPL210820P00280000`

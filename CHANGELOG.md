@@ -13,10 +13,11 @@
 ## API
 * New endpoint: `/ops/CONTRACTNAME` to get data about a specific contract.
 * Renamed: `/historical` into `/ops/historical` for consistency.
-* `/ops` exists both as `GET` and `POST`.
+* `/ops` exists both as `GET` and `POST`, `POST` returns more complete information.
 
 ## Misc
 * Preliminary work on backtesting & prediction projects!
+* See https://github.com/Tyruiop/syncretism-labs/blob/main/labs/data_exploration.ipynb
 
 # Week 26, 2021
 

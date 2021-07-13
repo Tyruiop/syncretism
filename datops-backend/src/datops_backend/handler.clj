@@ -407,7 +407,7 @@
                           (into {}))             
               catalysts (get-catalysts symbols)]
           (json/write-str {:options res :quotes quotes :catalysts catalysts})))
-  (GET "/ops/:cs" [cs] (json/write-str (get-contract cs)))
+  (GET "/ops/:cs" [cs] (json/write-str (first (get-contract cs))))
   (GET "/ops/ladder/:ticker/:opttype/:expiration"
        [ticker opttype expiration]
        (let [q-res (get-ladder ticker opttype expiration)]

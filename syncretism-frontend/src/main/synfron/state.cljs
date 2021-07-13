@@ -151,6 +151,8 @@
   (save-state))
 (defn toggle-chart [cs side v]
   (swap! app-state #(assoc-in % [:home :historical cs side] v)))
+(defn set-cs-time [cs ts]
+  (swap! app-state #(assoc-in % [:home :tracked-options cs :ts] ts)))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Service worker handling (communication between app & SW)
@@ -168,9 +170,11 @@
       "search-append" (append-data data)
       "ladder" (let [[ladder-def ladder-data] data]
                  (swap! app-state #(assoc-in % [:options :ladder ladder-def] ladder-data)))
-      "contract" (let [[cs cs-data] data]
-                   (swap! app-state #(assoc-in % [:home :tracked-options cs]
-                                               {:data cs-data :ts (cur-local-time)})))
+      "contract"
+      (let [[cs cs-data] data]
+        (swap! app-state #(-> %
+                              (assoc-in [:home :tracked-options cs :data] cs-data)
+                              (assoc-in [:home :tracked-options cs :ts] (cur-local-time)))))
       "historical" (let [[cs cs-data] data]
                      (init-historical cs cs-data))
       (err-message message))))

@@ -138,12 +138,15 @@
       (let [{:keys [ts]} (get-in @state/app-state [:home :tracked-options cs])]
         ;; Refresh if we see it again for the first time or if it hasn't been
         ;; seen for an hour
-        (when (or (nil? ts) (> (- cur-time ts) 3600))
+        (when (or (nil? ts) (> (- cur-time ts) 100))
           (reset! modif true)
+          ;; We initially set the new time to prevent a request loop
+          (state/set-cs-time cs cur-time)
           (.postMessage state/worker (clj->js {:message "contract" :data cs}))
           (.postMessage state/worker (clj->js {:message "historical" :data cs})))))
     (when @modif
-      (state/save-state))
+      (state/save-state)
+      (reset! modif false))
     (if (empty? (:tracked-options home))
       (render-empty)
       (render-tracked))))

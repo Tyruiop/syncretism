@@ -132,13 +132,18 @@
 (defn render
   []
   (let [home (:home @state/app-state)
-        cur-time (cur-local-time)]
+        cur-time (cur-local-time)
+        modif (atom false)]
     (doseq [cs (-> @state/app-state :home :tracked-options keys)]
       (let [{:keys [ts]} (get-in @state/app-state [:home :tracked-options cs])]
         ;; Refresh if we see it again for the first time or if it hasn't been
         ;; seen for an hour
-        (when (or (nil? ts) (> (- cur-time ts) 10))
-          (.postMessage state/worker (clj->js {:message "contract" :data cs})))))
+        (when (or (nil? ts) (> (- cur-time ts) 3600))
+          (reset! modif true)
+          (.postMessage state/worker (clj->js {:message "contract" :data cs}))
+          (.postMessage state/worker (clj->js {:message "historical" :data cs})))))
+    (when @modif
+      (state/save-state))
     (if (empty? (:tracked-options home))
       (render-empty)
       (render-tracked))))

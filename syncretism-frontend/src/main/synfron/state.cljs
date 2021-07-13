@@ -170,8 +170,7 @@
                  (swap! app-state #(assoc-in % [:options :ladder ladder-def] ladder-data)))
       "contract" (let [[cs cs-data] data]
                    (swap! app-state #(assoc-in % [:home :tracked-options cs]
-                                               {:data cs-data :ts (cur-local-time)}))
-                   (save-state))
+                                               {:data cs-data :ts (cur-local-time)})))
       "historical" (let [[cs cs-data] data]
                      (init-historical cs cs-data))
       (err-message message))))

@@ -138,7 +138,7 @@
       (let [{:keys [ts]} (get-in @state/app-state [:home :tracked-options cs])]
         ;; Refresh if we see it again for the first time or if it hasn't been
         ;; seen for an hour
-        (when (or (nil? ts) (> (- cur-time ts) 100))
+        (when (or (nil? ts) (> (- cur-time ts) 3600))
           (reset! modif true)
           ;; We initially set the new time to prevent a request loop
           (state/set-cs-time cs cur-time)

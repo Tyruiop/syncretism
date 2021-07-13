@@ -3,14 +3,8 @@
    [clojure.string :as str]
    [oz.core :as oc]
    [synfron.options :as options]
+   [synfron.time :refer [from-ts cur-local-time]]
    [synfron.state :as state]))
-
-(defn from-ts
-  [ts]
-  (-> ts
-      (* 1000)
-      (js/Date.)
-      (.toLocaleString "en-US")))
 
 (defn render-empty
   []
@@ -117,7 +111,7 @@
 (defn render-option
   [cs]
   (let [{:keys [symbol optType expiration] :as data}
-        (get-in @state/app-state [:home :tracked-options cs])
+        (get-in @state/app-state [:home :tracked-options cs :data])
         historical (get-in @state/app-state [:home :historical cs])]
     [:div {:class ["dash-option"]}
      [:h3
@@ -133,11 +127,18 @@
    (fn [acc cs]
      (conj acc (render-option cs)))
    [:<>]
-   (-> @state/app-state :home :historical keys)))
+   (-> @state/app-state :home :tracked-options keys)))
 
 (defn render
   []
-  (let [home (:home @state/app-state)]
+  (let [home (:home @state/app-state)
+        cur-time (cur-local-time)]
+    (doseq [cs (-> @state/app-state :home :tracked-options keys)]
+      (let [{:keys [ts]} (get-in @state/app-state [:home :tracked-options cs])]
+        ;; Refresh if we see it again for the first time or if it hasn't been
+        ;; seen for an hour
+        (when (or (nil? ts) (> (- cur-time ts) 10))
+          (.postMessage state/worker (clj->js {:message "contract" :data cs})))))
     (if (empty? (:tracked-options home))
       (render-empty)
       (render-tracked))))

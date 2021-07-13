@@ -2,7 +2,8 @@
   (:require
    [cljs.reader :refer [read-string]]
    [reagent.core :as r]
-   ["idb-keyval" :as idb]))
+   ["idb-keyval" :as idb]
+   [synfron.time :refer [cur-local-time]]))
 
 (def worker (js/Worker. "/js/worker.js"))
 
@@ -56,6 +57,7 @@
 
 (defn print-cur-filter [] (println (get-in @app-state [:filters :values])))
 (defn print-cur-hist [] (println (map #(get % "timestamp") (take 5 (get-in @app-state [:historical])))))
+(defn print-home-data [] (println (get-in @app-state [:home :tracked-options])))
 (defn print-home-spreads [] (println (get-in @app-state [:home :spreads])))
 (defn print-catalysts [] (println (get-in @app-state [:options :data :catalysts])))
 
@@ -137,7 +139,7 @@
       (swap! app-state #(update-in % [:home :tracked-options] dissoc cs))
       (swap! app-state #(update-in % [:home :historical] dissoc cs)))
     (do
-      (swap! app-state #(update-in % [:home :tracked-options] assoc cs data))
+      (swap! app-state #(update-in % [:home :tracked-options] assoc-in [cs :data] data))
       (.postMessage worker (clj->js {:message "historical" :data cs}))))
   (save-state))
 
@@ -167,7 +169,9 @@
       "ladder" (let [[ladder-def ladder-data] data]
                  (swap! app-state #(assoc-in % [:options :ladder ladder-def] ladder-data)))
       "contract" (let [[cs cs-data] data]
-                   (swap! app-state #(assoc-in % [:home :tracked-options cs] data)))
+                   (swap! app-state #(assoc-in % [:home :tracked-options cs]
+                                               {:data cs-data :ts (cur-local-time)}))
+                   (save-state))
       "historical" (let [[cs cs-data] data]
                      (init-historical cs cs-data))
       (err-message message))))

@@ -92,6 +92,8 @@
 
    {:title "Miscellaneous"
     :type :misc
+    :descr [:p [:strong "Active"]
+            " means only options for which ask, bid, OI, and V are > 0. "]
     :entries
     [{:name "Tickers: "
       :type :text
@@ -113,5 +115,5 @@
                 ["Stock Price ↑" "md_asc"]]}
      {:name "Active"
       :type :checkbox
-      :descr "Only check options for which ask, bid, OI, and V are > 0."
+      :descr ""
       :id "active"}]}])

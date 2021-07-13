@@ -158,7 +158,7 @@
                                 (trigger-search)))}]]]))
 
 (defmethod render-filter :misc
-  [{f-title :title entries :entries}]
+  [{f-title :title entries :entries descr :descr}]
   (let [lc-f-title (str/lower-case f-title)
         f-search (get-in @state/app-state [:filters :search])
         cur-vals (get-in @state/app-state [:filters :values])]
@@ -169,7 +169,8 @@
                                 lc-f-title (str/lower-case f-search))))
                      "hidden")]}
      [:div {:class ["title"]}
-      [:h3 f-title]]
+      [:h3 f-title]
+      (when descr descr)]
      (reduce
       (fn [acc {f-name :name f-type :type ph :placeholder id :id options :options}]
         (cond (= f-type :checkbox)

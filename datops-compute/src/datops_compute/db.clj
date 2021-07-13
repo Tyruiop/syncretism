@@ -1,5 +1,6 @@
 (ns datops-compute.db
   (:require
+   [clojure.java.io :as io]
    [clojure.string :as str]
    [clojure.java.jdbc :as db]
    [taoensso.timbre :as timbre :refer [info warn error]]
@@ -7,7 +8,7 @@
    [next.jdbc.prepare :as jdbp]
    [datops-compute.yield :refer [calculate-monthly-yield]]))
 
-(def db (-> "resources/db.edn" slurp read-string))
+(def db (-> "db.edn" io/resource slurp read-string))
 
 (defn get-live-options
   "Allow to get options with pagination"

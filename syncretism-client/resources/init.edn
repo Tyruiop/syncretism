@@ -1,0 +1,25 @@
+{;; General configuration
+ :server "https://api.syncretism.io"
+ 
+ ;; All currently loaded data 
+ :data
+ {;; Saved filters [Name, Data] to load on filter window
+  :filters {}
+  ;; Search results Map[UUID, [ts, Data]]
+  :search {}
+  ;; Historical options displayed Map[Contract, [ts, Data]]
+  :historical {}
+  ;; Ladders Map[[Ticker, expiration, opt-type], [ts, Data]]
+  :ladders {}}
+
+ :ui
+ {;; Spreads
+  :spreads #{}
+  ;; Historical Map[contract, [y left, y right]]
+  :historical {}
+  ;; Searches Map[UUID, [filter, ts, Data]] (window's UUID)
+  :searches {}
+  ;; Active filter window Map[key, value]
+  :fitlers {}
+  }
+ }

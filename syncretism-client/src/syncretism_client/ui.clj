@@ -1,7 +1,8 @@
 (ns syncretism-client.ui
   (:require
    [clojure.data.json :as json]
-   [clj-http.client :as http])
+   [clj-http.client :as http]
+   [syncretism-client.state :as st :refer [state]])
   (:import
    [imgui.extension.implot ImPlot ImPlotStyle]
    [imgui.extension.implot.flag ImPlotStyleVar ImPlotAxisFlags ImPlotFlags]
@@ -54,11 +55,32 @@
       (ImPlot/endPlot))
     (ImGui/end)))
 
+(defn draw-filter-window
+  [filter-data]
+  (ImGui/begin "New Search")
+  (ImGui/text "Strike to Stock diff")
+  (when (ImGui/button "Reset")
+    (st/init-filter))
+  (when (ImGui/button "Close")
+    (st/clear-filter))
+  (ImGui/end))
+
+(defn main-menu
+  []
+  (ImGui/beginMainMenuBar)
+  (when (ImGui/beginMenu "Syncretism")
+    (when (ImGui/menuItem "Quit")
+      (System/exit 0))
+    (ImGui/endMenu))
+  (when (ImGui/menuItem "Search")
+    (st/init-filter))
+  (ImGui/endMainMenuBar))
+
 (defn run
   []
-  (let [state (atom {:bool (new imgui.type.ImBoolean)
-                     :data data
-                     :scs (new imgui.type.ImString)})
+  (let [sstate (atom {:bool (new imgui.type.ImBoolean)
+                      :data data
+                      :scs (new imgui.type.ImString)})
         app
         (proxy [Application] []
           (configure [^Configuration config] (. config setTitle "Coucou"))
@@ -66,16 +88,10 @@
             (proxy-super initImGui config)
             (ImPlot/createContext))
           (process []
-            (ImGui/beginMainMenuBar)
-            (when (ImGui/beginMenu "Syncretism")
-              (when (ImGui/menuItem "Quit")
-                (System/exit 0))
-              (ImGui/endMenu))
-            (ImGui/endMainMenuBar)
-            (ImGui/begin "Foo")
-            (ImGui/text "machin")
-            (ImGui/end)
-            (draw-plot state)))]
+            (main-menu)
+            (when-let [filter-data (:filter @state)]
+              (draw-filter-window filter-data))
+            (draw-plot sstate)))]
     (Application/launch app)))
 
 ;; (run)

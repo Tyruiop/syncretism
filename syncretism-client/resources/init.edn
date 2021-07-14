@@ -20,6 +20,6 @@
   ;; Searches Map[UUID, [filter, ts, Data]] (window's UUID)
   :searches {}
   ;; Active filter window Map[key, value]
-  :fitlers {}
+  :filter nil
   }
  }

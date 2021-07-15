@@ -5,8 +5,6 @@
  :data
  {;; Saved filters [Name, Data] to load on filter window
   :filters {}
-  ;; Search results Map[UUID, [ts, Data]]
-  :search {}
   ;; Historical options displayed Map[Contract, [ts, Data]]
   :historical {}
   ;; Ladders Map[[Ticker, expiration, opt-type], [ts, Data]]

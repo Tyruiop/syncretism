@@ -51,6 +51,7 @@ regularMarketPrice FLOAT not null,
 regularMarketDayHigh FLOAT not null,
 regularMarketDayLow FLOAT not null,
 priceToBook FLOAT,
+premium FLOAT,
 ask FLOAT,
 bid FLOAT,
 lastTradeDate BIGINT,
@@ -60,13 +61,14 @@ monthlyYield FLOAT,
 delta FLOAT,
 gamma FLOAT,
 theta FLOAT,
-vega FLOAT
+vega FLOAT,
+rho FLOAT
 ) ENGINE=Aria;")
 
 ;; (jdbc/execute! db ["ALTER TABLE live ADD COLUMN (delta FLOAT)"])
 ;; (jdbc/execute! db ["ALTER TABLE live ADD COLUMN (gamma FLOAT)"])
-;; (jdbc/execute! db ["ALTER TABLE live ADD COLUMN (theta FLOAT)"])
-;; (jdbc/execute! db ["ALTER TABLE live ADD COLUMN (vega FLOAT)"])
+;; (jdbc/execute! db ["ALTER TABLE live ADD COLUMN (rho FLOAT)"])
+;; (jdbc/execute! db ["ALTER TABLE live ADD COLUMN (premium FLOAT)"])
 
 (def live-columns
   [[[:opt :contractSymbol] "contractSymbol"]
@@ -85,6 +87,7 @@ vega FLOAT
    [[:quote :regularMarketDayHigh] "regularMarketDayHigh"]
    [[:quote :regularMarketDayLow] "regularMarketDayLow"]
    [[:quote :priceToBook] "priceToBook"]
+   [[:opt :premium] "premium"]
    [[:opt :ask] "ask"]
    [[:opt :bid] "bid"]
    [[:opt :lastTradeDate] "lastTradeDate"]
@@ -92,7 +95,8 @@ vega FLOAT
    [[:opt :delta] "delta"]
    [[:opt :gamma] "gamma"]
    [[:opt :theta] "theta"]
-   [[:opt :vega] "vega"]])
+   [[:opt :vega] "vega"]
+   [[:opt :rho] "rho"]])
 
 (def live-columns-nb (count live-columns))
 

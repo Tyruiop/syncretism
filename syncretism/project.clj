@@ -1,4 +1,4 @@
-(defproject org.clojars.tyruiop/syncretism "0.1.0"
+(defproject org.clojars.tyruiop/syncretism "0.1.1"
   :description "Common library for all syncretism projects"
   :url "https://github.com/Tyruiop/syncretism/tree/main/syncretism"
   :license {:name "GNU AGPL-V3 or later"

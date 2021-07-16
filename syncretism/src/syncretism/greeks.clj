@@ -26,6 +26,16 @@
      (* v (Math/sqrt t))))
 (defn calc-d2 [d1 v t] (- d1 (* v (Math/sqrt t))))
 
+(defn calc-premium
+  [{opt-type :opt-type X :strike s0 :stock-price eqt :eqt d1 :d1 d2 :d2 t :t q :yield}]
+  (let [xert (* X (Math/exp (- (* rfr t))))
+        s0eqt (* s0 eqt)]
+    (cond (= opt-type "C")
+          (- (* s0eqt (cdf-normal d1)) (* xert (cdf-normal d2)))
+
+          (= opt-type "P")
+          (- (* xert (cdf-normal (- d2))) (* s0eqt (cdf-normal (- d1)))))))
+
 (defn calc-delta
   [{q :yield d1 :d1 t :t opt-type :opt-type}]
   (cond (= opt-type "C")
@@ -63,6 +73,15 @@
    (* s0 eqt (Math/sqrt t) (Math/exp (- (/ (* d1 d1) 2))))
    (* 100 (Math/sqrt (* 2 Math/PI)))))
 
+(defn calc-rho
+  [{opt-type :opt-type X :strike t :t d2 :d2}]
+  (let [xtert (* X t (Math/exp (- (* rfr t))))]
+    (cond (= opt-type "C")
+          (/ (* xtert (cdf-normal d2)) 100)
+
+          (= opt-type "P")
+          (- (/ (* xtert (cdf-normal (- d2))) 100)))))
+
 (defn calculate-greeks
   [{expiration :expiration v :impliedVolatility :as data}]
   (let [t (expiration-years expiration)
@@ -76,6 +95,10 @@
     (->> [[:delta (calc-delta full-data)]
           [:gamma (calc-gamma full-data)]
           [:theta (calc-theta full-data)]
-          [:vega (calc-vega full-data)]]
+          [:vega (calc-vega full-data)]
+          [:rho (calc-rho full-data)]
+          [:premium (calc-premium full-data)]
+          [:dividendYield q]
+          [:rfr rfr]]
          (filter #(-> % last Double/isNaN not))
          (into {}))))

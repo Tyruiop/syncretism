@@ -3,6 +3,14 @@
 ## UI
 * Work on making the UI more smartphone friendly.
 
+## Syncretism lib
+* Added theoretical premium calculation
+* Added rho calculation
+* More complete data saved in db
+
+## Syncretism Client
+* Preliminary work
+
 # Week 27, 2021
 
 ## UI

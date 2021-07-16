@@ -41,6 +41,7 @@
    ["create table if not exists timeseries (
   contractSymbol VARCHAR(40) not null,
   timestamp INT not null,
+  premium FLOAT,
   ask FLOAT,
   bid FLOAT,
   impliedVolatility FLOAT,
@@ -50,16 +51,20 @@
   gamma FLOAT,
   theta FLOAT,
   vega FLOAT,
+  rho FLOAT,
+  dividendYield FLOAT,
   regularMarketPrice DOUBLE,
   regularMarketVolume DOUBLE,
   regularMarketChange DOUBLE,
   marketCap DOUBLE,
+  rfr FLOAT,
   PRIMARY KEY (contractSymbol, timestamp)
   ) ENGINE=Aria;"]))
 
 (def ts-columns
   ["contractSymbol"
    "timestamp"
+   "premium"
    "ask"
    "bid"
    "impliedVolatility"
@@ -69,10 +74,13 @@
    "gamma"
    "theta"
    "vega"
+   "rho"
+   "dividendYield"
    "regularMarketPrice"
    "regularMarketVolume"
    "regularMarketChange"
-   "marketCap"])
+   "marketCap"
+   "rfr"])
 
 (def ts-columns-nb (count ts-columns))
 

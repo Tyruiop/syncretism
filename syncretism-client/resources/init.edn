@@ -1,5 +1,10 @@
 {;; General configuration
+ ;; API Endpoint
  :server "https://api.syncretism.io"
+ ;; Is local crawler on
+ :local-crawler false
+ ;; Where do we store permanent data
+ :data-path "data/"
  
  ;; All currently loaded data 
  :data

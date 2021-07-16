@@ -13,7 +13,7 @@
 ;; We use https://www.macroption.com/black-scholes-formula/ as reference
 (defn parse-line
   [{:keys [opt quote req-time :as data]}]
-  (let [{:keys [delta gamma theta vega]}
+  (let [{:keys [delta gamma theta vega rho rfr premium dividendYield]}
         (gks/calculate-greeks
          (assoc
           opt
@@ -26,6 +26,7 @@
      (get opt :strike)
      (get opt :expiration)
      req-time
+     premium
      (get opt :ask)
      (get opt :bid)
      (get opt :impliedVolatility)
@@ -35,10 +36,13 @@
      (or (get opt :gamma) gamma)
      (or (get opt :theta) theta)
      (or (get opt :vega) vega)
+     (or (get opt :rho) rho)
+     dividendYield
      (get quote :regularMarketPrice)
      (get quote :regularMarketVolume)
      (get quote :regularMarketChange)
-     (get quote :marketCap)]))
+     (get quote :marketCap)
+     rfr]))
 
 (defn aggregate-ticker
   [options-path ticker nb-days]

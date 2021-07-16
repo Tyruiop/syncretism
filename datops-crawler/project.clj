@@ -13,7 +13,7 @@
                  [com.taoensso/timbre "5.1.2"]
                  [com.velisco/clj-ftp "0.3.12"]
 
-                 [org.clojars.tyruiop/syncretism "0.1.0"]]
+                 [org.clojars.tyruiop/syncretism "0.1.1"]]
   :main ^:skip-aot datops.core
   :target-path "target/%s"
   :profiles {:uberjar {:aot :all}})

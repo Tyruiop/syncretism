@@ -45,27 +45,39 @@
      rfr]))
 
 (defn aggregate-ticker
-  [options-path ticker nb-days]
-  (let [options (io/file options-path)
-        selected-days (->> options
-                           file-seq
-                           rest
-                           (filter #(.isDirectory %))
-                           sort
-                           reverse
-                           (take nb-days))]
-    (->> selected-days
-         (pmap
-          (fn [f]
-            (try
-              (utils/read-gzipped
-               (comp parse-line read-string)
-               (str f "/" ticker ".txt.gz"))
-              (catch Exception _ []))))
-         (mapcat identity)
-         (group-by #(take 4 %))
-         (map (fn [[idcontract data]] [idcontract (map #(drop 4 %) data)]))
-         doall)))
+  "If nb-days is set, then aggregates all the data starting from the last day,
+  if it's not set, then it's assumed that options-path points to a specific day."
+  ([options-path ticker]
+   (let [options (io/file options-path)]
+     (->> (try
+            (utils/read-gzipped
+             (comp parse-line read-string)
+             (str f "/" ticker ".txt.gz"))
+            (catch Exception _ []))
+          (group-by #(take 4 %))
+          (map (fn [[idcontract data]] [idcontract (map #(drop 4 %) data)]))
+          doall)))
+  ([options-path ticker nb-days]
+   (let [options (io/file options-path)
+         selected-days (->> options
+                            file-seq
+                            rest
+                            (filter #(.isDirectory %))
+                            sort
+                            reverse
+                            (take nb-days))]
+     (->> selected-days
+          (pmap
+           (fn [f]
+             (try
+               (utils/read-gzipped
+                (comp parse-line read-string)
+                (str f "/" ticker ".txt.gz"))
+               (catch Exception _ []))))
+          (mapcat identity)
+          (group-by #(take 4 %))
+          (map (fn [[idcontract data]] [idcontract (map #(drop 4 %) data)]))
+          doall))))
 
 (def market-open-mins (+ (* 9 60 60) (* 30 60)))
 (def market-mid-mins (+ (* 12 60 60) (* 30 60)))
@@ -203,7 +215,9 @@
 
 (defn process-option
   [option-path ticker nb-days]
-  (let [data (doall (aggregate-ticker option-path ticker nb-days))]
+  (let [data (doall (if (nil? nb-days)
+                      (aggregate-ticker option-path ticker)
+                      (aggregate-ticker option-path ticker nb-days)))]
     (->> data
          (pmap align-option-data)
          (keep identity)
@@ -232,3 +246,19 @@
   [option-path nb-days]
   (let [tickers (utils/find-tickers option-path)]
     (process-options option-path tickers nb-days)))
+
+(defn process-all
+  [option-path]
+  (let [days (->> option-path
+                  io/file file-seq rest
+                  (filter #(.isDirectory %)))
+        _ (println "Processing" (count days) "days.")]
+    (doseq [day days]
+      (println "Processing all tickers in" (str day))
+      (let [tickers (utils/find-tickers day false)
+            nbs
+            (reduce
+             (fn [acc ticker]
+               (into acc (process-option day ticker nil)))
+             tickers)]
+        (println (str day) "done (" (apply + nbs) ").")))))

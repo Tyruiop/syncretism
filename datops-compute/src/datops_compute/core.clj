@@ -18,8 +18,14 @@
         (recur (assoc acc :yields true) (rest args))
 
         (= arg "--timeseries")
-        (if (or (nil? v) (str/starts-with? v "--"))
+        (cond
+          (= v "--all")
+          (recur (assoc acc :timeseries :all) (rest args))
+          
+          (or (nil? v) (str/starts-with? v "--"))
           (recur (assoc acc :timeseries []) (rest args))
+
+          :else
           (recur (assoc acc :timeseries (str/split v #",")) r))
 
         (= arg "--nb-days")
@@ -38,9 +44,13 @@
       (let [tickers (:timeseries set-args)
             nb-days (get set-args :nb-days 1)
             opts-path (get set-args :opts-path "options/")]
-        (if (empty? tickers)
-          (ts/process-all-options opts-path nb-days)
-          (ts/process-options opts-path tickers nb-days))))
+        (cond (= :all tickers)
+              (ts/process-all opts-path)
+              
+              (empty? tickers)
+              (ts/process-all-options opts-path nb-days)
+              
+              :else (ts/process-options opts-path tickers nb-days))))
     (when (:yields set-args)
       (info "Updating yields across active options.")
       (db/update-live-options 10000)

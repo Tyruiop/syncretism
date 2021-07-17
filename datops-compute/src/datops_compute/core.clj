@@ -20,7 +20,7 @@
         (= arg "--timeseries")
         (cond
           (= v "--all")
-          (recur (assoc acc :timeseries :all) (rest args))
+          (recur (assoc acc :timeseries :all) r)
           
           (or (nil? v) (str/starts-with? v "--"))
           (recur (assoc acc :timeseries []) (rest args))
@@ -32,7 +32,9 @@
         (recur (assoc acc :nb-days (Integer/parseInt v)) r)
 
         (= arg "--opts-path")
-        (recur (assoc acc :opts-path v) r)))
+        (recur (assoc acc :opts-path v) r)
+
+        :else (recur acc (rest args))))
 
 (defn -main
   [& args]

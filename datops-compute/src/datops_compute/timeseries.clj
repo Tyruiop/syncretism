@@ -259,5 +259,6 @@
             (reduce
              (fn [acc ticker]
                (into acc (process-option day ticker nil)))
+             []
              tickers)]
         (println (str day) "done (" (apply + nbs) ").")))))

@@ -48,15 +48,14 @@
   "If nb-days is set, then aggregates all the data starting from the last day,
   if it's not set, then it's assumed that options-path points to a specific day."
   ([options-path ticker]
-   (let [options (io/file options-path)]
-     (->> (try
-            (utils/read-gzipped
-             (comp parse-line read-string)
-             (str f "/" ticker ".txt.gz"))
-            (catch Exception _ []))
-          (group-by #(take 4 %))
-          (map (fn [[idcontract data]] [idcontract (map #(drop 4 %) data)]))
-          doall)))
+   (->> (try
+          (utils/read-gzipped
+           (comp parse-line read-string)
+           (str options-path "/" ticker ".txt.gz"))
+          (catch Exception _ []))
+        (group-by #(take 4 %))
+        (map (fn [[idcontract data]] [idcontract (map #(drop 4 %) data)]))
+        doall))
   ([options-path ticker nb-days]
    (let [options (io/file options-path)
          selected-days (->> options

@@ -45,6 +45,16 @@
     :descr nil
     :id "sto"}
 
+   {:title "Strike"
+    :type :min-max
+    :descr "Strike price range"
+    :id "strike"}
+
+   {:title "Stock Price"
+    :type :min-max
+    :descr "Stock price range"
+    :id "stock"}
+
    {:title "Yield"
     :type :min-max
     :descr "The returns of the premium compared to the strike."

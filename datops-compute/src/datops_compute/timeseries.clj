@@ -252,16 +252,13 @@
                   io/file file-seq rest
                   (filter #(.isDirectory %)))
         _ (println "Processing" (count days) "days.")]
-    (->> days
-         (pmap
-          (fn [day] 
-            (println "Processing all tickers in" (str day))
-            (let [tickers (utils/find-tickers day false)
-                  nbs
-                  (reduce
-                   (fn [acc ticker]
-                     (into acc (process-option day ticker nil)))
-                   []
-                   tickers)]
-              (println (str day) "done (" (apply + nbs) ")."))))
-         doall)))
+    (doseq [day days] 
+      (println "Processing all tickers in" (str day))
+      (let [tickers (utils/find-tickers day false)
+            nbs
+            (reduce
+             (fn [acc ticker]
+               (into acc (process-option day ticker nil)))
+             []
+             tickers)]
+        (println (str day) "done (" (apply + nbs) ").")))))

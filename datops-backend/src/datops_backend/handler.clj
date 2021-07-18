@@ -127,6 +127,8 @@
                          min-exp max-exp
                          min-iv max-iv
                          min-price max-price
+                         min-strike max-strike
+                         min-stock max-stock
                          calls puts
                          stock etf
                          min-sto max-sto
@@ -169,6 +171,10 @@
         params (into params [(if min-price min-price 0.001) (if min-price min-price 0.001)])
         params (if min-sto (conj params min-sto) params)
         params (if max-sto (conj params max-sto) params)
+        params (if min-strike (conj params min-strike) params)
+        params (if max-strike (conj params max-strike) params)
+        params (if min-stock (conj params min-stock) params)
+        params (if max-stock (conj params max-stock) params)
         params (if min-yield (conj params min-yield) params)
         params (if max-yield (conj params max-yield) params)
         params (if min-myield (conj params min-myield) params)
@@ -271,6 +277,18 @@
            " AND (100*ask)/regularmarketprice >= ?")
          (when max-sto
            " AND (100*ask)/regularmarketprice <= ?")
+
+         ;; Strike price
+         (when min-strike
+           " AND strike >= ?")
+         (when max-strike
+           " AND strike <= ?")
+
+         ;; Underlying stock price
+         (when min-stock
+           " AND regularmarketprice >= ?")
+         (when max-stock
+           " AND regularmarketprice <= ?")
 
          ;; Yield
          (when min-yield

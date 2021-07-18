@@ -1,5 +1,9 @@
 # Week 28, 2021
 
+## Filters
+* Added strike price filter
+* Added underlying stock's price filter
+
 ## UI
 * Work on making the UI more smartphone friendly.
 
@@ -10,6 +14,9 @@
 
 ## Syncretism Client
 * Preliminary work
+
+## Misc
+* Adding rho & premium to historical data (in progress).
 
 # Week 27, 2021
 

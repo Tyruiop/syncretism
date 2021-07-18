@@ -121,54 +121,6 @@
     ;; Remove empty tickers
     (filter #(not= % "") tick)))
 
-(defn sanitize-query
-  [{:keys [limit
-           min-diff max-diff
-           min-ask-bid max-ask-bid
-           min-exp max-exp
-           min-iv max-iv
-           min-price max-price
-           min-sto max-sto
-           min-yield max-yield
-           min-myield max-myield
-           min-delta max-delta
-           min-gamma max-gamma
-           min-theta max-theta
-           min-vega max-vega
-           min-cap max-cap] :as req}]
-  (-> req
-      (assoc :limit (try (Integer/parseInt limit) (catch Exception e 50)))
-      (assoc :min-diff (try (Integer/parseInt min-diff) (catch Exception e nil)))
-      (assoc :max-diff (try (Integer/parseInt max-diff) (catch Exception e nil)))
-      (assoc :min-ask-bid (try (Double/parseDouble min-ask-bid) (catch Exception e nil)))
-      (assoc :max-ask-bid (try (Double/parseDouble max-ask-bid) (catch Exception e nil)))
-      (assoc :min-exp (try (Integer/parseInt min-exp) (catch Exception e nil)))
-      (assoc :max-exp (try (Integer/parseInt max-exp) (catch Exception e nil)))
-      (assoc :min-iv (try (Integer/parseInt min-iv) (catch Exception e nil)))
-      (assoc :max-iv (try (Integer/parseInt max-iv) (catch Exception e nil)))
-      (assoc :min-price (try (Double/parseDouble min-price) (catch Exception e nil)))
-      (assoc :max-price (try (Double/parseDouble max-price) (catch Exception e nil)))
-      (assoc :min-sto (try (Double/parseDouble min-sto) (catch Exception e nil)))
-      (assoc :max-sto (try (Double/parseDouble max-sto) (catch Exception e nil)))
-      (assoc :min-yield (try (Double/parseDouble min-yield) (catch Exception e nil)))
-      (assoc :max-yield (try (Double/parseDouble max-yield) (catch Exception e nil)))
-      (assoc :min-myield (try (Double/parseDouble min-myield) (catch Exception e nil)))
-      (assoc :max-myield (try (Double/parseDouble max-myield) (catch Exception e nil)))
-      (assoc :min-delta (try (Double/parseDouble min-delta) (catch Exception e nil)))
-      (assoc :max-delta (try (Double/parseDouble max-delta) (catch Exception e nil)))
-      (assoc :min-gamma (try (Double/parseDouble min-gamma) (catch Exception e nil)))
-      (assoc :max-gamma (try (Double/parseDouble max-gamma) (catch Exception e nil)))
-      (assoc :min-theta (try (Double/parseDouble min-theta) (catch Exception e nil)))
-      (assoc :max-theta (try (Double/parseDouble max-theta) (catch Exception e nil)))
-      (assoc :min-vega (try (Double/parseDouble min-vega) (catch Exception e nil)))
-      (assoc :max-vega (try (Double/parseDouble max-vega) (catch Exception e nil)))
-      (assoc :min-cap (try
-                        (long (* 1E9 (Double/parseDouble min-cap)))
-                        (catch Exception e nil)))
-      (assoc :max-cap (try
-                        (long (* 1E9 (Double/parseDouble max-cap)))
-                        (catch Exception e nil)))))
-
 (defn run-query [{:keys [tickers exclude
                          min-diff max-diff itm otm
                          min-ask-bid max-ask-bid
@@ -382,17 +334,6 @@
   (GET "/count" []
        (let [res (get-count)]
          (pr-str {:opts-nb res})))
-  (GET "/query" {:keys [params]}
-       (let [res (-> params :params read-string sanitize-query run-query)
-             symbols (map :symbol res)
-             quotes (->> symbols
-                         get-quotes
-                         (map
-                          (fn [{symb :live_quote/symbol data :live_quote/data}]
-                            [symb (json/read-str data :key-fn keyword)]))
-                         (into {}))             
-             catalysts (get-catalysts symbols)]
-         (pr-str {:options res :quotes quotes :catalysts catalysts})))
   (GET "/ops" req
        (let [res (-> req :body slurp (json/read-str :key-fn keyword) run-query)]
          (json/write-str res)))

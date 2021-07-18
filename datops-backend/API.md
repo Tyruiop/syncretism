@@ -64,9 +64,13 @@ the difference between `POST` and `GET` is that `GET` will only return options d
 
 * `max-sto [float]`: maximum option price / stock price ratio.
 
-* ~~`min-pso [float]`: deprecated~~ (see `min-yield`)
+* `min-strike [float]`: minimum option strike.
 
-* ~~`max-pso [float]`: deprecated~~ (see `max-yield`)
+* `max-strike [float]`: maximum option strike.
+
+* `min-stock [float]`: minimum underlying stock's price.
+
+* `max-stock [float]`: maximum underlying stock's price.
 
 * `min-yield [float]`: minimum premium / strike price ratio.
 

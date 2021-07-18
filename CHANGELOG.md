@@ -6,14 +6,19 @@
 
 ## UI
 * Work on making the UI more smartphone friendly.
+* Fix data persistence bugs (w/r to plot display).
 
 ## Syncretism lib
 * Added theoretical premium calculation
 * Added rho calculation
 * More complete data saved in db
 
+## Backend
+* Can trigger day by day complete historical timeseries computation
+
 ## Syncretism Client
-* Preliminary work
+* Preliminary work.
+* Design of the program state.
 
 ## Misc
 * Adding rho & premium to historical data (in progress).

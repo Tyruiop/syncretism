@@ -253,7 +253,7 @@
                   (filter #(.isDirectory %)))
         _ (println "Processing" (count days) "days.")]
     (doseq [day days] 
-      (println "Processing all tickers in" (str day))
+      (info "Processing all tickers in" (str day))
       (let [tickers (utils/find-tickers day false)
             nbs
             (reduce
@@ -261,4 +261,4 @@
                (into acc (process-option day ticker nil)))
              []
              tickers)]
-        (println (str day) "done (" (apply + nbs) ").")))))
+        (info (str day) "done (" (apply + nbs) ").")))))

@@ -102,6 +102,8 @@
 (def order-aliases
   {"e_desc" "expiration desc"
    "e_asc" "expiration asc"
+   "s_desc" "strike desc"
+   "s_asc" "strike asc"
    "iv_desc" "impliedvolatility desc"
    "iv_asc" "impliedvolatility asc"
    "lp_desc" "lastprice desc"

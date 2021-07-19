@@ -121,6 +121,10 @@
                 ["Implied Volatility ↑" "iv_asc"]
                 ["Premium ↓" "lp_desc"]
                 ["Premium ↑" "lp_asc"]
+                ["Strike ↓" "s_desc"]
+                ["Strike ↑" "s_asc"]
+                ["Symbol ↓" "t_desc"]
+                ["Symbol ↑" "t_asc"]
                 ["Stock Price ↓" "md_desc"]
                 ["Stock Price ↑" "md_asc"]]}
      {:name "Active"

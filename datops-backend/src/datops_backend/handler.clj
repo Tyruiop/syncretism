@@ -104,6 +104,8 @@
    "e_asc" "expiration asc"
    "s_desc" "strike desc"
    "s_asc" "strike asc"
+   "t_desc" "symbol desc"
+   "t_asc" "symbol asc"
    "iv_desc" "impliedvolatility desc"
    "iv_asc" "impliedvolatility asc"
    "lp_desc" "lastprice desc"

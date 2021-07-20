@@ -1,3 +1,16 @@
+# Week 29, 2021
+
+## Filters
+* Added Volume filter
+* Added Open Interest filter
+
+## UI
+* Added order by `symbol` and order by `strike` to search.
+* Added order by `volume` and order by `open interest` to search.
+
+## Backend
+* Added order by `symbol` and order by `strike` to search.
+
 # Week 28, 2021
 
 ## Filters

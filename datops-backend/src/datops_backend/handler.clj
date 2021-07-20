@@ -108,6 +108,10 @@
    "t_asc" "symbol asc"
    "iv_desc" "impliedvolatility desc"
    "iv_asc" "impliedvolatility asc"
+   "oi_desc" "openinterest desc"
+   "oi_asc" "openinterest asc"
+   "v_desc" "volume desc"
+   "v_asc" "volume asc"
    "lp_desc" "bid desc"
    "lp_asc" "bid asc"
    "md_desc" "regularmarketprice desc"
@@ -129,8 +133,10 @@
                          min-diff max-diff itm otm
                          min-ask-bid max-ask-bid
                          min-exp max-exp
-                         min-iv max-iv
                          min-price max-price
+                         min-iv max-iv
+                         min-oi max-oi
+                         min-volume max-volume
                          min-strike max-strike
                          min-stock max-stock
                          calls puts
@@ -169,10 +175,14 @@
                  params)
         params (if min-ask-bid (conj params min-ask-bid) params)
         params (if max-ask-bid (conj params max-ask-bid) params)
-        params (if min-iv (conj params min-iv) params)
-        params (if max-iv (conj params max-iv) params)
         params (if max-price (into params [max-price max-price]) params)
         params (into params [(if min-price min-price 0.001) (if min-price min-price 0.001)])
+        params (if min-iv (conj params min-iv) params)
+        params (if max-iv (conj params max-iv) params)
+        params (if min-oi (conj params min-oi) params)
+        params (if max-oi (conj params max-oi) params)
+        params (if min-volume (conj params min-volume) params)
+        params (if max-volume (conj params max-volume) params)
         params (if min-sto (conj params min-sto) params)
         params (if max-sto (conj params max-sto) params)
         params (if min-strike (conj params min-strike) params)
@@ -250,12 +260,6 @@
          (when max-ask-bid
            " AND ask - bid <= ?")
 
-         ;; IV
-         (when min-iv
-           " AND impliedvolatility >= ?")
-         (when max-iv
-           " AND impliedvolatility <= ?")
-
          ;; Premium (put a minimum price by default not to show options with no premium
          (when max-price
            (str " AND ((ask <> 0 AND ask <= ? "
@@ -267,14 +271,23 @@
           ") OR (ask = 0 AND lastprice >= ?"
           "))")
 
-         ;; Opt-type
-         (when (not puts) " AND opttype <> 'P'")
-         (when (not calls) " AND opttype <> 'C'")
+         ;; IV
+         (when min-iv
+           " AND impliedvolatility >= ?")
+         (when max-iv
+           " AND impliedvolatility <= ?")
+         
+         ;; Open Interest
+         (when min-oi
+           " AND openInterest >= ?")
+         (when max-oi
+           " AND openInterest <= ?")
 
-         ;; Stock type
-         (cond (and etf (not stock)) " AND quotetype = 'ETF'"
-               (and stock (not etf)) " AND quotetype <> 'ETF'"
-               :else "")
+         ;; IV
+         (when min-volume
+           " AND volume >= ?")
+         (when max-volume
+           " AND volume <= ?")
 
          ;; Stock/Option price ratio
          (when min-sto
@@ -329,6 +342,15 @@
            " AND JSON_VALUE(live_quote.data, '$.marketCap') >= ?")
          (when max-cap
            " AND JSON_VALUE(live_quote.data, '$.marketCap') <= ?")
+         
+         ;; Opt-type
+         (when (not puts) " AND opttype <> 'P'")
+         (when (not calls) " AND opttype <> 'C'")
+
+         ;; Stock type
+         (cond (and etf (not stock)) " AND quotetype = 'ETF'"
+               (and stock (not etf)) " AND quotetype <> 'ETF'"
+               :else "")
 
          (when active
            " AND ask > 0 AND bid > 0 AND volume > 0 AND openinterest > 0")

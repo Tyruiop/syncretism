@@ -35,6 +35,16 @@
     :descr nil
     :id "iv"}
 
+   {:title "Open Interest"
+    :type :min-max
+    :descr nil
+    :id "oi"}
+
+   {:title "Volume"
+    :type :min-max
+    :descr nil
+    :id "volume"}
+
    {:title "Option Premium"
     :type :min-max
     :descr nil
@@ -125,6 +135,10 @@
                 ["Strike ↑" "s_asc"]
                 ["Symbol ↓" "t_desc"]
                 ["Symbol ↑" "t_asc"]
+                ["Open Interest ↓" "oi_desc"]
+                ["Open Interest ↑" "oi_asc"]
+                ["Volume ↓" "v_desc"]
+                ["Volume ↑" "v_asc"]
                 ["Stock Price ↓" "md_desc"]
                 ["Stock Price ↑" "md_asc"]]}
      {:name "Active"

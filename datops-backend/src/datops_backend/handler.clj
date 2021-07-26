@@ -213,7 +213,7 @@
                         0)
                       (if (number? limit)
                         limit
-                        500)])
+                        100)])
         params (into [] (reverse params))
         
         query

@@ -33,9 +33,12 @@
     (into {} vals)))
 
 (defn trigger-search
-  ([] (trigger-search nil))
-  ([offset]
-   (let [filter-data (collect-filter)
+  ([] (trigger-search nil true))
+  ([offset] (trigger-search offset true))
+  ([offset collect?]
+   (let [filter-data (if collect?
+                       (collect-filter)
+                       (get-in @state/app-state [:filters :values]))
          filter-data (if (number? offset)
                        (assoc filter-data :offset offset)
                        filter-data)
@@ -53,7 +56,8 @@
                                        :else
                                        (try (js/parseFloat v) (catch js/Error _ 0)))])))
                            (into {}))]
-     (state/set-cur-filter filter-data)
+     (when collect?
+       (state/set-cur-filter filter-data))
      (.postMessage state/worker (clj->js {:message "search" :data clean-filter})))))
 
 (defn save-filter

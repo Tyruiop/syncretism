@@ -91,7 +91,7 @@
               (when (contains? activ-cols col-id)
                 [:div {:class ["cell"]
                        :key (str (name col-id) "-header")}
-                 [:p abbrev [:span descr]]]))))]
+                 [:p abbrev [:span.descr descr]]]))))]
      [:div {:class ["row"]}
       [:div {:class ["cell" "buttons"]}
        [:button

@@ -214,6 +214,6 @@
         (fn []
           (-> (get-in @state/app-state [:options :data :options])
               count
-              trigger-search))}
+              (trigger-search false)))}
        "See more options"]]]))
 

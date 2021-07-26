@@ -30,6 +30,11 @@
     :descr nil
     :id "exp"}
 
+   {:title "Option Premium"
+    :type :min-max
+    :descr nil
+    :id "price"}
+
    {:title "Implied volatility"
     :type :min-max
     :descr nil
@@ -44,11 +49,6 @@
     :type :min-max
     :descr nil
     :id "volume"}
-
-   {:title "Option Premium"
-    :type :min-max
-    :descr nil
-    :id "price"}
 
    {:title "Option Price / Stock Price ratio"
     :type :min-max

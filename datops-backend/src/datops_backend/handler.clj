@@ -43,6 +43,14 @@
        ["SELECT * FROM live WHERE contractSymbol = ?" contract]))
     (catch Exception e [])))
 
+(defn get-expirations [ticker]
+  (try
+    (with-open [con (jdbc/get-connection db)]
+      (jdbc/execute!
+       con
+       ["SELECT DISTINCT(expiration) FROM live WHERE symbol = ?" ticker]))
+    (catch Exception e [])))
+
 (defn get-fundamentals [symbs]
   (try
     (with-open [con (jdbc/get-connection db)]
@@ -396,6 +404,10 @@
   (GET "/ops/ladder/:ticker/:opttype/:expiration"
        [ticker opttype expiration]
        (let [q-res (get-ladder ticker opttype expiration)]
+         (json/write-str q-res)))
+  (GET "/ops/expirations/:ticker"
+       [ticker]
+       (let [q-res (get-expirations ticker)]
          (json/write-str q-res)))
   (GET "/catalysts/:ticker"
        [ticker]

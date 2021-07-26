@@ -1,3 +1,12 @@
+# Week 30, 2021
+
+## UI
+* Fixed bug where searching for more option was resetting the filters.
+* Ability to sort results by column.
+
+## Backend
+* New API call: `/ops/expirations/SYMBOL` to list all possible expirations.
+
 # Week 29, 2021
 
 ## Filters

@@ -237,14 +237,17 @@ input[type="number"] { width:3em; margin:0 0.5em; }
     padding-right:1.4em;
 }
 .options > .row > .cell.buttons { white-space: nowrap; padding-right:1em; }
-.options > .row.header > .cell > p { position:relative; }
-.options > .row.header > .cell > p > span {
+.options > .row.header > .cell > p { position:relative; white-space:nowrap; }
+.options > .row.header > .cell > p > span.descr {
     display:none; z-index:19;
     position:absolute; background:#eee; padding:3px; border-radius:3px;
     top:100%; left:10px;
 }
-.options > .row.header > .cell > p:hover > span {
+.options > .row.header > .cell > p:hover > span.descr {
     display:block;
+}
+.options > .row.header > .cell > p > span.order-by {
+    display:inline-block; padding:2px 4px; cursor:pointer; 
 }
 label.follow, button.follow, .options button, .options-footer button {
     padding:3px 5px; margin-left:0.2em;

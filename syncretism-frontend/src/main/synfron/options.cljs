@@ -166,7 +166,17 @@
 
 (defn render
   []
-  (let [activ-cols (get-in @state/app-state [:options :columns])]
+  (let [activ-cols (get-in @state/app-state [:options :columns])
+        [order-col direction] (get-in @state/app-state [:options :order-col])
+        data (get-in @state/app-state [:options :data :options])
+        sorted-data (if order-col
+                      (sort-by
+                       order-col
+                       (if (= "asc" direction)
+                         #(compare %1 %2)
+                         #(compare %2 %1))
+                       data)
+                      data)]
     [:<>
      (opt-sidebar)
      [:div {:class ["options"]}
@@ -178,8 +188,24 @@
                (when (contains? activ-cols col-id)
                  [:div {:class ["cell"]
                         :key (str (name col-id) "-header")}
-                  [:p abbrev [:span descr]]]))))]
-      (->> (get-in @state/app-state [:options :data :options])
+                  [:p abbrev [:span.descr descr]
+                   (cond (and (= order-col col-id)
+                              (= direction "asc"))
+                         [:span.order-by
+                          {:on-click (fn [] (state/toggle-order-by-opts [col-id "desc"]))}
+                          "↑"]
+
+                         (and (= order-col col-id)
+                              (= direction "desc"))
+                         [:span.order-by
+                          {:on-click (fn [] (state/toggle-order-by-opts nil))}
+                          "↓"]
+
+                         :else
+                         [:span.order-by
+                          {:on-click (fn [] (state/toggle-order-by-opts [col-id "asc"]))}
+                          "-"])]]))))]
+      (->> sorted-data
            (map row)
            doall)]
      [:div {:class ["options-footer"]}
@@ -190,3 +216,4 @@
               count
               trigger-search))}
        "See more options"]]]))
+

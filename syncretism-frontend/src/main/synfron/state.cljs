@@ -49,12 +49,15 @@
      ;; option ladders
      :ladder {}
      ;; Which options do we want to see a spread for
-     :spreads #{}}
+     :spreads #{}
+     ;; Which column do we use to sort the results (& asc or desc), e.g. [:gamma "asc"]
+     :order-col nil}
 
     ;; Is there an alert to display on FE.
     :alert nil
     }))
 
+(defn print-cur-opts [] (println (get-in @app-state [:options :data])))
 (defn print-cur-filter [] (println (get-in @app-state [:filters :values])))
 (defn print-cur-hist [] (println (map #(get % "timestamp") (take 5 (get-in @app-state [:historical])))))
 (defn print-home-data [] (println (get-in @app-state [:home :tracked-options])))
@@ -142,6 +145,9 @@
       (swap! app-state #(update-in % [:home :tracked-options] assoc-in [cs :data] data))
       (.postMessage worker (clj->js {:message "historical" :data cs}))))
   (save-state))
+(defn toggle-order-by-opts
+  [v]
+  (swap! app-state #(assoc-in % [:options :order-col] v)))
 
 
 ;; Dashboard functions

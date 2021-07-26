@@ -139,3 +139,12 @@ All parameters are required.
 Endpoint is `/ops/historical` and is called by passing an option name as parameter, e.g.:
 
 `curl -X GET https://api.syncretism.io/ops/historical/PYPL210820P00280000`
+
+## Get all expiration dates for a given symbol
+
+### Example use:
+
+`curl -X GET https://api.syncretism.io/ops/expirations/AAPL`
+
+Will return all the valid expiration dates for `AAPL` (to be passed to the
+ladder API call for example).

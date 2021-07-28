@@ -145,6 +145,7 @@
                          min-iv max-iv
                          min-oi max-oi
                          min-volume max-volume
+                         min-voi max-voi
                          min-strike max-strike
                          min-stock max-stock
                          calls puts
@@ -191,6 +192,8 @@
         params (if max-oi (conj params max-oi) params)
         params (if min-volume (conj params min-volume) params)
         params (if max-volume (conj params max-volume) params)
+        params (if min-voi (conj params min-voi) params)
+        params (if max-voi (conj params max-voi) params)
         params (if min-sto (conj params min-sto) params)
         params (if max-sto (conj params max-sto) params)
         params (if min-strike (conj params min-strike) params)
@@ -291,11 +294,17 @@
          (when max-oi
            " AND openInterest <= ?")
 
-         ;; IV
+         ;; Volume
          (when min-volume
            " AND volume >= ?")
          (when max-volume
            " AND volume <= ?")
+
+         ;; Volume / OI ratio
+         (when min-voi
+           " AND volume / openInterest >= ?")
+         (when max-voi
+           " AND volume / openInterest <= ?")
 
          ;; Stock/Option price ratio
          (when min-sto

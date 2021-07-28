@@ -48,6 +48,18 @@ the difference between `POST` and `GET` is that `GET` will only return options d
 
 * `max-iv [float]`: maximum implied volatility.
 
+* `min-oi [float]`: minimum open interest.
+
+* `max-oi [float]`: maximum open interest.
+
+* `min-volume [float]`: minimum volume.
+
+* `max-volume [float]`: maximum volume.
+
+* `min-voi [float]`: minimum volume / oi ratio.
+
+* `max-voi [float]`: maximum volume / oi ratio.
+
 * `min-price [float]`: minimum option premium.
 
 * `max-price [float]`: maximum option premium.

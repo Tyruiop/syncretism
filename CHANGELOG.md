@@ -1,5 +1,8 @@
 # Week 30, 2021
 
+## Filters
+* Added Volume/Open Interest ratio filter
+
 ## UI
 * Fixed bug where searching for more option was resetting the filters.
 * Ability to sort results by column.

@@ -50,6 +50,11 @@
     :descr nil
     :id "volume"}
 
+   {:title "Volume / OI ratio"
+    :type :min-max
+    :descr nil
+    :id "voi"}
+
    {:title "Option Price / Stock Price ratio"
     :type :min-max
     :descr nil

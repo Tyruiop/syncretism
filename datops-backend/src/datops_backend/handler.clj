@@ -107,6 +107,28 @@
            doall))
     (catch Exception e [])))
 
+(defn get-option-chain
+  "Given a (ticker, expiration) input, returns the corresponding
+  options chain."
+  [ticker expiration]
+  (info (str "--- Chain request " ticker " " expiration))
+  (try
+    (with-open [con (jdbc/get-connection db)]
+      (->> (jdbc/execute!
+            con
+            ["SELECT contractSymbol, opttype FROM live WHERE symbol=? AND expiration=?"
+             ticker expiration])
+           (map
+            (fn [d]
+              (->> d
+                   (map (fn [[k v]] [(-> k name keyword) v]))
+                   (into {}))))
+           (group-by :opttype)
+           (map (fn [[k v]] [k (map :contractSymbol v)]))
+           (into {})
+           doall))
+    (catch Exception e [])))
+
 (def order-aliases
   {"e_desc" "expiration desc"
    "e_asc" "expiration asc"
@@ -410,6 +432,10 @@
               catalysts (get-catalysts symbols)]
           (json/write-str {:options res :quotes quotes :catalysts catalysts})))
   (GET "/ops/:cs" [cs] (json/write-str (first (get-contract cs))))
+  (GET "/ops/chain/:ticker/:expiration"
+       [ticker expiration]
+       (let [q-res (get-option-chain ticker expiration)]
+         (json/write-str q-res)))
   (GET "/ops/ladder/:ticker/:opttype/:expiration"
        [ticker opttype expiration]
        (let [q-res (get-ladder ticker opttype expiration)]

@@ -144,6 +144,22 @@ All parameters are required.
 
 * `opt-type [string]`: either `C` (call) or `P` (put).
 
+## Option chain
+
+Similar to ladder request, but only returns the contract symbol, sorted by calls `C` and puts `P`.
+
+### Example use:
+
+`curl -X GET https://api.syncretism.io/ops/chain/PAYO/1626393600`
+
+### Parameters
+
+All parameters are required.
+
+* `ticker [string]`: target ticker.
+
+* `expiration [int]`: target expiration date, timestamp in seconds.
+
 ## Historical data
 
 ### Example use:

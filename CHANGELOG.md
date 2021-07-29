@@ -9,6 +9,7 @@
 
 ## Backend
 * New API call: `/ops/expirations/SYMBOL` to list all possible expirations.
+* New API call: `/ops/chain/SYMBOL/EXPIRATION` to list option chain.
 
 # Week 29, 2021
 

@@ -62,13 +62,57 @@ delta FLOAT,
 gamma FLOAT,
 theta FLOAT,
 vega FLOAT,
-rho FLOAT
+rho FLOAT,
+vol20d FLOAT,
+vol100d FLOAT,
+oi20d FLOAT,
+oi100d FLOAT,
+iv20d FLOAT,
+iv100d FLOAT,
+pr20d FLOAT,
+pr100d FLOAT,
+bid20d FLOAT,
+bid100d FLOAT,
+delta20d FLOAT,
+delta100d FLOAT,
+gamma20d FLOAT,
+gamma100d FLOAT,
+theta20d FLOAT,
+theta100d FLOAT,
+vega20d FLOAT,
+vega100d FLOAT,
+rho20d FLOAT,
+rho100d FLOAT
 ) ENGINE=Aria;")
 
 ;; (jdbc/execute! db ["ALTER TABLE live ADD COLUMN (delta FLOAT)"])
 ;; (jdbc/execute! db ["ALTER TABLE live ADD COLUMN (gamma FLOAT)"])
 ;; (jdbc/execute! db ["ALTER TABLE live ADD COLUMN (rho FLOAT)"])
 ;; (jdbc/execute! db ["ALTER TABLE live ADD COLUMN (premium FLOAT)"])
+(comment
+  (jdbc/execute!
+   db
+   ["ALTER TABLE live
+ ADD COLUMN vol20d FLOAT,
+ ADD COLUMN vol100d FLOAT,
+ ADD COLUMN oi20d FLOAT,
+ ADD COLUMN oi100d FLOAT,
+ ADD COLUMN iv20d FLOAT,
+ ADD COLUMN iv100d FLOAT,
+ ADD COLUMN pr20d FLOAT,
+ ADD COLUMN pr100d FLOAT,
+ ADD COLUMN bid20d FLOAT,
+ ADD COLUMN bid100d FLOAT,
+ ADD COLUMN delta20d FLOAT,
+ ADD COLUMN delta100d FLOAT,
+ ADD COLUMN gamma20d FLOAT,
+ ADD COLUMN gamma100d FLOAT,
+ ADD COLUMN theta20d FLOAT,
+ ADD COLUMN theta100d FLOAT,
+ ADD COLUMN vega20d FLOAT,
+ ADD COLUMN vega100d FLOAT,
+ ADD COLUMN rho20d FLOAT,
+ ADD COLUMN rho100d FLOAT"]))
 
 (def live-columns
   [[[:opt :contractSymbol] "contractSymbol"]

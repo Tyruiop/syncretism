@@ -14,6 +14,12 @@
         (= arg "--init-db")
         (recur (assoc acc :init-db true) (rest args))
 
+        (= arg "--avgs-20")
+        (recur (assoc acc :avgs-20 true) (rest args))
+
+        (= arg "--avgs-100")
+        (recur (assoc acc :avgs-100 true) (rest args))
+
         (= arg "--yields")
         (recur (assoc acc :yields true) (rest args))
 
@@ -56,4 +62,12 @@
     (when (:yields set-args)
       (info "Updating yields across active options.")
       (db/update-live-options 10000)
+      (info "Done."))
+    (when (:avgs-20 set-args)
+      (info "Calculating 20 days averages")
+      (db/write-averages-20)
+      (info "Done."))
+    (when (:avgs-100 set-args)
+      (info "Calculating 100 days averages")
+      (db/write-averages-100)
       (info "Done."))))

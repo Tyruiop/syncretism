@@ -75,7 +75,6 @@ FROM timeseries LEFT JOIN live ON timeseries.contractsymbol = live.contractsymbo
   []
   (let [avgs (get-averages 20)
         avgs-flat (map flatten-vec avgs)]
-    (println avgs-flat)
     (with-open [con (jdbc/get-connection db)
                 ps
                 (jdbc/prepare

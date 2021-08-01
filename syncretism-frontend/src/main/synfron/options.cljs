@@ -37,6 +37,7 @@
    [:gamma "Gamma" "γ"]
    [:theta "Theta" "θ"]
    [:vega "Vega" "ν"]
+   [:rho "Rho" "ρ"]
    [:quoteType "Quote Type" "QT"]
    [:lastCrawl "Last Updated" "LU"]])
 

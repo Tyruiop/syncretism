@@ -159,50 +159,52 @@
     ;; Remove empty tickers
     (filter #(not= % "") tick)))
 
-(defn run-query [{:keys [tickers exclude
-                         min-diff max-diff itm otm
-                         min-ask-bid max-ask-bid
-                         min-exp max-exp
-                         min-price max-price
-                         min-iv max-iv
-                         min-oi max-oi
-                         min-volume max-volume
-                         min-voi max-voi
-                         min-strike max-strike
-                         min-stock max-stock
-                         calls puts
-                         stock etf
-                         min-sto max-sto
-                         min-yield max-yield
-                         min-myield max-myield
-                         min-delta max-delta
-                         min-gamma max-gamma
-                         min-theta max-theta
-                         min-vega max-vega
-                         min-rho max-rho
-                         min-cap max-cap
-                         order-by limit offset active
-                         
-                         min-price-20d max-price-20d
-                         min-iv-20d max-iv-20d
-                         min-oi-20d max-oi-20d
-                         min-volume-20d max-volume-20d
-                         min-delta-20d max-delta-20d
-                         min-gamma-20d max-gamma-20d
-                         min-theta-20d max-theta-20d
-                         min-vega-20d max-vega-20d
-                         min-rho-20d max-rho-20d
-                         min-price-100d max-price-100d
-                         min-iv-100d max-iv-100d
-                         min-oi-100d max-oi-100d
-                         min-volume-100d max-volume-100d
-                         min-delta-100d max-delta-100d
-                         min-gamma-100d max-gamma-100d
-                         min-theta-100d max-theta-100d
-                         min-vega-100d max-vega-100d
-                         min-rho-100d max-rho-100d]
-                  :as req
-                  :or {etf true stock true itm true otm true puts true calls true}}]
+(defn run-query
+  [{:keys
+    [tickers exclude
+     min-diff max-diff itm otm
+     min-ask-bid max-ask-bid
+     min-exp max-exp
+     min-price max-price
+     min-iv max-iv
+     min-oi max-oi
+     min-volume max-volume
+     min-voi max-voi
+     min-strike max-strike
+     min-stock max-stock
+     calls puts
+     stock etf
+     min-sto max-sto
+     min-yield max-yield
+     min-myield max-myield
+     min-delta max-delta
+     min-gamma max-gamma
+     min-theta max-theta
+     min-vega max-vega
+     min-rho max-rho
+     min-cap max-cap
+     order-by limit offset active
+     
+     min-price-20d max-price-20d
+     min-iv-20d max-iv-20d
+     min-oi-20d max-oi-20d
+     min-volume-20d max-volume-20d
+     min-delta-20d max-delta-20d
+     min-gamma-20d max-gamma-20d
+     min-theta-20d max-theta-20d
+     min-vega-20d max-vega-20d
+     min-rho-20d max-rho-20d
+     min-price-100d max-price-100d
+     min-iv-100d max-iv-100d
+     min-oi-100d max-oi-100d
+     min-volume-100d max-volume-100d
+     min-delta-100d max-delta-100d
+     min-gamma-100d max-gamma-100d
+     min-theta-100d max-theta-100d
+     min-vega-100d max-vega-100d
+     min-rho-100d max-rho-100d]
+    :as req
+    :or {etf true stock true itm true otm true puts true calls true}}]
   (let [order-column (get order-aliases order-by "impliedvolatility desc")
         tickers (if tickers (parse-tickers tickers) "")
         cur-time (int (/ (System/currentTimeMillis) 1000))

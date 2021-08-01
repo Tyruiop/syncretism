@@ -14,6 +14,8 @@
    [:lastTradeDate "Last Trade Date" "LTD"]
    [:impliedVolatility "Implied Volatility" "IV"]
    [:bid "Bid" "B"]
+   [:bid20d "Bid 20days avg" "B20d"]
+   [:bid100d "Bid 100days avg" "B100d"]
    [:ask "Ask" "A"]
    [:lastPrice "Last Price" "LP"]
    [:volume "Volume" "V"]

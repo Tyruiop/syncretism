@@ -8,6 +8,7 @@
 * Ability to sort results by column.
 
 ## Backend
+* Compute 20 days and 100 days average for volume, OI, IV, premium, bid, and all the greeks.
 * New API call: `/ops/expirations/SYMBOL` to list all possible expirations.
 * New API call: `/ops/chain/SYMBOL/EXPIRATION` to list option chain.
 

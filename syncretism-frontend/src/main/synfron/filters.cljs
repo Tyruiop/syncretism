@@ -161,6 +161,85 @@
                               (when (= (.-keyCode ev) 13)
                                 (trigger-search)))}]]]))
 
+(defmethod render-filter :min-max-with-var
+  [{f-title :title descr :descr id :id}]
+  (let [lc-f-title (str/lower-case f-title)
+        min-id (str "min-" id)
+        max-id (str "max-" id)
+        min-id-var-20d (str min-id "-20d")
+        max-id-var-20d (str max-id "-20d")
+        min-id-var-100d (str min-id "-100d")
+        max-id-var-100d (str max-id "-100d")
+        f-search (get-in @state/app-state [:filters :search])
+        cur-vals (get-in @state/app-state [:filters :values])
+        min-v (str (get cur-vals min-id ""))
+        max-v (str (get cur-vals max-id ""))
+        min-v-var-20d (str (get cur-vals min-id-var-20d ""))
+        max-v-var-20d (str (get cur-vals max-id-var-20d ""))
+        min-v-var-100d (str (get cur-vals min-id-var-100d ""))
+        max-v-var-100d (str (get cur-vals max-id-var-100d ""))]
+    [:div {:class ["filter"
+                   (when (and f-search
+                              (not
+                               (str/includes?
+                                lc-f-title (str/lower-case f-search))))
+                     "hidden")]}
+     [:div {:class ["title"]}
+      [:h3 f-title]
+      (when descr [:p descr])]
+     [:div {:class ["criterias" "vertical"]}
+      [:div
+       [:label {:for min-id} "from"]
+       [:input {:type "number" :step 0.01 :id min-id :value min-v
+                :on-change (fn [ev]
+                             (state/update-cur-filter
+                              min-id (.. ev -target -value)))
+                :on-key-down (fn [ev]
+                               (when (= (.-keyCode ev) 13)
+                                 (trigger-search)))}]
+       [:label {:for max-id} "to"]
+       [:input {:type "number" :step 0.01 :id max-id :value max-v
+                :on-change (fn [ev]
+                             (state/update-cur-filter
+                              max-id (.. ev -target -value)))
+                :on-key-down (fn [ev]
+                               (when (= (.-keyCode ev) 13)
+                                 (trigger-search)))}]]
+      [:div
+       [:label {:for min-id} "20d deviation, from"]
+       [:input {:type "number" :step 0.01 :id min-id-var-20d :value min-v-var-20d
+                :on-change (fn [ev]
+                             (state/update-cur-filter
+                              min-id-var-20d (.. ev -target -value)))
+                :on-key-down (fn [ev]
+                               (when (= (.-keyCode ev) 13)
+                                 (trigger-search)))}]
+       [:label {:for max-id} "to"]
+       [:input {:type "number" :step 0.01 :id max-id-var-20d :value max-v-var-20d
+                :on-change (fn [ev]
+                             (state/update-cur-filter
+                              max-id-var-20d (.. ev -target -value)))
+                :on-key-down (fn [ev]
+                               (when (= (.-keyCode ev) 13)
+                                 (trigger-search)))}]]
+      [:div
+       [:label {:for min-id} "100d deviation, from"]
+       [:input {:type "number" :step 0.01 :id min-id-var-100d :value min-v-var-100d
+                :on-change (fn [ev]
+                             (state/update-cur-filter
+                              min-id-var-100d (.. ev -target -value)))
+                :on-key-down (fn [ev]
+                               (when (= (.-keyCode ev) 13)
+                                 (trigger-search)))}]
+       [:label {:for max-id} "to"]
+       [:input {:type "number" :step 0.01 :id max-id-var-100d :value max-v-var-100d
+                :on-change (fn [ev]
+                             (state/update-cur-filter
+                              max-id-var-100d (.. ev -target -value)))
+                :on-key-down (fn [ev]
+                               (when (= (.-keyCode ev) 13)
+                                 (trigger-search)))}]]]]))
+
 (defmethod render-filter :misc
   [{f-title :title entries :entries descr :descr}]
   (let [lc-f-title (str/lower-case f-title)

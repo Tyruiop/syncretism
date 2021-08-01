@@ -124,6 +124,32 @@ the difference between `POST` and `GET` is that `GET` will only return options d
 
 * `active [true|false]`: if set to true, restricts to options for which volume, open interest, ask, and bid are all `> 0`.
 
+On top off all these, you can also filter by deviation from the 20 days or 100 days
+average with the following variables:
+
+* `min-price-20d` `max-price-20d`
+* `min-iv-20d` `max-iv-20d`
+* `min-oi-20d` `max-oi-20d`
+* `min-volume-20d` `max-volume-20d`
+* `min-delta-20d` `max-delta-20d`
+* `min-gamma-20d` `max-gamma-20d`
+* `min-theta-20d` `max-theta-20d`
+* `min-vega-20d` `max-vega-20d`
+* `min-rho-20d` `max-rho-20d`
+
+* `min-price-100d` `max-price-100d`
+* `min-iv-100d` `max-iv-100d`
+* `min-oi-100d` `max-oi-100d`
+* `min-volume-100d` `max-volume-100d`
+* `min-delta-100d` `max-delta-100d`
+* `min-gamma-100d` `max-gamma-100d`
+* `min-theta-100d` `max-theta-100d`
+* `min-vega-100d` `max-vega-100d`
+* `min-rho-100d` `max-rho-100d`
+
+For example, setting `min-volume-20d = 0.3` will filter by
+`abs(volume - vol20d)/volume >= 0.3`.
+
 ## Ladder request
 
 ### Example use:

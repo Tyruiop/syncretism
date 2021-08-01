@@ -1,6 +1,7 @@
 # Week 30, 2021
 
 ## Filters
+* Added average deviation filters for volume, OI, IV, bid, and all the greeks.
 * Added Volume/Open Interest ratio filter
 
 ## UI

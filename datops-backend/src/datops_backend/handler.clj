@@ -179,6 +179,7 @@
                          min-gamma max-gamma
                          min-theta max-theta
                          min-vega max-vega
+                         min-rho max-rho
                          min-cap max-cap
                          order-by limit offset active]
                   :as req
@@ -375,6 +376,10 @@
            " AND vega >= ?")
          (when max-vega
            " AND vega <= ?")
+         (when min-rho
+           " AND rho >= ?")
+         (when max-rho
+           " AND rho <= ?")
 
          ;; Market cap
          (when min-cap

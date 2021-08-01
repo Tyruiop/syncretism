@@ -258,6 +258,40 @@
         params (if max-cap (conj params max-cap) params)
         params (if min-price-20d (conj params min-price-20d) params)
         params (if max-price-20d (conj params max-price-20d) params)
+        params (if min-iv-20d (conj params min-iv-20d) params)
+        params (if max-iv-20d (conj params max-iv-20d) params)
+        params (if min-oi-20d (conj params min-oi-20d) params)
+        params (if max-oi-20d (conj params max-oi-20d) params)
+        params (if min-volume-20d (conj params min-volume-20d) params)
+        params (if max-volume-20d (conj params max-volume-20d) params)
+        params (if min-delta-20d (conj params min-delta-20d) params)
+        params (if max-delta-20d (conj params max-delta-20d) params)
+        params (if min-gamma-20d (conj params min-gamma-20d) params)
+        params (if max-gamma-20d (conj params max-gamma-20d) params)
+        params (if min-theta-20d (conj params min-theta-20d) params)
+        params (if max-theta-20d (conj params max-theta-20d) params)
+        params (if min-vega-20d (conj params min-vega-20d) params)
+        params (if max-vega-20d (conj params max-vega-20d) params)
+        params (if min-rho-20d (conj params min-rho-20d) params)
+        params (if max-rho-20d (conj params max-rho-20d) params)
+        params (if min-price-100d (conj params min-price-100d) params)
+        params (if max-price-100d (conj params max-price-100d) params)
+        params (if min-iv-100d (conj params min-iv-100d) params)
+        params (if max-iv-100d (conj params max-iv-100d) params)
+        params (if min-oi-100d (conj params min-oi-100d) params)
+        params (if max-oi-100d (conj params max-oi-100d) params)
+        params (if min-volume-100d (conj params min-volume-100d) params)
+        params (if max-volume-100d (conj params max-volume-100d) params)
+        params (if min-delta-100d (conj params min-delta-100d) params)
+        params (if max-delta-100d (conj params max-delta-100d) params)
+        params (if min-gamma-100d (conj params min-gamma-100d) params)
+        params (if max-gamma-100d (conj params max-gamma-100d) params)
+        params (if min-theta-100d (conj params min-theta-100d) params)
+        params (if max-theta-100d (conj params max-theta-100d) params)
+        params (if min-vega-100d (conj params min-vega-100d) params)
+        params (if max-vega-100d (conj params max-vega-100d) params)
+        params (if min-rho-100d (conj params min-rho-100d) params)
+        params (if max-rho-100d (conj params max-rho-100d) params)
         params (into params
                      [(- (int (/ (System/currentTimeMillis) 1000))
                          (* 24 3600 21))
@@ -408,10 +442,97 @@
          (when max-cap
            " AND JSON_VALUE(live_quote.data, '$.marketCap') <= ?")
 
+         ;; 20 days averages
          (when min-price-20d
            " AND ABS(bid - bid20d)/bid >= ?")
          (when max-price-20d
            " AND ABS(bid - bid20d)/bid <= ?")
+
+         (when min-iv-20d
+           " AND ABS(impliedVolatility - iv20d)/impliedVolatility >= ?")
+         (when max-iv-20d
+           " AND ABS(impliedVolatility - iv20d)/impliedVolatility <= ?")
+
+         (when min-oi-20d
+           " AND ABS(openInterest - oi20d)/openInterest >= ?")
+         (when max-oi-20d
+           " AND ABS(openInterest - oi20d)/openInterest <= ?")
+
+         (when min-volume-20d
+           " AND ABS(volume - vol20d)/volume >= ?")
+         (when max-volume-20d
+           " AND ABS(volume - vol20d)/volume <= ?")
+
+         (when min-delta-20d
+           " AND ABS(delta - delta20d)/delta >= ?")
+         (when max-delta-20d
+           " AND ABS(delta - delta20d)/delta <= ?")
+
+         (when min-gamma-20d
+           " AND ABS(gamma - gamma20d)/gamma >= ?")
+         (when max-gamma-20d
+           " AND ABS(gamma - gamma20d)/gamma <= ?")
+         
+         (when min-theta-20d
+           " AND ABS(theta - theta20d)/theta >= ?")
+         (when max-theta-20d
+           " AND ABS(theta - theta20d)/theta <= ?")
+         
+         (when min-vega-20d
+           " AND ABS(vega - vega20d)/vega >= ?")
+         (when max-vega-20d
+           " AND ABS(vega - vega20d)/vega <= ?")
+         
+         (when min-rho-20d
+           " AND ABS(rho - rho20d)/rho >= ?")
+         (when max-rho-20d
+           " AND ABS(rho - rho20d)/rho <= ?")
+
+         ;; 100 days averages
+         (when min-price-100d
+           " AND ABS(bid - bid100d)/bid >= ?")
+         (when max-price-100d
+           " AND ABS(bid - bid100d)/bid <= ?")
+
+         (when min-iv-100d
+           " AND ABS(impliedVolatility - iv100d)/impliedVolatility >= ?")
+         (when max-iv-100d
+           " AND ABS(impliedVolatility - iv100d)/impliedVolatility <= ?")
+
+         (when min-oi-100d
+           " AND ABS(openInterest - oi100d)/openInterest >= ?")
+         (when max-oi-100d
+           " AND ABS(openInterest - oi100d)/openInterest <= ?")
+
+         (when min-volume-100d
+           " AND ABS(volume - vol100d)/volume >= ?")
+         (when max-volume-100d
+           " AND ABS(volume - vol100d)/volume <= ?")
+
+         (when min-delta-100d
+           " AND ABS(delta - delta100d)/delta >= ?")
+         (when max-delta-100d
+           " AND ABS(delta - delta100d)/delta <= ?")
+
+         (when min-gamma-100d
+           " AND ABS(gamma - gamma100d)/gamma >= ?")
+         (when max-gamma-100d
+           " AND ABS(gamma - gamma100d)/gamma <= ?")
+         
+         (when min-theta-100d
+           " AND ABS(theta - theta100d)/theta >= ?")
+         (when max-theta-100d
+           " AND ABS(theta - theta100d)/theta <= ?")
+         
+         (when min-vega-100d
+           " AND ABS(vega - vega100d)/vega >= ?")
+         (when max-vega-100d
+           " AND ABS(vega - vega100d)/vega <= ?")
+         
+         (when min-rho-100d
+           " AND ABS(rho - rho100d)/rho >= ?")
+         (when max-rho-100d
+           " AND ABS(rho - rho100d)/rho <= ?")
          
          ;; Opt-type
          (when (not puts) " AND opttype <> 'P'")

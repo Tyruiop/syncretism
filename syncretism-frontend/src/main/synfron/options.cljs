@@ -104,10 +104,19 @@
     (= id :lastCrawl)
     (s-to-h-min (- (- (cur-local-time) offset) v))
     
-    (or (= id :expiration) (= id :lastTradeDate))
+    (= id :lastTradeDate)
     [:p
      (if (number? v)
-       (-> (from-ts (+ (or v 0) offset-exp)) (str/split #",") first)
+       (-> (from-ts (+ v offset-exp)) (str/split #",") first)
+       (str v))]
+
+    (= id :expiration)
+    [:p
+     (if (number? v)
+       (let [ts (+ v offset-exp)]
+         (str
+          (-> (from-ts (+ v offset-exp)) (str/split #",") first)
+          " (" (inc (int (/ (- ts (cur-ny-time)) 86400))) "d)"))
        (str v))]
     
     (or (= id :impliedVolatility)

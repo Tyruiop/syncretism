@@ -238,6 +238,7 @@ input[type="number"] { width:3em; margin:0 0.5em; }
     padding:4px 4px;
     padding-right:1.4em;
 }
+.options > .row > .cell > p { white-space:nowrap; }
 .options > .row > .cell.buttons { white-space: nowrap; padding-right:1em; }
 .options > .row.header > .cell > p { position:relative; white-space:nowrap; }
 .options > .row.header > .cell > p > span.descr {

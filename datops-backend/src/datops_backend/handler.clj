@@ -603,7 +603,7 @@
        (json/write-str (get-catalysts [ticker])))
   (GET "/ops/historical/:contract" [contract]
        (json/write-str (get-timeseries contract)))
-  (GET "/market/status" req (pr-str {:status (market-time (System/currentTimeMillis))}))
+  (GET "/market/status" req (json/write-str {:status (market-time (System/currentTimeMillis))}))
   (route/not-found "Not Found"))
 
 (def app

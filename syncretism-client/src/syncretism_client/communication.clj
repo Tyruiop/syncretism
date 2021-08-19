@@ -21,7 +21,7 @@
 
 (defn get-historical
   [cs]
-  (-> (str (:server @state/state) "/ops/historical" cs)
+  (-> (str (:server @state/state) "/ops/historical/" cs)
       http/get
       :body
       (json/read-str :key-fn keyword)))
@@ -35,7 +35,7 @@
 
 (defn get-ladder
   []
-  (-> (str (:server @state/state) "/ops/ladder" ticker "/" opttype "/" expiration)
+  (-> (str (:server @state/state) "/ops/ladder/" ticker "/" opttype "/" expiration)
       http/get
       :body
       (json/read-str :key-fn keyword)))

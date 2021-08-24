@@ -5,6 +5,8 @@
  :local-crawler false
  ;; Where do we store permanent data
  :data-path "data/"
+ ;; TD Ameritrade API KEY
+ :td-ameritrade-key "ENTER KEY"
  
  ;; All currently loaded data 
  :data

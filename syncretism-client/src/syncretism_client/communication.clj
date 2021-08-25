@@ -39,3 +39,10 @@
       http/get
       :body
       (json/read-str :key-fn keyword)))
+
+(defn get-td-ameritrade-ladder
+  []
+  (-> (str (:td-ameritrade-api @state/state) "/chains?apikey=" (:td-ameritrade-key @state/state) "&symbol=" ticker)
+      http/get
+      :body
+      (json/read-str :key-fn keyword)))

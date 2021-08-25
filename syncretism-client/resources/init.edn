@@ -7,6 +7,8 @@
  :data-path "data/"
  ;; TD Ameritrade API KEY
  :td-ameritrade-key "ENTER KEY"
+ ;; TD Ameritrade API Endpoint
+ :td-ameritrade-api "https://api.tdameritrade.com/v1/marketdata/"
  
  ;; All currently loaded data 
  :data

@@ -12,12 +12,11 @@
   [& args]
   (if (= "--init" (first args))
     (db/init-db)
-    (let [fname (str (:save-path shared/config) "/queue.edn")]
+    (do
+      (options/init-queue)
       (future (fundamentals/crawler))
-      (future
-        (if (.exists (io/file fname))
-          (options/crawler (-> fname slurp read-string distinct))
-          (options/crawler nil))))))
+      (future (options/crawler)))))
 
 ;; Start from here in emacs for live code reload
 ;; (-main)
+

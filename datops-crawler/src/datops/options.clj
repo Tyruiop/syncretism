@@ -7,7 +7,7 @@
    [clojure.set :as set]
    [clj-http.client :as http]
    [datops.db :as odb]
-   [datops.shared :refer [config symbols update-tickers-dict]]
+   [datops.shared :refer [config state symbols update-tickers-dict]]
    [datops.endpoints :refer [all-endpoints available-endpoints
                              register-failure sort-endpoints]]
    [syncretism.time :refer [cur-ny-time market-time]]
@@ -115,9 +115,20 @@
   "Once a day, clean the queue, queue is short enough that it doesn't really matter when.
   t is in seconds"
   [t]
-  (while true
-    (clean-queue-inside-loop)
-    (Thread/sleep (* t 1000))))
+  (case (:options-status @state)
+    :running
+    (do
+      (clean-queue-inside-loop)
+      (Thread/sleep (* t 1000))
+      (recur t))
+
+    :paused
+    (do
+      (Thread/sleep (* t 1000))
+      (recur t))
+
+    :terminate
+    :terminated))
 
 ;; Map[[type symbol date strike], Map[kw, dataval]]
 ;; Not used for now, let's just dump directly to file.
@@ -233,48 +244,67 @@
   and saving the data"
   [config]
   ;; Re-order queue
-  (info (str "Running scheduler (iteration: " @iter ")"))
+  (println (str "Running scheduler (iteration: " @iter ")"))
   (swap! queue #(into [] (sort-by last %)))
   ;; Re-order proxies
   (sort-endpoints)
   (spit (str (:save-path config) "/status.edn") (pr-str @all-endpoints))
   (spit (str (:save-path config) "/queue.edn") (pr-str @queue))
-  (info (str "Seen options: " (count @options-set) " | queue size: " (count @queue)))
+  (println (str "Seen options: " (count @options-set) " | queue size: " (count @queue)))
   (let [data (take (:batch-size config) @agent-live-options)
         c-data (count data)]
     (try
-      (info (str "SQL Write in progress, " c-data " rows."))
+      (println (str "SQL Write in progress, " c-data " rows."))
       (odb/insert-or-update-live data)
       (catch Exception e (error (str "SQL FAILURE " e))))
     (send agent-live-options (fn [old] (into [] (drop c-data old))))))
 
+(defn init-queue
+  []
+  (let [fname (str (:save-path config) "/queue.edn")]
+    (if (.exists (io/file fname))
+      (reset! queue (-> fname slurp read-string distinct))
+      (clean-queue-inside-loop))))
+
 (defn crawler
-  [init-queue]
-  (if (nil? init-queue)
-    (clean-queue-inside-loop)
-    (reset! queue init-queue))
+  []
   ;; Trigger clean-queue-loop, if queue was empty, update is twice in a row, I can
   ;; live with that.
   (future (clean-queue-loop (:t-clean-queue config)))
   (let [nb-endpoints (:nb-endpoints config)
         old-time (atom 0)]
-    (while (not-empty @queue)
-      (let [cur-time (System/currentTimeMillis)
-            is-market (market-time cur-time)
-            cur-op (first @queue)
-            endpoint (nth @available-endpoints (mod @iter nb-endpoints))]
-        (if (or (not= "CLOSED" is-market) (:force-crawl config))
-          (do
-            (swap! queue #(->> % rest (into [])))
-            (future (process-queue (:debug config) endpoint cur-op))
-            (when (> (/ (- cur-time @old-time) 1000) (:t-reorder config))
-              (reset! old-time cur-time)
-              (scheduler config))
-            (swap! iter inc))
-          (do
-            (when (= (mod @iter (* nb-endpoints 500)) 0)
-              (info "Currently outside of [PRE|POST] market hours."))))
-        (Thread/sleep (/ 2000 nb-endpoints))))
+    (loop []
+      (case (:options-status @state)
+        
+        :running
+        (let [cur-time (System/currentTimeMillis)
+              is-market (market-time cur-time)
+              cur-op (first @queue)
+              endpoint (nth @available-endpoints (mod @iter nb-endpoints))]
+          (if (or (not= "CLOSED" is-market) (:force-crawl config))
+            (do
+              (swap! queue #(->> % rest (into [])))
+              (future (process-queue (:debug config) endpoint cur-op))
+              (when (> (/ (- cur-time @old-time) 1000) (:t-reorder config))
+                (reset! old-time cur-time)
+                (scheduler config))
+              (swap! iter inc))
+            (do
+              (when (= (mod @iter (* nb-endpoints 500)) 0)
+                (info "Currently outside of [PRE|POST] market hours."))))
+          (Thread/sleep (/ 2000 nb-endpoints))
+          (recur))
+
+        :paused
+        (do
+          (Thread/sleep 1000)
+          (recur))
+
+        :terminate
+        (do
+          (info "Terminating options crawler.")
+          :done)
+        ))
     (warn "Crawler coming to a halt.")))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;

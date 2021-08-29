@@ -14,6 +14,6 @@
                  [com.velisco/clj-ftp "0.3.12"]
 
                  [org.clojars.tyruiop/syncretism "0.1.1"]]
-  :main ^:skip-aot syncretism.core
+  :main ^:skip-aot syncretism.crawler.core
   :target-path "target/%s"
   :profiles {:uberjar {:aot :all}})

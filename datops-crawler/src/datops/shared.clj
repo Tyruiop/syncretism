@@ -7,6 +7,12 @@
    [taoensso.timbre.appenders.core :as appenders]
    [miner.ftp :as ftp]))
 
+(def state
+  (atom
+   {;; possible status: `:running`, `:paused`, `:terminate`
+    :fundamentals-status :paused
+    :options-status :running}))
+
 (timbre/merge-config!
  {:appenders {:println {:enabled? false}
               :spit (appenders/spit-appender {:fname "opts-crawler.log"})}})

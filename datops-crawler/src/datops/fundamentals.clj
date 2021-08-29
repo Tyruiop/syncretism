@@ -4,7 +4,7 @@
    [clojure.data.json :as json]
    [clj-http.client :as http]
    [datops.db :as odb]
-   [datops.shared :refer [symbols]]
+   [datops.shared :refer [symbols state]]
    [syncretism.time :refer [market-time]]))
 
 (defn format-address
@@ -29,22 +29,29 @@
         (get "result")
         first)))
 
-(defn process-data
-  [[ticker & r]]
-  (when ticker
-    (try
-      (let [data (get-ticker-data ticker)]
-        (odb/insert-or-update-fundamentals ticker (json/write-str data)))
-      (catch Exception e (warn (str "Error with ticker " ticker))))
-    (Thread/sleep 1800)
-    (recur r)))
-
 (defn crawler
-  []
-  (when (= "CLOSED" (market-time (System/currentTimeMillis)))
-    (let [tickers (keys @symbols)]
-      (info (str "Gathering fundamental data for " (count tickers) " symbols."))
-      (process-data tickers)
-      (info (str "Fundamental data acquisition for " (count tickers) " symbols"))))
-  (Thread/sleep (* 3 60 60 1000)) ;; wait 3h, so we don't do it so often.
-  (recur))
+  ([] (crawler [] (keys @symbols)))
+  ([seen [ticker & r :as tickers]]
+   (case (:fundamentals-status @state)
+     :running
+     (if ticker
+       (do
+         (println (format "Gathering fundamentals for %s" ticker))
+         (try
+           (let [data (get-ticker-data ticker)]
+             (odb/insert-or-update-fundamentals ticker (json/write-str data)))
+           (catch Exception e (warn (str "Error with ticker " ticker))))
+         (Thread/sleep 1800)
+         (recur (conj seen ticker) r))
+       (recur [] (keys @symbols)))
+
+     :paused
+     (do
+       (Thread/sleep 1000)
+       (recur seen tickers))
+
+     :terminate
+     (do
+       (info "Terminating fundamentals crawler.")
+       :done))))
+

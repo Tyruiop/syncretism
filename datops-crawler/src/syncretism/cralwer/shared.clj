@@ -1,4 +1,4 @@
-(ns datops.shared
+(ns syncretism.crawler.shared
   (:require
    [clojure.string :as str]
    [clojure.set :as set]

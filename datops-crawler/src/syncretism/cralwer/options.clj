@@ -1,4 +1,4 @@
-(ns datops.options
+(ns syncretism.crawler.options
   (:require
    [taoensso.timbre :as timbre :refer [info warn error]]
    [clojure.java.io :as io]
@@ -6,10 +6,10 @@
    [clojure.data.json :as json]
    [clojure.set :as set]
    [clj-http.client :as http]
-   [datops.db :as odb]
-   [datops.shared :refer [config state symbols update-tickers-dict]]
-   [datops.endpoints :refer [all-endpoints available-endpoints
-                             register-failure sort-endpoints]]
+   [syncretism.crawler.db :as odb]
+   [syncretism.crawler.shared :refer [config state symbols update-tickers-dict]]
+   [syncretism.crawler.endpoints :refer [all-endpoints available-endpoints
+                                         register-failure sort-endpoints]]
    [syncretism.time :refer [cur-ny-time market-time]]
    [syncretism.greeks :as gks])
   (:gen-class))
@@ -244,17 +244,17 @@
   and saving the data"
   [config]
   ;; Re-order queue
-  (println (str "Running scheduler (iteration: " @iter ")"))
+  (info (str "Running scheduler (iteration: " @iter ")"))
   (swap! queue #(into [] (sort-by last %)))
   ;; Re-order proxies
   (sort-endpoints)
   (spit (str (:save-path config) "/status.edn") (pr-str @all-endpoints))
   (spit (str (:save-path config) "/queue.edn") (pr-str @queue))
-  (println (str "Seen options: " (count @options-set) " | queue size: " (count @queue)))
+  (info (str "Seen options: " (count @options-set) " | queue size: " (count @queue)))
   (let [data (take (:batch-size config) @agent-live-options)
         c-data (count data)]
     (try
-      (println (str "SQL Write in progress, " c-data " rows."))
+      (info (str "SQL Write in progress, " c-data " rows."))
       (odb/insert-or-update-live data)
       (catch Exception e (error (str "SQL FAILURE " e))))
     (send agent-live-options (fn [old] (into [] (drop c-data old))))))

@@ -1,11 +1,11 @@
-(ns datops.core
+(ns syncretism.crawler.core
   (:gen-class)
   (:require
    [clojure.java.io :as io]
-   [datops.db :as db]
-   [datops.shared :as shared]
-   [datops.options :as options]
-   [datops.fundamentals :as fundamentals]))
+   [syncretism.crawler.db :as db]
+   [syncretism.crawler.shared :as shared]
+   [syncretism.crawler.options :as options]
+   [syncretism.crawler.fundamentals :as fundamentals]))
 
 (defn -main
   "Starts the option crawler, reloading the last saved queue if it exists."

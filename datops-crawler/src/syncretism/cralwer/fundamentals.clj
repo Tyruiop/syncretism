@@ -1,10 +1,10 @@
-(ns datops.fundamentals
+(ns syncretism.crawler.fundamentals
   (:require
    [taoensso.timbre :as timbre :refer [info warn error]]
    [clojure.data.json :as json]
    [clj-http.client :as http]
-   [datops.db :as odb]
-   [datops.shared :refer [symbols state]]
+   [syncretism.crawler.db :as odb]
+   [syncretism.crawler.shared :refer [symbols state]]
    [syncretism.time :refer [market-time]]))
 
 (defn format-address

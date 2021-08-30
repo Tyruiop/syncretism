@@ -5,7 +5,9 @@
    [clojure.data.csv :as csv]
    [taoensso.timbre :as timbre :refer [info warn error]]
    [taoensso.timbre.appenders.core :as appenders]
-   [miner.ftp :as ftp]))
+   [miner.ftp :as ftp]
+   [clojure.data.json :as json]
+   [clj-http.client :as http]))
 
 (def state
   (atom
@@ -18,6 +20,14 @@
               :spit (appenders/spit-appender {:fname "opts-crawler.log"})}})
 
 (def config (-> "resources/config.edn" slurp read-string))
+
+;; rfr returns historical rfr data from St. Louis FRED (for later use)
+(defn rfr
+  []
+      (-> (str "https://api.stlouisfed.org/fred/series/observations?series_id=DGS10&api_key=" (:fred-api-key @config) "&file_type=json")
+          http/get
+          :body
+          (json/read-str :key-fn keyword)))
 
 ;; GETTING SYMBOLS LIST
 ;; --------------------

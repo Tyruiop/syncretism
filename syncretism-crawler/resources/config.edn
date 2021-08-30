@@ -19,6 +19,6 @@
  ;; Where to save the options data
  :save-path "options"
 
- ;; Risk free interest rate (ask google)
- :risk-free 0.0154
+ ;; St. Louis FRED api key
+ :fred-api-key "ENTER KEY"
  }

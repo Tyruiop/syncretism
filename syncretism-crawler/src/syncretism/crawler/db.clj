@@ -1,4 +1,4 @@
-(ns datops.db
+(ns syncretism.crawler.db
   (:require
    [clojure.string :as str]
    [next.jdbc :as jdbc]

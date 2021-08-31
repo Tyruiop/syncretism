@@ -1,4 +1,4 @@
-(defproject datops "0.1.0"
+(defproject syncretism.crawler "0.1.1"
   :description "Option data crawler"
   :url "https://github.com/Tyruiop/syncretism"
   :license {:name "GNU AGPL-V3 or later"
@@ -14,6 +14,6 @@
                  [com.velisco/clj-ftp "0.3.12"]
 
                  [org.clojars.tyruiop/syncretism "0.1.1"]]
-  :main ^:skip-aot datops.core
+  :main ^:skip-aot syncretism.crawler.core
   :target-path "target/%s"
   :profiles {:uberjar {:aot :all}})

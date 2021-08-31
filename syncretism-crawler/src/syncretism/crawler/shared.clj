@@ -1,4 +1,4 @@
-(ns datops.shared
+(ns syncretism.crawler.shared
   (:require
    [clojure.string :as str]
    [clojure.set :as set]
@@ -6,6 +6,12 @@
    [taoensso.timbre :as timbre :refer [info warn error]]
    [taoensso.timbre.appenders.core :as appenders]
    [miner.ftp :as ftp]))
+
+(def state
+  (atom
+   {;; possible status: `:running`, `:paused`, `:terminate`
+    :fundamentals-status :paused
+    :options-status :running}))
 
 (timbre/merge-config!
  {:appenders {:println {:enabled? false}

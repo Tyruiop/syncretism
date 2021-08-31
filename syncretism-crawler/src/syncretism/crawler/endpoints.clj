@@ -1,4 +1,4 @@
-(ns datops.endpoints
+(ns syncretism.crawler.endpoints
   (:require
    [taoensso.timbre :as timbre :refer [info warn error]]))
 

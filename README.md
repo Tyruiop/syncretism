@@ -8,7 +8,7 @@ We try to minimize dependencies to make it easy to install and run locally.
 Join us on [Discord](https://discord.gg/qBWD5Sus3d) for any question you might have. 
 Use [Github Issues](https://github.com/Tyruiop/syncretism/issues) for bug reports & feature requests.
 
-## Crawler `/datops-crawler`
+## Crawler `/syncretism-crawler`
 
 This crawlers targets **Yahoo Finance** market data to extract options related information.
 

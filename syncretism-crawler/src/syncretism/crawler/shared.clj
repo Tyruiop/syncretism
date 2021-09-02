@@ -13,7 +13,8 @@
   (atom
    {;; possible status: `:running`, `:paused`, `:terminate`
     :fundamentals-status :paused
-    :options-status :running}))
+    :options-status :running
+    :rfr-status :paused}))
 
 (timbre/merge-config!
  {:appenders {:println {:enabled? false}
@@ -28,6 +29,30 @@
           http/get
           :body
           (json/read-str :key-fn keyword)))
+
+(defn rfr-crawler
+      []
+       (case (:rfr-status @state)
+         :running
+         (do
+           (println (format "Gathering the Risk Free Rate"))
+           (try
+             (let [data (rfr)]
+                  (json/write-str data))
+             (catch Exception e (warn  "Error with Risk Free Rate")))
+           (Thread/sleep (* 24 60 60 1000))
+           (recur))
+
+         :paused
+         (do
+           (Thread/sleep (* 10 1000))
+           (recur))
+
+         :terminate
+         (do
+           (info "Terminating Risk Free Rate crawler.")
+           :done))
+      )
 
 ;; GETTING SYMBOLS LIST
 ;; --------------------

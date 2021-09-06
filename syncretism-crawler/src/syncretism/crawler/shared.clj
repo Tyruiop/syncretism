@@ -14,7 +14,7 @@
    {;; possible status: `:running`, `:paused`, `:terminate`
     :fundamentals-status :paused
     :options-status :running
-    :rfr-status :paused}))
+    :rfr-status :running}))
 
 (timbre/merge-config!
  {:appenders {:println {:enabled? false}
@@ -32,13 +32,13 @@
 
 (defn rfr-crawler
       []
+       (def risk-free-rate (atom "Not Crawled"))
        (case (:rfr-status @state)
          :running
          (do
            (println (format "Gathering the Risk Free Rate"))
            (try
-             (let [data (rfr)]
-                  (json/write-str data))
+             (reset! risk-free-rate (atom rfr))
              (catch Exception e (warn  "Error with Risk Free Rate")))
            (Thread/sleep (* 24 60 60 1000))
            (recur))

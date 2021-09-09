@@ -3,8 +3,6 @@
   (:require
    [fastmath.random :as fr]))
 
-;; Risk free interest rate, 
-(def rfr 0.0154)
 (def cdf-normal (fn [x] (fr/cdf (fr/distribution :normal) x)))
 
 (defn calc-annual-yield
@@ -22,13 +20,13 @@
 (defn calc-d1
   [{s0 :stock-price q :yield X :strike t :t v :impliedVolatility :as data}]
   (/ (+ (Math/log (/ s0 X))
-        (* t (+ (- rfr q) (/ (Math/pow v 2) 2))))
+        (* t (+ (- risk-free-rate q) (/ (Math/pow v 2) 2))))
      (* v (Math/sqrt t))))
 (defn calc-d2 [d1 v t] (- d1 (* v (Math/sqrt t))))
 
 (defn calc-premium
   [{opt-type :opt-type X :strike s0 :stock-price eqt :eqt d1 :d1 d2 :d2 t :t q :yield}]
-  (let [xert (* X (Math/exp (- (* rfr t))))
+  (let [xert (* X (Math/exp (- (* risk-free-rate t))))
         s0eqt (* s0 eqt)]
     (cond (= opt-type "C")
           (- (* s0eqt (cdf-normal d1)) (* xert (cdf-normal d2)))
@@ -57,7 +55,7 @@
   (let [p1 (- (/
                (* s0 v eqt (Math/exp (- (/ (* d1 d1) 2))))
                (* 2 (Math/sqrt t) (Math/sqrt (* 2 Math/PI)))))
-        p2 (* rfr X (Math/exp (- (* rfr t))))
+        p2 (* risk-free-rate X (Math/exp (- (* risk-free-rate t))))
         p3 (* q s0 eqt)]
     (*
      (/ 1 365)
@@ -75,7 +73,7 @@
 
 (defn calc-rho
   [{opt-type :opt-type X :strike t :t d2 :d2}]
-  (let [xtert (* X t (Math/exp (- (* rfr t))))]
+  (let [xtert (* X t (Math/exp (- (* risk-free-rate t))))]
     (cond (= opt-type "C")
           (/ (* xtert (cdf-normal d2)) 100)
 
@@ -99,6 +97,6 @@
           [:rho (calc-rho full-data)]
           [:premium (calc-premium full-data)]
           [:dividendYield q]
-          [:rfr rfr]]
+          [:rfr risk-free-rate]]
          (filter #(-> % last Double/isNaN not))
          (into {}))))

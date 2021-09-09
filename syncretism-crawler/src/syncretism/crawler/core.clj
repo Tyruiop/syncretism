@@ -13,6 +13,7 @@
   (if (= "--init" (first args))
     (db/init-db)
     (do
+      (shared/rfr-crawler)
       (options/init-queue)
       (future (fundamentals/crawler))
       (future (options/crawler)))))

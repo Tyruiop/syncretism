@@ -5,19 +5,54 @@
    [clojure.data.csv :as csv]
    [taoensso.timbre :as timbre :refer [info warn error]]
    [taoensso.timbre.appenders.core :as appenders]
-   [miner.ftp :as ftp]))
+   [miner.ftp :as ftp]
+   [clojure.data.json :as json]
+   [clj-http.client :as http]))
 
 (def state
   (atom
    {;; possible status: `:running`, `:paused`, `:terminate`
     :fundamentals-status :paused
-    :options-status :running}))
+    :options-status :running
+    :rfr-status :running}))
 
 (timbre/merge-config!
  {:appenders {:println {:enabled? false}
               :spit (appenders/spit-appender {:fname "opts-crawler.log"})}})
 
 (def config (-> "resources/config.edn" slurp read-string))
+
+;; rfr returns historical rfr data from St. Louis FRED (for later use)
+(defn rfr
+  []
+      (-> (str "https://api.stlouisfed.org/fred/series/observations?series_id=DGS10&api_key=" (:fred-api-key @config) "&file_type=json")
+          http/get
+          :body
+          (json/read-str :key-fn keyword)))
+
+(defn rfr-crawler
+      []
+       (def risk-free-rate (atom "Not Crawled"))
+       (case (:rfr-status @state)
+         :running
+         (do
+           (println (format "Gathering the Risk Free Rate"))
+           (try
+             (reset! risk-free-rate (atom rfr))
+             (catch Exception e (warn  "Error with Risk Free Rate")))
+           (Thread/sleep (* 24 60 60 1000))
+           (recur))
+
+         :paused
+         (do
+           (Thread/sleep (* 10 1000))
+           (recur))
+
+         :terminate
+         (do
+           (info "Terminating Risk Free Rate crawler.")
+           :done))
+      )
 
 ;; GETTING SYMBOLS LIST
 ;; --------------------

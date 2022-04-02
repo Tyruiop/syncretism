@@ -26,7 +26,8 @@
         (menu-entry cur-view :options))]
      [:div {:class "top-right-menu"}
       [:p [:a {:href "https://github.com/Tyruiop/syncretism" :target "_blank"} "Github"]]
-      [:p [:a {:href "https://ops.syncretism.io/api.html" :target "_blank"} "API"]]
+      [:p [:a {:href "https://github.com/Tyruiop/syncretism/blob/main/datops-backend/API.md"
+               :target "_blank"} "API"]]
       [:p [:a {:href "https://discord.gg/qBWD5Sus3d" :target "_blank"} "Discord"]]
       [:p [:a {:href "https://www.buymeacoffee.com/syncretism" :target "_blank"}
            "Buy me a coffee"]]

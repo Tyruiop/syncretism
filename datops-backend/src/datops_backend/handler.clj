@@ -339,6 +339,22 @@
          (when max-diff
            " AND strike >= ? * regularmarketprice AND strike <= ? * regularmarketprice")
 
+         ;; Breakeven price
+         (when min-breakeven
+           (str
+            " AND ("
+            "(opttype == 'P' AND ABS(regularmarketprice - (strike - ask))/(strike - ask) >= ?)"
+            " OR "
+            "(opttype == 'C' AND ABS(regularmarketprice - (strike + ask))/(strike + ask) >= ?)"
+            ")"))
+         (when max-breakeven
+           (str
+            " AND ("
+            "(opttype == 'P' AND ABS(regularmarketprice - (strike - ask))/(strike - ask) <= ?)"
+            " OR "
+            "(opttype == 'C' AND ABS(regularmarketprice - (strike + ask))/(strike + ask) <= ?)"
+            ")"))
+
          ;; ITM/OTM
          (when (not itm)
            " AND inTheMoney <> true")

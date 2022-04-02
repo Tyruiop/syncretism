@@ -20,6 +20,7 @@
   "Given an endpoint and possibly a proxy, extract a given ticker's option
   data on a given date (can be nil)."
   [{:keys [endpoint proxy]} ticker date]
+  (println ticker date)
   (let [addr (if date
                (str endpoint ticker "?date=" date)
                (str endpoint ticker))
@@ -290,7 +291,7 @@
           (if (or (not= "CLOSED" is-market) (:force-crawl config))
             (do
               (swap! queue #(->> % rest (into [])))
-              (process-queue (:debug config) endpoint cur-op)
+              (future (process-queue (:debug config) endpoint cur-op))
               (when (> (/ (- cur-time @old-time) 1000) (:t-reorder config))
                 (reset! old-time cur-time)
                 (scheduler config))

@@ -1,5 +1,5 @@
 {;; Should we crawl out of market hours
- :force-crawl false
+ :force-crawl true
 
  ;; Do we log debug info
  :debug false

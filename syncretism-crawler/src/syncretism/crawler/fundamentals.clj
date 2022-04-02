@@ -36,7 +36,7 @@
      :running
      (if ticker
        (do
-         (println (format "Gathering fundamentals for %s" ticker))
+         ;; (println (format "Gathering fundamentals for %s" ticker))
          (try
            (let [data (get-ticker-data ticker)]
              (odb/insert-or-update-fundamentals ticker (json/write-str data)))

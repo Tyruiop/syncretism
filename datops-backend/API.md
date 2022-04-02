@@ -36,6 +36,11 @@ the difference between `POST` and `GET` is that `GET` will only return options d
 
 * `otm [bool]`: select out of the money options, **default: true**.
 
+* `min-breakeven [float]`: minimum breakeven value in %. i.e. the required change in the underlying security for the 
+  option to be worth something given its current premium.
+
+* `max-breakeven [float]`: maximum breakeven value in %.
+
 * `min-ask-bid [float]`: minimum spread between bid and ask.
 
 * `max-ask-bid [float]`: maximum spread between bid and ask.

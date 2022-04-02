@@ -71,6 +71,11 @@
     :descr nil
     :id "ask-bid"}
 
+   {:title "Breakeven"
+    :type :min-max
+    :descr nil
+    :id "breakeven"}
+
    {:title "Days to expiration date"
     :type :min-max
     :descr nil

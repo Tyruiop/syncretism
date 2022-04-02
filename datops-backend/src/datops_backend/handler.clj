@@ -163,6 +163,7 @@
   [{:keys
     [tickers exclude
      min-diff max-diff itm otm
+     min-breakeven max-breakeven
      min-ask-bid max-ask-bid
      min-exp max-exp
      min-price max-price
@@ -226,6 +227,8 @@
                  (into params [(float (- 1 (/ max-diff 100)))
                                (float (+ 1 (/ max-diff 100)))])
                  params)
+        params (if min-breakeven (conj params min-breakeven) params)
+        params (if max-breakeven (conj params max-breakeven) params)
         params (if min-ask-bid (conj params min-ask-bid) params)
         params (if max-ask-bid (conj params max-ask-bid) params)
         params (if max-price (into params [max-price max-price]) params)
@@ -341,19 +344,9 @@
 
          ;; Breakeven price
          (when min-breakeven
-           (str
-            " AND ("
-            "(opttype == 'P' AND ABS(regularmarketprice - (strike - ask))/(strike - ask) >= ?)"
-            " OR "
-            "(opttype == 'C' AND ABS(regularmarketprice - (strike + ask))/(strike + ask) >= ?)"
-            ")"))
+           " AND breakeven >= ?/100")
          (when max-breakeven
-           (str
-            " AND ("
-            "(opttype == 'P' AND ABS(regularmarketprice - (strike - ask))/(strike - ask) <= ?)"
-            " OR "
-            "(opttype == 'C' AND ABS(regularmarketprice - (strike + ask))/(strike + ask) <= ?)"
-            ")"))
+           " AND breakeven <= ?/100")
 
          ;; ITM/OTM
          (when (not itm)

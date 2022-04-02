@@ -11,6 +11,7 @@
    [:optType "Type" "T"]
    [:strike "Strike" "Str"]
    [:expiration "Expiration" "Exp"]
+   [:breakeven "Breakeven" "Bre"]
    [:lastTradeDate "Last Trade Date" "LTD"]
    [:impliedVolatility "Implied Volatility" "IV"]
    [:iv20d "IV 20 days avg" "IV20d"]
@@ -109,6 +110,12 @@
      (if (number? v)
        (-> (from-ts (+ v offset-exp)) (str/split #",") first)
        (str v))]
+
+    (= id :breakeven)
+    [:p
+     (if (number? v)
+       (str (.toFixed (* 100 v) 2) "%")
+       (str v "%"))]
 
     (= id :expiration)
     [:p

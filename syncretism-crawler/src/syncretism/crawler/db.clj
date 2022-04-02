@@ -55,6 +55,7 @@ premium FLOAT,
 ask FLOAT,
 bid FLOAT,
 lastTradeDate BIGINT,
+breakeven FLOAT,
 quoteType VARCHAR(15),
 yield FLOAT,
 monthlyYield FLOAT,
@@ -85,6 +86,7 @@ rho20d FLOAT,
 rho100d FLOAT
 ) ENGINE=Aria;")
 
+;; (jdbc/execute! db ["ALTER TABLE live ADD COLUMN (breakeven FLOAT)"])
 ;; (jdbc/execute! db ["ALTER TABLE live ADD COLUMN (delta FLOAT)"])
 ;; (jdbc/execute! db ["ALTER TABLE live ADD COLUMN (gamma FLOAT)"])
 ;; (jdbc/execute! db ["ALTER TABLE live ADD COLUMN (rho FLOAT)"])
@@ -136,6 +138,7 @@ rho100d FLOAT
    [[:opt :bid] "bid"]
    [[:opt :lastTradeDate] "lastTradeDate"]
    [[:opt :quote-type] "quoteType"]
+   [[:opt :breakeven] "breakeven"]
    [[:opt :delta] "delta"]
    [[:opt :gamma] "gamma"]
    [[:opt :theta] "theta"]

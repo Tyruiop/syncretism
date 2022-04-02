@@ -4,7 +4,7 @@
    [fastmath.random :as fr]))
 
 ;; Risk free interest rate, 
-(def rfr 0.0154)
+(def rfr 0.0232)
 (def cdf-normal (fn [x] (fr/cdf (fr/distribution :normal) x)))
 
 (defn calc-annual-yield

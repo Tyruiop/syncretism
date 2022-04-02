@@ -183,10 +183,15 @@
                             :annual-dividend-rate (:trailingAnnualDividendRate quote)
                             :annual-dividend-yield (:tailingAnnualDividendYield quote)
                             :stock-price (:regularMarketPrice quote)))
-                          (catch Exception e (do (println e) {})))]
+                          (catch Exception e (do (println e) {})))
+                 breakeven (/ (Math/abs (- (:regularMarketPrice quote)
+                                           ((if (= t "C") + -)
+                                            (:strike opt)
+                                            (or (:ask opt) (:lastPrice opt)))))
+                              (:regularMarketPrice quote))]
              {:req-time cur-time
               :opt (merge
-                    (assoc opt :opt-type t :quote-type (:quoteType quote))
+                    (assoc opt :opt-type t :quote-type (:quoteType quote) :breakeven breakeven)
                     greeks)
               :quote
               (dissoc
@@ -270,6 +275,7 @@
   []
   ;; Trigger clean-queue-loop, if queue was empty, update is twice in a row, I can
   ;; live with that.
+  (println "Starting crawler")
   (future (clean-queue-loop (:t-clean-queue config)))
   (let [nb-endpoints (:nb-endpoints config)
         old-time (atom 0)]
@@ -284,7 +290,7 @@
           (if (or (not= "CLOSED" is-market) (:force-crawl config))
             (do
               (swap! queue #(->> % rest (into [])))
-              (future (process-queue (:debug config) endpoint cur-op))
+              (process-queue (:debug config) endpoint cur-op)
               (when (> (/ (- cur-time @old-time) 1000) (:t-reorder config))
                 (reset! old-time cur-time)
                 (scheduler config))

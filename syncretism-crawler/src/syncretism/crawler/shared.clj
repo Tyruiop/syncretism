@@ -10,7 +10,7 @@
 (def state
   (atom
    {;; possible status: `:running`, `:paused`, `:terminate`
-    :fundamentals-status :paused
+    :fundamentals-status :running
     :options-status :running}))
 
 (timbre/merge-config!
